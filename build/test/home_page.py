@@ -1,5 +1,4 @@
 from pathlib import Path
-import tkinter as tk
 import customtkinter
 from PIL import Image
 
@@ -15,9 +14,9 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-class home_page(tk.Frame):
+class home_page(customtkinter.CTkFrame):
     def __init__(self, parent, controller, os_properties):
-        tk.Frame.__init__(self, parent)
+        customtkinter.CTkFrame.__init__(self, parent)
         self.controller = controller
         self.os_properties = os_properties
 

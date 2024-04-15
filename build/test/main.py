@@ -1,6 +1,4 @@
 from pathlib import Path
-import tkinter as tk
-from tkinter import messagebox
 from custom_exit_message import CombinedModal
 from status_page import status_page
 from home_page import home_page
@@ -20,14 +18,16 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-class MultiPageApp(tk.Tk):
+class MultiPageApp(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
+        customtkinter.CTk.__init__(self, *args, **kwargs)
 
-        self.title("Multi-Page App")
+        self.title("RealFire Installer")
         self.geometry("1108x667")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
+        
+
 
         # Instantiate the OSProperties class
         self.os_properties = OSProperties()
@@ -36,7 +36,7 @@ class MultiPageApp(tk.Tk):
         self.os_properties.get_os()
 
         # Container to hold all the pages
-        container = tk.Frame(self)
+        container = customtkinter.CTkFrame(self)
         container.pack(side="top", fill="both", expand=True)
 
         container.grid_rowconfigure(0, weight=1)
@@ -47,7 +47,7 @@ class MultiPageApp(tk.Tk):
         for F in (home_page, install_page, remove_page, status_page):
             frame = F(container, self, os_properties=self.os_properties)
 
-            frame.configure(bg="#2B2631")
+            frame.configure(fg_color="#2B2631")
             frame.installer_img = customtkinter.CTkImage(
                 light_image=Image.open(
                     "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/img/installer_img.png"

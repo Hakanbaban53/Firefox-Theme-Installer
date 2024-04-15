@@ -1,6 +1,4 @@
 from pathlib import Path
-import tkinter as tk
-from tkinter import messagebox
 import customtkinter
 from PIL import Image
 
@@ -17,9 +15,9 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-class status_page(tk.Frame):
+class status_page(customtkinter.CTkFrame):
     def __init__(self, parent, controller, os_properties):
-        tk.Frame.__init__(self, parent)
+        customtkinter.CTkFrame.__init__(self, parent)
         self.controller = controller
         self.os_properties = os_properties
 

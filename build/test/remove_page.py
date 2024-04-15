@@ -1,7 +1,5 @@
 import os
 from pathlib import Path
-import tkinter as tk
-from tkinter import Canvas, messagebox
 import customtkinter
 from custom_exit_message import CombinedModal
 from PIL import Image
@@ -17,9 +15,9 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-class remove_page(tk.Frame):
+class remove_page(customtkinter.CTkFrame):
     def __init__(self, parent, controller, os_properties):
-        tk.Frame.__init__(self, parent)
+        customtkinter.CTkFrame.__init__(self, parent)
         self.controller = controller
         self.os_properties = os_properties
 
@@ -421,3 +419,84 @@ class remove_page(tk.Frame):
             self.firefox_folder_entry.configure(state="disabled")
             self.application_folder_entry.configure(state="disabled")
             self.profile_folder_name_entry.configure(state="disabled")
+
+
+    def custom_label(
+        self,
+        master_frame,
+        label_text,
+        label_text_color,
+        label_image,
+        label_font,
+        label_row,
+        label_column,
+        label_columnspan,
+        label_padx=0,
+        label_pady=0,
+        label_stciky="",
+    ):
+        label_config = {
+            "text": label_text,
+            "text_color": label_text_color,
+            "image": label_image,
+            "font": label_font,
+        }
+        label_widget = customtkinter.CTkLabel(master=master_frame, **label_config)
+        label_widget.grid(
+            row=label_row,
+            column=label_column,
+            columnspan=label_columnspan,
+            padx=label_padx,
+            pady=label_pady,
+            sticky=label_stciky,
+        )
+        return label_widget
+
+    def custom_entry(
+        self,
+        master_frame,
+        entry_placeholder_text,
+        file,
+        grid_row,
+        grid_column,
+        grid_padx=0,
+        grid_pady=0,
+        grid_sticky="",
+    ):
+        entry_config = {
+            "width": 342,
+            "height": 38,
+            "fg_color": "white",
+            "text_color": "black",
+            "corner_radius": 8,
+            "border_width": 3,
+            "bg_color": "#2B2631",
+            "border_color": "purple",
+            "placeholder_text": entry_placeholder_text,
+        }
+
+        entry_widget = customtkinter.CTkEntry(master=master_frame, **entry_config)
+        entry_widget.grid(
+            row=grid_row,
+            column=grid_column,
+            padx=grid_padx,
+            pady=grid_pady,
+            sticky=grid_sticky,
+        )
+
+        if file:  # Only bind events if the file parameter is provided
+            entry_widget.bind(
+                "<FocusOut>", lambda event: self.validate_location(entry_widget, ".png")
+            )
+            entry_widget.bind(
+                "<Return>", lambda event: self.validate_location(entry_widget, ".png")
+            )
+        else:
+            entry_widget.bind(
+                "<FocusOut>", lambda event: self.validate_location(entry_widget, None)
+            )
+            entry_widget.bind(
+                "<Return>", lambda event: self.validate_location(entry_widget, None)
+            )
+
+        return entry_widget

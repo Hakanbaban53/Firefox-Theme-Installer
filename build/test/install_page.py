@@ -1,7 +1,5 @@
 import os
 from pathlib import Path
-import tkinter as tk
-from tkinter import Canvas, messagebox
 from tkinter import colorchooser
 import customtkinter
 from custom_exit_message import CombinedModal
@@ -18,9 +16,9 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-class install_page(tk.Frame):
+class install_page(customtkinter.CTkFrame):
     def __init__(self, parent, controller, os_properties):
-        tk.Frame.__init__(self, parent)
+        customtkinter.CTkFrame.__init__(self, parent)
         self.controller = controller
         self.os_properties = os_properties
 
@@ -53,16 +51,18 @@ class install_page(tk.Frame):
             ),
             size=(300, 64),
         )
-        self.header_title_background_label = customtkinter.CTkLabel(
-            master=install_page_frame,
-            text="Status",
-            image=self.header_title_background,
-            text_color="White",
-            font=customtkinter.CTkFont(family="Inter", size=24, weight="bold"),
-            bg_color="#2B2631",
-        )
-        self.header_title_background_label.grid(
-            row=0, column=0, columnspan=2, padx=248, pady=(75, 0), sticky="NSEW"
+        self.header_title_background_label = self.custom_label(
+            install_page_frame,
+            "Check Varibles",
+            "White",
+            self.header_title_background,
+            customtkinter.CTkFont(family="Inter", size=24, weight="bold"),
+            0,
+            0,
+            2,
+            248,
+            (75, 0),
+            "NSEW",
         )
 
         self.line_top_image = customtkinter.CTkImage(
@@ -74,13 +74,18 @@ class install_page(tk.Frame):
             ),
             size=(650, 6),
         )
-        self.line_top_image_label = customtkinter.CTkLabel(
-            master=install_page_frame,
-            text="",
-            image=self.line_top_image,
-        )
-        self.line_top_image_label.grid(
-            row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+        self.line_top_image_label = self.custom_label(
+            install_page_frame,
+            "",
+            None,
+            self.line_top_image,
+            None,
+            1,
+            0,
+            2,
+            10,
+            (20, 30),
+            "NSEW",
         )
 
         inputs_frame = customtkinter.CTkFrame(
@@ -95,32 +100,29 @@ class install_page(tk.Frame):
         )
 
         # Profile Name
-        self.profile_folder_name_label = customtkinter.CTkLabel(
-            master=inputs_frame,
-            text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
-            text="Profile Folder",
+        self.profile_folder_name_label = self.custom_label(
+            inputs_frame,
+            "Profile Folder",
+            "white",
+            None,
+            customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            0,
+            0,
+            None,
+            (10,4),
+            0,
+            "W",
         )
-        self.profile_folder_name_label.grid(row=0, column=0, padx=(10, 4), sticky="w")
 
-        self.profile_folder_name_entry = customtkinter.CTkEntry(
-            master=inputs_frame,
-            width=342,
-            height=38,
-            state="disabled",
-            fg_color="white",
-            text_color="black",
-            corner_radius=8,
-            border_width=3,
-            bg_color="#2B2631",
-            border_color="purple",
-        )
-        self.profile_folder_name_entry.grid(
-            row=1, column=0, padx=(10, 4), pady=10, sticky="ew"
-        )
-        self.profile_folder_name_entry.bind(
-            "<FocusOut>",
-            lambda event: self.validate_file_location(self.profile_folder_name_entry),
+        self.profile_folder_name_entry = self.custom_entry(
+            inputs_frame,
+            "profile_folder_name_entry",
+            False,
+            grid_row=1,
+            grid_column=0,
+            grid_padx=(10, 4),
+            grid_pady=10,
+            grid_sticky="ew",
         )
 
         # Checkbox
@@ -140,71 +142,72 @@ class install_page(tk.Frame):
         self.edit_checkbox.grid(row=5, column=1, padx=(10, 4), pady=10, sticky="ew")
 
         # Firefox Folder
-        self.firefox_folder_label = customtkinter.CTkLabel(
-            master=inputs_frame,
-            text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
-            text="Firefox Folder",
+        self.firefox_folder_label = self.custom_label(
+            inputs_frame,
+            "Firefox Folder",
+            "white",
+            None,
+            customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            0,
+            1,
+            None,
+            (10,4),
+            0,
+            "W",
         )
-        self.firefox_folder_label.grid(row=0, column=1, padx=(10, 4), sticky="w")
 
-        self.firefox_folder_entry = customtkinter.CTkEntry(
-            master=inputs_frame,
-            width=342,
-            height=38,
-            state="disabled",
-            fg_color="white",
-            text_color="black",
-            corner_radius=8,
-            border_width=3,
-            bg_color="#2B2631",
-            border_color="orange",
-        )
-        self.firefox_folder_entry.grid(
-            row=1, column=1, padx=(10, 4), pady=10, sticky="ew"
-        )
-        self.firefox_folder_entry.bind(
-            "<FocusOut>",
-            lambda event: self.validate_file_location(self.firefox_folder_entry),
+        self.firefox_folder_entry = self.custom_entry(
+            inputs_frame,
+            "firefox_folder_entry",
+            False,
+            grid_row=1,
+            grid_column=1,
+            grid_padx=(10, 4),
+            grid_pady=10,
+            grid_sticky="ew",
         )
 
         # Application Folder
-        self.application_folder_label = customtkinter.CTkLabel(
-            master=inputs_frame,
-            text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
-            text="Application Folder",
-        )
-        self.application_folder_label.grid(row=2, column=0, padx=(10, 4), sticky="w")
 
-        self.application_folder_entry = customtkinter.CTkEntry(
-            master=inputs_frame,
-            width=342,
-            height=38,
-            state="disabled",
-            fg_color="white",
-            text_color="black",
-            corner_radius=8,
-            border_width=3,
-            bg_color="#2B2631",
-            border_color="green",
+        self.application_folder_label = self.custom_label(
+            inputs_frame,
+            "Firefox Folder",
+            "white",
+            None,
+            customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            2,
+            0,
+            None,
+            (10,4),
+            0,
+            "W",
         )
-        self.application_folder_entry.grid(
-            row=3, column=0, padx=(10, 4), pady=10, sticky="ew"
-        )
-        self.application_folder_entry.bind(
-            "<FocusOut>",
-            lambda event: self.validate_file_location(self.application_folder_entry),
+
+        self.application_folder_entry = self.custom_entry(
+            inputs_frame,
+            "application_folder_entry",
+            False,
+            grid_row=3,
+            grid_column=0,
+            grid_padx=(10, 4),
+            grid_pady=10,
+            grid_sticky="ew",
         )
 
         # Accent Color
-        self.accent_color_label = customtkinter.CTkLabel(
-            master=inputs_frame,
-            text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
-            text="Accent Color",
+        self.accent_color_label = self.custom_label(
+            inputs_frame,
+            "Accent Color",
+            "white",
+            None,
+            customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            2,
+            1,
+            None,
+            (10,4),
+            0,
+            "W",
         )
-        self.accent_color_label.grid(row=2, column=1, padx=(10, 4), sticky="w")
         self.accent_color_values = ["Blue", "Red", "Custom"]  # Initial values
         self.selected_color = None  # Store custom color
 
@@ -212,7 +215,6 @@ class install_page(tk.Frame):
             master=inputs_frame,
             width=342,
             height=38,
-            state="disabled",
             fg_color="white",
             text_color="black",
             values=self.accent_color_values,  # Use initial values
@@ -236,32 +238,29 @@ class install_page(tk.Frame):
         )
 
         # New tab wallpaper
-        self.newtab_wallpaper_label = customtkinter.CTkLabel(
-            master=inputs_frame,
-            text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
-            text="New Tab Wallpaper Location",
+        self.newtab_wallpaper_label = self.custom_label(
+            inputs_frame,
+            "New Tab Wallpaper Location",
+            "white",
+            None,
+            customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            4,
+            0,
+            None,
+            (10,4),
+            0,
+            "W",
         )
-        self.newtab_wallpaper_label.grid(row=4, column=0, padx=(10, 4), sticky="w")
 
-        self.newtab_wallpaper_entry = customtkinter.CTkEntry(
-            master=inputs_frame,
-            width=342,
-            height=38,
-            fg_color="white",
-            text_color="black",
-            state="disabled",
-            corner_radius=8,
-            border_width=3,
-            bg_color="#2B2631",
-            border_color="green",
-        )
-        self.newtab_wallpaper_entry.grid(
-            row=5, column=0, padx=(10, 4), pady=10, sticky="ew"
-        )
-        self.newtab_wallpaper_entry.bind(
-            "<FocusOut>",
-            lambda event: self.validate_png_location(self.newtab_wallpaper_entry),
+        self.newtab_wallpaper_entry = self.custom_entry(
+            inputs_frame,
+            "newtab_wallpaper_entry",
+            True,
+            grid_row=5,
+            grid_column=0,
+            grid_padx=(10, 4),
+            grid_pady=10,
+            grid_sticky="ew",
         )
 
         self.invalid_entry_frame = customtkinter.CTkFrame(
@@ -423,6 +422,7 @@ class install_page(tk.Frame):
         os_image.pack(
             padx=(4, 10), pady=10, side="right"
         )  # Pack on the right side with padding
+        self.checkbox_event()
 
     def on_accent_color_select(self, color):
         if color == "Custom":
@@ -438,23 +438,19 @@ class install_page(tk.Frame):
             self.accent_color_combobox.set(self.selected_color)  # Set custo
             self.accent_color_combobox.configure(button_color=self.selected_color)
 
-    def validate_file_location(self, entry_widget):
+    def validate_location(self, entry_widget, file_extension=None):
         location = entry_widget.get()
-        if os.path.exists(location):
-            entry_widget.configure(border_color="#10dc60")
-            # Remove entry from invalid_entries if it exists
-            if entry_widget in self.invalid_entries:
-                self.invalid_entries.remove(entry_widget)
-        else:
-            entry_widget.configure(border_color="#f04141")
-            # Add entry to invalid_entries if it's not already in the list
-            if entry_widget not in self.invalid_entries:
-                self.invalid_entries.append(entry_widget)
-        self.update_invalid_entries_display()
 
-    def validate_png_location(self, entry_widget):
-        location = entry_widget.get()
-        if os.path.isfile(location) and location.lower().endswith(".png"):
+        if (os.path.exists(location) or location == "") and file_extension == None:
+            entry_widget.configure(border_color="#10dc60")
+            # Remove entry from invalid_entries if it exists
+            if entry_widget in self.invalid_entries:
+                self.invalid_entries.remove(entry_widget)
+        elif (
+            os.path.isfile(location)
+            and location.lower().endswith(".png")
+            or location == ""
+        ) and file_extension == ".png":
             entry_widget.configure(border_color="#10dc60")
             # Remove entry from invalid_entries if it exists
             if entry_widget in self.invalid_entries:
@@ -464,6 +460,7 @@ class install_page(tk.Frame):
             # Add entry to invalid_entries if it's not already in the list
             if entry_widget not in self.invalid_entries:
                 self.invalid_entries.append(entry_widget)
+
         self.update_invalid_entries_display()
 
     def update_invalid_entries_display(self):
@@ -515,3 +512,83 @@ class install_page(tk.Frame):
             self.firefox_folder_entry.configure(state="disabled")
             self.application_folder_entry.configure(state="disabled")
             self.profile_folder_name_entry.configure(state="disabled")
+
+    def custom_label(
+        self,
+        master_frame,
+        label_text,
+        label_text_color,
+        label_image,
+        label_font,
+        label_row,
+        label_column,
+        label_columnspan,
+        label_padx=0,
+        label_pady=0,
+        label_stciky="",
+    ):
+        label_config = {
+            "text": label_text,
+            "text_color": label_text_color,
+            "image": label_image,
+            "font": label_font,
+        }
+        label_widget = customtkinter.CTkLabel(master=master_frame, **label_config)
+        label_widget.grid(
+            row=label_row,
+            column=label_column,
+            columnspan=label_columnspan,
+            padx=label_padx,
+            pady=label_pady,
+            sticky=label_stciky,
+        )
+        return label_widget
+
+    def custom_entry(
+        self,
+        master_frame,
+        entry_placeholder_text,
+        file,
+        grid_row,
+        grid_column,
+        grid_padx=0,
+        grid_pady=0,
+        grid_sticky="",
+    ):
+        entry_config = {
+            "width": 342,
+            "height": 38,
+            "fg_color": "white",
+            "text_color": "black",
+            "corner_radius": 8,
+            "border_width": 3,
+            "bg_color": "#2B2631",
+            "border_color": "purple",
+            "placeholder_text": entry_placeholder_text,
+        }
+
+        entry_widget = customtkinter.CTkEntry(master=master_frame, **entry_config)
+        entry_widget.grid(
+            row=grid_row,
+            column=grid_column,
+            padx=grid_padx,
+            pady=grid_pady,
+            sticky=grid_sticky,
+        )
+
+        if file:  # Only bind events if the file parameter is provided
+            entry_widget.bind(
+                "<FocusOut>", lambda event: self.validate_location(entry_widget, ".png")
+            )
+            entry_widget.bind(
+                "<Return>", lambda event: self.validate_location(entry_widget, ".png")
+            )
+        else:
+            entry_widget.bind(
+                "<FocusOut>", lambda event: self.validate_location(entry_widget, None)
+            )
+            entry_widget.bind(
+                "<Return>", lambda event: self.validate_location(entry_widget, None)
+            )
+
+        return entry_widget
