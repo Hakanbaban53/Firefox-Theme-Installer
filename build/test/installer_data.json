@@ -1,0 +1,14 @@
+{
+    "installer_info":{
+        "installer_title":"RealFire Installer",
+        "installer_version":" RealFire Version: Beta β 0.1 "
+    },
+    "exit_modal":{
+        "modal_title":"Exit Confirmation",
+        "modal_label":"Are you sure you want to exit?"
+    },
+    "attention_modal":{
+        "modal_title":"Attention!",
+        "modal_label":"RealFire Succesfully installed.\n Please restart firefox twice!"
+    }
+}

@@ -104,7 +104,6 @@ class remove_page(customtkinter.CTkFrame):
             master=inputs_frame,
             width=342,
             height=38,
-            state="disabled",
             fg_color="white",
             text_color="black",
             placeholder_text="Folder Profile Name",
@@ -147,7 +146,6 @@ class remove_page(customtkinter.CTkFrame):
             master=inputs_frame,
             width=342,
             height=38,
-            state="disabled",
             fg_color="white",
             text_color="black",
             placeholder_text="Firefox Folder Location",
@@ -174,7 +172,6 @@ class remove_page(customtkinter.CTkFrame):
             master=inputs_frame,
             width=342,
             height=38,
-            state="disabled",
             fg_color="white",
             text_color="black",
             placeholder_text="Application Folder",
@@ -197,7 +194,6 @@ class remove_page(customtkinter.CTkFrame):
             fg_color="white",
         )
         self.invalid_entry_frame.grid(row=4, column=0, columnspan=2, padx=(10, 4), pady=10)
-        self.update_invalid_entries_display()
 
 
         # Load the attention icon image
@@ -255,7 +251,10 @@ class remove_page(customtkinter.CTkFrame):
             bg_color="white",
             corner_radius=12,
             command=lambda: controller.show_frame(
-                "status_page", come_from_which_page="remove"
+                "status_page", come_from_which_page="remove",
+                profile_folder=self.get_variables(self.profile_folder_name_entry),
+                application_folder=self.get_variables(self.application_folder_entry),
+                firefox_folder=self.get_variables(self.firefox_folder_entry),
             ),
             width=122.0,
             height=38.0,
@@ -346,24 +345,13 @@ class remove_page(customtkinter.CTkFrame):
         os_image.pack(
             padx=(4, 10), pady=10, side="right"
         )  # Pack on the right side with padding
+        self.update_invalid_entries_display()
+        self.checkbox_event()
+
 
     def validate_file_location(self, entry_widget):
         location = entry_widget.get()
-        if os.path.exists(location):
-            entry_widget.configure(border_color="#10dc60")
-            # Remove entry from invalid_entries if it exists
-            if entry_widget in self.invalid_entries:
-                self.invalid_entries.remove(entry_widget)
-        else:
-            entry_widget.configure(border_color="#f04141")
-            # Add entry to invalid_entries if it's not already in the list
-            if entry_widget not in self.invalid_entries:
-                self.invalid_entries.append(entry_widget)
-        self.update_invalid_entries_display()
-
-    def validate_png_location(self, entry_widget):
-        location = entry_widget.get()
-        if os.path.isfile(location) and location.lower().endswith(".png"):
+        if os.path.exists(location) or location == "":
             entry_widget.configure(border_color="#10dc60")
             # Remove entry from invalid_entries if it exists
             if entry_widget in self.invalid_entries:
@@ -377,9 +365,11 @@ class remove_page(customtkinter.CTkFrame):
 
     def update_invalid_entries_display(self):
         if len(self.invalid_entries) == 0:
+            self.remove_button.configure(state="normal")
             # Hide the invalid entry frame if there are no invalid entries
             self.invalid_entry_frame.grid_remove()
         else:
+            self.remove_button.configure(state="disabled")
             # Show the invalid entry frame and update the text with the count of invalid entries
             self.invalid_entries_text.configure(
                 text=f"  {len(self.invalid_entries)} entries is invalid"
@@ -387,7 +377,16 @@ class remove_page(customtkinter.CTkFrame):
             self.invalid_entry_frame.grid()
 
     def exit_confirmation(self):
-        CombinedModal(self, "Exit Confirmation", "Are you sure you want to exit?")
+        print("Remove page exit_confirmation func")
+        CombinedModal(self, "Exit")
+
+    def get_variables(self, entry):
+        input_value = entry.get()
+        placeholder_text = entry.cget("placeholder_text")
+        if input_value:
+            return input_value
+        else:
+            return placeholder_text
 
     def update_parameters(self, **kwargs):
         # # Process and use the parameters as needed
@@ -420,83 +419,3 @@ class remove_page(customtkinter.CTkFrame):
             self.application_folder_entry.configure(state="disabled")
             self.profile_folder_name_entry.configure(state="disabled")
 
-
-    def custom_label(
-        self,
-        master_frame,
-        label_text,
-        label_text_color,
-        label_image,
-        label_font,
-        label_row,
-        label_column,
-        label_columnspan,
-        label_padx=0,
-        label_pady=0,
-        label_stciky="",
-    ):
-        label_config = {
-            "text": label_text,
-            "text_color": label_text_color,
-            "image": label_image,
-            "font": label_font,
-        }
-        label_widget = customtkinter.CTkLabel(master=master_frame, **label_config)
-        label_widget.grid(
-            row=label_row,
-            column=label_column,
-            columnspan=label_columnspan,
-            padx=label_padx,
-            pady=label_pady,
-            sticky=label_stciky,
-        )
-        return label_widget
-
-    def custom_entry(
-        self,
-        master_frame,
-        entry_placeholder_text,
-        file,
-        grid_row,
-        grid_column,
-        grid_padx=0,
-        grid_pady=0,
-        grid_sticky="",
-    ):
-        entry_config = {
-            "width": 342,
-            "height": 38,
-            "fg_color": "white",
-            "text_color": "black",
-            "corner_radius": 8,
-            "border_width": 3,
-            "bg_color": "#2B2631",
-            "border_color": "purple",
-            "placeholder_text": entry_placeholder_text,
-        }
-
-        entry_widget = customtkinter.CTkEntry(master=master_frame, **entry_config)
-        entry_widget.grid(
-            row=grid_row,
-            column=grid_column,
-            padx=grid_padx,
-            pady=grid_pady,
-            sticky=grid_sticky,
-        )
-
-        if file:  # Only bind events if the file parameter is provided
-            entry_widget.bind(
-                "<FocusOut>", lambda event: self.validate_location(entry_widget, ".png")
-            )
-            entry_widget.bind(
-                "<Return>", lambda event: self.validate_location(entry_widget, ".png")
-            )
-        else:
-            entry_widget.bind(
-                "<FocusOut>", lambda event: self.validate_location(entry_widget, None)
-            )
-            entry_widget.bind(
-                "<Return>", lambda event: self.validate_location(entry_widget, None)
-            )
-
-        return entry_widget

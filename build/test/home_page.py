@@ -1,7 +1,6 @@
 from pathlib import Path
 import customtkinter
 from PIL import Image
-
 from custom_exit_message import CombinedModal
 
 OUTPUT_PATH = Path(__file__).parent
@@ -232,7 +231,7 @@ class home_page(customtkinter.CTkFrame):
 
 
     def exit_confirmation(self):
-        CombinedModal(self, "Exit Confirmation", "Are you sure you want to exit?")
+        CombinedModal(self, "Exit")
 
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed

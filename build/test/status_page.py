@@ -29,6 +29,8 @@ class status_page(customtkinter.CTkFrame):
 
         os_icon_path = self.os_properties.os_icon()
 
+        self.bind("<Visibility>", self.start_simulate_progress)
+
         self.button_font = customtkinter.CTkFont(family="Inter", size=20)
 
         status_page_frame = customtkinter.CTkFrame(
@@ -59,7 +61,7 @@ class status_page(customtkinter.CTkFrame):
             bg_color="#2B2631",
         )
         self.header_title_background_label.grid(
-            row=0, column=0, columnspan=2, padx=273, pady=(75,0), sticky="NSEW"
+            row=0, column=0, columnspan=2, padx=273, pady=(75, 0), sticky="NSEW"
         )
 
         self.line_top_image = customtkinter.CTkImage(
@@ -76,16 +78,29 @@ class status_page(customtkinter.CTkFrame):
             text="",
             image=self.line_top_image,
         )
-        self.line_top_image_label.grid(row=1, column=0, columnspan=2, padx=10, pady=(20,30), sticky="NSEW")
+        self.line_top_image_label.grid(
+            row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+        )
 
+        self.check_icon = customtkinter.CTkImage(
+            light_image=Image.open(
+                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/icons/check.png"
+            ),
+            dark_image=Image.open(
+                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/icons/check.png"
+            ),
+            size=(20, 20),
+        )
         self.action_label = customtkinter.CTkLabel(
             master=status_page_frame,
             fg_color="#2B2631",
             text_color="white",
             text="",
+            image=None,
+            compound="right",
             font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
         )
-        self.action_label.grid(row=2, column=0, padx=20, pady=10, sticky="W")
+        self.action_label.grid(row=2, column=0, padx=60, pady=10, sticky="W")
 
         self.progress_bar = customtkinter.CTkProgressBar(
             master=status_page_frame,
@@ -95,14 +110,8 @@ class status_page(customtkinter.CTkFrame):
             fg_color="white",
             progress_color="#9747FF",
         )
-        self.progress_bar.grid(row=3, column=0, padx=30, pady=10, sticky="NSEW")
+        self.progress_bar.grid(row=3, column=0, padx=50, pady=10, sticky="NSEW")
         self.progress_bar.set(0)
-        start_button = customtkinter.CTkButton(
-            self,
-            text="Simulate Progress",
-            command=lambda: self.simulate_progress(self.progress_bar),
-        )
-        start_button.pack()
 
         self.output_entry = customtkinter.CTkTextbox(
             master=status_page_frame,
@@ -206,7 +215,6 @@ class status_page(customtkinter.CTkFrame):
         )
         exit_button.pack(padx=(20, 5), pady=10, side="left")
 
-
         os_frame = customtkinter.CTkFrame(
             master=bottom_frame,
             width=440,  # Adjust initial width as needed
@@ -241,7 +249,14 @@ class status_page(customtkinter.CTkFrame):
             padx=(4, 10), pady=10, side="right"
         )  # Pack on the right side with padding
 
+    def start_simulate_progress(self, event):
+        # Unbind the event so that this function is not called again when the page becomes visible again
+        self.unbind("<Visibility>")
+        # Start the progress simulation
+        self.simulate_progress(self.progress_bar)
+
     def simulate_progress(self, progress_bar):
+        print("Status page simulate_progress func")
         """Simulates a task with a progress bar.
 
         Args:
@@ -255,37 +270,46 @@ class status_page(customtkinter.CTkFrame):
             self.output_entry.insert("end", "Your text goes here\n")
 
         if self.come_from_which_page == "install":
-            self.action_label.configure(text="Installed")
+            self.action_label.configure(text="Installed  ", image=self.check_icon)
         elif self.come_from_which_page == "remove":
-            self.action_label.configure(text="Removed")
-        
+            self.action_label.configure(text="Removed  ", image=self.check_icon)
 
     def attention(self):
-        CombinedModal(
-            self,
-            "Attention!",
-            "RealFire Succesfully installed.\n Please restart firefox twice!",
-            "OK",
-            "OK",
-        )
+        print("Status page attention func")
+        CombinedModal(self, "Attention")
 
     def exit_confirmation(self):
-        CombinedModal(self, "Exit Confirmation", "Are you sure you want to exit?")
+        print("Status page exit_confirmation func")
+        CombinedModal(self, "Exit")
 
     def update_parameters(self, **kwargs):
+        print("Status page parameters func")
         # # Process and use the parameters as needed
         self.come_from_which_page = kwargs.get("come_from_which_page")
-
+        self.profile_folder = kwargs.get("profile_folder")
+        self.application_folder = kwargs.get("application_folder")
+        self.new_tab_wallpaper = kwargs.get("new_tab_wallpaper")
+        self.firefox_folder = kwargs.get("firefox_folder")
+        self.accent_color = kwargs.get("accent_color")
+        # start_button = customtkinter.CTkButton(
+        #     self,
+        #     text="Simulate Progress",
+        #     command=lambda: self.simulate_progress(self.progress_bar),
+        # )
+        # start_button.pack()
         if self.come_from_which_page == "install":
             self.action_label.configure(text="Instaling...")
+            print(
+                f"self.profile_folder={self.profile_folder}\nself.application_folder={self.application_folder}\nself.new_tab_wallpaper={self.new_tab_wallpaper}\nself.firefox_folder={self.firefox_folder}\nself.accent_color={self.accent_color}"
+            )
         elif self.come_from_which_page == "remove":
+            print(
+                f"self.profile_folder={self.profile_folder}\nself.application_folder={self.application_folder}\nself.firefox_folder={self.firefox_folder}"
+            )
             self.action_label.configure(text="Removing...")
-
 
         self.back_button.configure(
             command=lambda: self.controller.show_frame(
                 f"{self.come_from_which_page}_page"
             ),
         )
-        pass
-

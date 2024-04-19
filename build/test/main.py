@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from custom_exit_message import CombinedModal
 from status_page import status_page
@@ -22,76 +23,77 @@ class MultiPageApp(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         customtkinter.CTk.__init__(self, *args, **kwargs)
 
-        self.title("RealFire Installer")
+        with open("/home/hakan/Documents/GitHub/pythonInstaller/build/test/installer_data.json", "r") as file:
+            self.text_data = json.load(file)
+
+        self.title(self.text_data["installer_info"]["installer_title"])
         self.geometry("1108x667")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
-        
 
-
-        # Instantiate the OSProperties class
+        self.cont = home_page
         self.os_properties = OSProperties()
 
-        # Detect the operating system
-        self.os_properties.get_os()
-
-        # Container to hold all the pages
-        container = customtkinter.CTkFrame(self)
-        container.pack(side="top", fill="both", expand=True)
-
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        self.container = customtkinter.CTkFrame(self)
+        self.container.pack(side="top", fill="both", expand=True)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
 
-        for F in (home_page, install_page, remove_page, status_page):
-            frame = F(container, self, os_properties=self.os_properties)
+    def create_frame(self, page_class):
+        frame = page_class(self.container, self, os_properties=self.os_properties)
+        frame.configure(fg_color="#2B2631")
 
-            frame.configure(fg_color="#2B2631")
-            frame.installer_img = customtkinter.CTkImage(
-                light_image=Image.open(
-                    "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/img/installer_img.png"
-                ),
-                dark_image=Image.open(
-                    "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/img/installer_img.png"
-                ),
-                size=(310, 667),
-            )
-            frame.installer_img_label = customtkinter.CTkLabel(
-                frame,
-                text="",
-                image=frame.installer_img,
-            )
-            frame.installer_img_label.place(x=0, y=0)
+        frame.installer_img = customtkinter.CTkImage(
+            light_image=Image.open(relative_to_assets("img/installer_img.png")),
+            dark_image=Image.open(relative_to_assets("img/installer_img.png")),
+            size=(310, 667),
+        )
+        frame.installer_img_label = customtkinter.CTkLabel(
+            frame,
+            text="",
+            image=frame.installer_img,
+        )
+        frame.installer_img_label.place(x=0, y=0)
 
-            version = customtkinter.CTkLabel(
-                frame,
-                text=" RealFire Version: Beta β 0.1 ",
-                text_color="White",
-                bg_color="#2B2631",
-                font=customtkinter.CTkFont(family="Inter", size=14),
-            )
-            version.place(x=65.0, y=620.0)
-            # Add the version label to each frame
+        version = customtkinter.CTkLabel(
+            frame,
+            text=self.text_data["installer_info"]["installer_version"],
+            text_color="White",
+            bg_color="#2B2631",
+            font=customtkinter.CTkFont(family="Inter", size=14),
+        )
+        version.place(x=65.0, y=620.0)
 
+        frame.grid(row=0, column=0, sticky="nsew")
+        return frame
 
-            self.frames[F.__name__] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
+    def show_frame(self, page_name, **kwargs):
+        page_class = {
+            "status_page": status_page,
+            "home_page": home_page,
+            "remove_page": remove_page,
+            "install_page": install_page,
+        }.get(page_name)
 
-        self.show_frame("home_page")
+        if page_class:
+            if page_class not in self.frames:
+                self.frames[page_class] = self.create_frame(page_class)
 
-    def show_frame(self, cont, **kwargs):
-        frame = self.frames[cont]
-        frame.update_parameters(**kwargs)
-        frame.tkraise()
+            frame = self.frames[page_class]
+            frame.update_parameters(**kwargs)
+            frame.tkraise()
 
     def exit_confirmation(self):
-        CombinedModal(self, "Exit Confirmation", "Are you sure you want to exit?")
+        CombinedModal(self, "Exit")
 
 
 if __name__ == "__main__":
     app = MultiPageApp()
+    app.show_frame("home_page")
     app.mainloop()
+
 
 
 # import os
