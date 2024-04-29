@@ -5,7 +5,7 @@ from custom_exit_message import CombinedModal
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(
-    r"/home/hakan/Documents/GitHub/pythonInstaller/build/assets"
+    r"/home/hakan/Documents/GitHub/pythonInstaller/assets/"
 )
 
 
@@ -39,10 +39,10 @@ class home_page(customtkinter.CTkFrame):
 
         self.header_title_background = customtkinter.CTkImage(
             light_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/header_title_background.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/header_title_background.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/header_title_background.png"
             ),
             size=(390, 64),
         )
@@ -60,10 +60,10 @@ class home_page(customtkinter.CTkFrame):
 
         self.line_top_image = customtkinter.CTkImage(
             light_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/line_top.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/line_top.png"
             ),
             dark_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/line_top.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/line_top.png"
             ),
             size=(650, 6),
         )
@@ -120,10 +120,10 @@ class home_page(customtkinter.CTkFrame):
 
         self.select_action_image = customtkinter.CTkImage(
             light_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/header_title_background.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/header_title_background.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/header_title_background.png"
             ),
             size=(270, 36),
         )

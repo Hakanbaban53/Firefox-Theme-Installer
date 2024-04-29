@@ -11,7 +11,7 @@ class CombinedModal(tk.Toplevel):
         self.wait_visibility()
         self.grab_set()
 
-        with open("/home/hakan/Documents/GitHub/pythonInstaller/build/test/installer_data.json", "r") as file:
+        with open("/home/hakan/Documents/GitHub/pythonInstaller/test/installer_data.json", "r") as file:
             self.text_data = json.load(file)
 
         self.button_font = customtkinter.CTkFont(family="Arial", size=18)

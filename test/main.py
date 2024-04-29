@@ -12,7 +12,7 @@ from PIL import Image
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(
-    r"/home/hakan/Documents/GitHub/pythonInstaller/build/assets"
+    r"/home/hakan/Documents/GitHub/pythonInstaller/assets/"
 )
 
 def relative_to_assets(path: str) -> Path:
@@ -23,7 +23,7 @@ class MultiPageApp(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         customtkinter.CTk.__init__(self, *args, **kwargs)
 
-        with open("/home/hakan/Documents/GitHub/pythonInstaller/build/test/installer_data.json", "r") as file:
+        with open("/home/hakan/Documents/GitHub/pythonInstaller/test/installer_data.json", "r") as file:
             self.text_data = json.load(file)
 
         self.title(self.text_data["installer_info"]["installer_title"])

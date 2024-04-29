@@ -7,7 +7,7 @@ from PIL import Image
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(
-    r"/home/hakan/Documents/GitHub/pythonInstaller/build/assets"
+    r"/home/hakan/Documents/GitHub/pythonInstaller/assets"
 )
 
 
@@ -37,10 +37,10 @@ class install_page(customtkinter.CTkFrame):
         install_page_frame.columnconfigure(0, weight=1)
         self.header_title_background = customtkinter.CTkImage(
             light_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/header_title_background.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/header_title_background.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/header_title_background.png"
             ),
             size=(300, 64),
         )
@@ -58,10 +58,10 @@ class install_page(customtkinter.CTkFrame):
 
         self.line_top_image = customtkinter.CTkImage(
             light_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/line_top.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/line_top.png"
             ),
             dark_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/backgrounds/line_top.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/backgrounds/line_top.png"
             ),
             size=(650, 6),
         )
@@ -266,10 +266,10 @@ class install_page(customtkinter.CTkFrame):
         # Load the attention icon image
         self.attention_icon = customtkinter.CTkImage(
             light_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/icons/attention.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/icons/attention.png"
             ),
             dark_image=Image.open(
-                "/home/hakan/Documents/GitHub/pythonInstaller/build/assets/icons/attention.png"
+                "/home/hakan/Documents/GitHub/pythonInstaller/assets/icons/attention.png"
             ),
             size=(24, 24),
         )
