@@ -1,0 +1,63 @@
+{
+  "common_values": {
+    "installer_info": {
+      "installer_title": "RealFire Installer",
+      "installer_version": " RealFire Version: Beta β 0.1 "
+    },
+    "exit_modal": {
+      "modal_title": "Exit Confirmation",
+      "modal_label": "Are you sure you want to exit?"
+    },
+    "attention_modal": {
+      "modal_title": "Attention!",
+      "modal_label": "RealFire Succesfully installed.\n Please restart firefox twice!"
+    },
+    "inputs": {
+      "border_color": "#771D76",
+      "text_color": "#000000",
+      "bg_color": "#2B2631",
+      "fg_color": "#FFFFFF",
+      "corner_radius": "8",
+      "border_width": "3",
+      "height": "38",
+      "width": "342"
+    },
+    "navigation_buttons":{
+      "fg_color":"#D9D9D9",
+      "hover_color":"#EEEEEE",
+      "bg_color":"#FFFFFF",
+      "corner_radius":"12",
+      "width":"122",
+      "height":"38",
+      "text_color":"#000000",
+      "font_family":"Inter",
+      "font_size":"20"
+    },
+    "dropboxes": {}
+  },
+  
+  "windows": {
+    "os_name":"Windows",
+    "os_color":"#357EC7",
+    "default_locations":{
+      "application_folder":"C:\\Program Files\\Mozilla Firefox",
+      "firefox_folder":"%APPDATA%\\Mozilla\\Firefox"
+    }
+  },
+  "linux": {
+    "os_name":"Linux",
+    "os_color":"#F06F27",
+    "default_locations":{
+      "application_folder":"/usr/lib64/firefox",
+      "firefox_folder":"/home/$USER/.mozilla/firefox"
+    }
+  },
+  "macos": {
+    "os_name":"macOS",
+    "os_color":"#000000",
+    "default_locations":{
+      "application_folder":"/Applications/Firefox.app/Contents/MacOS/Firefox",
+      "firefox_folder":"/Library/Application\\ Support/Firefox"
+    }
+  }
+}

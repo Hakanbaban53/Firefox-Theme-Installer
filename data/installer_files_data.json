@@ -1,0 +1,139 @@
+{
+    "realfire": {
+      "img": {
+        "new_tab_wallpaper.jpg": "Download_link"
+      },
+      "includes": {
+        "realfire-addons-page.css": "Download_link",
+        "realfire-button.css": "Download_link",
+        "realfire-checkbox.css": "Download_link",
+        "realfire-colours.css": "Download_link",
+        "realfire-config.css": "Download_link",
+        "realfire-findbar.css": "Download_link",
+        "realfire-floating-panel.css": "Download_link",
+        "realfire-icons.css": "Download_link",
+        "realfire-inputs.css": "Download_link",
+        "realfire-layout.css": "Download_link",
+        "realfire-library.css": "Download_link",
+        "realfire-nav-bar.css": "Download_link",
+        "realfire-popups.css": "Download_link",
+        "realfire-responsive.css": "Download_link",
+        "realfire-settings-page.css": "Download_link",
+        "realfire-side-bar.css": "Download_link",
+        "realfire-tabs.css": "Download_link"
+      },
+      "JS": {
+        "aboutUserChrome.sys.mjs": "Download_link",
+        "animateContextMenus.uc.js": "Download_link",
+        "appMenuAboutConfigButton.uc.js": "Download_link",
+        "appMenuMods.uc.js": "Download_link",
+        "autoHideNavbarSupport.uc.js": "Download_link",
+        "clearDownloadsButton.uc.js": "Download_link",
+        "customHintProvider.uc.js": "Download_link",
+        "debugExtensionInToolbarContextMenu.uc.js": "Download_link",
+        "fluentRevealNavbar.uc.js": "Download_link",
+        "fluentRevealTabs.uc.js": "Download_link",
+        "hideScrollbar.uc.js": "Download_link",
+        "macosTheme.uc.js": "Download_link",
+        "navbarToolbarButtonSlider.uc.js": "Download_link",
+        "osDetector.uc.js": "Download_link",
+        "privateTabs.uc.js": "Download_link",
+        "privateWindowHomepage.uc.js": "Download_link",
+        "tabLoadingSpinner.uc.js": "Download_link",
+        "tabThumbnailTooltip.uc.js": "Download_link",
+        "updateBannerLabels.uc.js": "Download_link",
+        "updateNotificationSlayer.uc.js": "Download_link",
+        "verticalTabsPane.uc.js": "Download_link"
+      },
+      "resources": {
+        "aboutuserchrome": {
+          "aboutuserchrome.css": "Download_link",
+          "aboutuserchrome.html": "Download_link",
+          "aboutuserchrome.js": "Download_link",
+          "chrome": {
+            "userchrome-notifications.css": "Download_link"
+          },
+          "modules": {
+            "UCMSingletonData.sys.mjs": "Download_link"
+          },
+          "src": {
+            "aboutuserchrome.html": "Download_link",
+            "aboutuserchrome.json": "Download_link",
+            "aboutuserchrome.jsx": "Download_link",
+            "aboutuserchrome.scss": "Download_link",
+            "components": {
+              "GlobalContext.jsx": "Download_link",
+              "PeriodInput.jsx": "Download_link",
+              "RichDescription.jsx": "Download_link",
+              "ScriptCard.jsx": "Download_link",
+              "ScriptDetails.jsx": "Download_link",
+              "ScriptsView.jsx": "Download_link",
+              "SearchBar.jsx": "Download_link",
+              "SettingsView.jsx": "Download_link",
+              "WarningBox.jsx": "Download_link"
+            }
+          }
+        },
+        "material": {
+          "actual-zoom.svg": "Download_link",
+          "all-history.svg": "Download_link",
+          "bookmark-manage.svg": "Download_link",
+          "browser-task-manager.svg": "Download_link",
+          "checked copy.svg": "Download_link",
+          "checked.svg": "Download_link",
+          "close-hover.svg": "Download_link",
+          "close.svg": "Download_link",
+          "close-tab-option.svg": "Download_link",
+          "command-pick.svg": "Download_link",
+          "desktop-bg.svg": "Download_link",
+          "duplicate-tab.svg": "Download_link",
+          "experiments.svg": "Download_link",
+          "ideas.svg": "Download_link",
+          "inactive.svg": "Download_link",
+          "maximize-hover.svg": "Download_link",
+          "maximize-restore.svg": "Download_link",
+          "maximize.svg": "Download_link",
+          "maximize-svg.svg": "Download_link",
+          "minimize-hover.svg": "Download_link",
+          "minimize.svg": "Download_link",
+          "move-container.svg": "Download_link",
+          "move-end.svg": "Download_link",
+          "move-start.svg": "Download_link",
+          "move-tab.svg": "Download_link",
+          "new-container.svg": "Download_link",
+          "open_new_tabs.svg": "Download_link",
+          "page-source.svg": "Download_link",
+          "pause.svg": "Download_link",
+          "playButton.svg": "Download_link",
+          "quit.svg": "Download_link",
+          "radio-checked.svg": "Download_link",
+          "radio-unchecked.svg": "Download_link",
+          "redo.svg": "Download_link",
+          "reload.svg": "Download_link",
+          "remote-debug.svg": "Download_link",
+          "restore-session.svg": "Download_link",
+          "select-all.svg": "Download_link",
+          "send-tab.svg": "Download_link",
+          "share-tab.svg": "Download_link",
+          "signout.svg": "Download_link",
+          "terminal.svg": "Download_link",
+          "toolbox.svg": "Download_link",
+          "translate.svg": "Download_link",
+          "unchecked.svg": "Download_link",
+          "userScriptsMenu.svg": "Download_link",
+          "web-page-source-code.svg": "Download_link",
+          "zoom-in.svg": "Download_link",
+          "zoom-out.svg": "Download_link"
+        }
+      },
+      "userChrome.css": "Download_link",
+      "userContent.css": "Download_link",
+      "utils": {
+        "boot.sys.mjs": "Download_link",
+        "chrome.manifest": "Download_link",
+        "fs.sys.mjs": "Download_link",
+        "utils.sys.mjs": "Download_link"
+      }
+    }
+  }
+  

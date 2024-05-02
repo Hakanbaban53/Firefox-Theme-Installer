@@ -1,25 +1,23 @@
 import json
-import tkinter as tk
 import customtkinter
 
 
-class CombinedModal(tk.Toplevel):
+class CombinedModal(customtkinter.CTkToplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
-        self.configure(bg="#2B2631")
+        self.configure(fg_color="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
 
-        with open("/home/hakan/Documents/GitHub/pythonInstaller/test/installer_data.json", "r") as file:
-            self.text_data = json.load(file)
+        with open("../RealFire_Installer/data/installer_data.json", "r") as file:
+            self.installer_data = json.load(file)
+
+        self.text_data = self.installer_data.get("common_values")
 
         self.button_font = customtkinter.CTkFont(family="Arial", size=18)
 
-        modal_mapping = {
-            "exit": "exit_modal",
-            "attention": "attention_modal"
-        }
+        modal_mapping = {"exit": "exit_modal", "attention": "attention_modal"}
 
         modal_key = modal_mapping.get(modal.lower())
         if modal_key is None:
@@ -31,7 +29,10 @@ class CombinedModal(tk.Toplevel):
 
         self.title(modal_data["modal_title"])
         self.message_label = customtkinter.CTkLabel(
-            self, text=modal_data["modal_label"], font=customtkinter.CTkFont(family="Arial", size=16)
+            self,
+            text=modal_data["modal_label"],
+            text_color="white",
+            font=customtkinter.CTkFont(family="Arial", size=16),
         )
         self.message_label.pack(padx=10, pady=10)
 
@@ -48,7 +49,7 @@ class CombinedModal(tk.Toplevel):
             command=self.ok_action,
             bg_color="#2B2631",
             fg_color="#f04141",
-            font=self.button_font
+            font=self.button_font,
         )
         self.ok_button.pack(side="left", padx=10, pady=20)
 
@@ -59,7 +60,7 @@ class CombinedModal(tk.Toplevel):
             command=self.cancel_action,
             bg_color="#2B2631",
             fg_color="#10dc60",
-            font=self.button_font
+            font=self.button_font,
         )
         self.cancel_button.pack(side="right", padx=10, pady=20)
 
@@ -72,7 +73,7 @@ class CombinedModal(tk.Toplevel):
             command=self.ok_action,
             bg_color="#2B2631",
             fg_color="#10dc60",
-            font=self.button_font
+            font=self.button_font,
         )
         self.ok_button.pack(pady=20)
 
