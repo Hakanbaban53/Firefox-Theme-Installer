@@ -1,11 +1,12 @@
 import json
 import customtkinter
 from PIL import Image
-from functions.combined_modal import CombinedModal
+from modals.combined_modal import CombinedModal
 from pages.home_page import home_page
 from pages.install_page import install_page
 from pages.remove_page import remove_page
 from pages.status_page import status_page
+from functions.detect_files import FileManager
 
 
 class MultiPageApp(customtkinter.CTk):
@@ -144,3 +145,4 @@ if __name__ == "__main__":
 #     subprocess.call(cmd, shell=True)
 
 # run_as_admin()
+

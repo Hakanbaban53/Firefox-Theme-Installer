@@ -1,7 +1,7 @@
 import json
 import customtkinter
 from PIL import Image
-from functions.combined_modal import CombinedModal
+from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
 
 

@@ -1,8 +1,14 @@
 import json
+import time
+import tkinter as tk
+from itertools import cycle
 import customtkinter
 from PIL import Image
-from functions.combined_modal import CombinedModal
+from modals.check_files_modal import FileInstallerModal
+from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
+from threading import Thread
+from functions.detect_files import FileManager
 
 
 
@@ -90,6 +96,15 @@ class home_page(customtkinter.CTkFrame):
             ),
             dark_image=Image.open(
                 "../RealFire_Installer/assets/icons/check.png"
+            ),
+            size=(20, 20),
+        )
+        self.reload_icon = customtkinter.CTkImage(
+            light_image=Image.open(
+                "../RealFire_Installer/assets/icons/reload_icon.png"
+            ),
+            dark_image=Image.open(
+                "../RealFire_Installer/assets/icons/reload_icon.png"
             ),
             size=(20, 20),
         )
@@ -213,7 +228,7 @@ class home_page(customtkinter.CTkFrame):
         )
         remove_button.pack(padx=(5, 20), pady=10, side="right")
 
-        install_button = customtkinter.CTkButton(
+        self.install_button = customtkinter.CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -223,11 +238,12 @@ class home_page(customtkinter.CTkFrame):
             hover_color=self.button_data["hover_color"],
             text_color=self.button_data["text_color"],
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
+            state="disabled",
             image=self.install_button_image,
             text="Install",
             command=lambda: controller.show_frame("install_page"),
         )
-        install_button.pack(padx=5, pady=10, side="right")
+        self.install_button.pack(padx=5, pady=10, side="right")
 
         exit_button = customtkinter.CTkButton(
             master=navigation_frame,
@@ -255,18 +271,44 @@ class home_page(customtkinter.CTkFrame):
             corner_radius=12,
             fg_color="white",
         )
-        self.detect_files_frame.grid(row=5, column=0, padx=0, pady=20, columnspan=2, sticky="")
-        
-        # Create the label to display the invalid entries count
+        self.detect_files_frame.grid(row=5, column=0, padx=0, pady=(20,10), columnspan=2, sticky="")
+
         self.detect_files_text = customtkinter.CTkLabel(
             master=self.detect_files_frame,
-            text="Cannot Locate The Files ",
-            text_color="#f04141",
-            font=("Arial", 16, "bold"),  # Adjust font size and family as needed
-            image=self.attention_icon,
+            text="Checking The Files   ",
+            text_color="#000000",
+            font=("Arial", 16, "bold"),
             compound="right",
         )
-        self.detect_files_text.pack(padx=10, pady=10)
+        self.detect_files_text.grid(row=0, column=0, padx=10, pady=10, sticky="")
+        thread = Thread(target=self.locate_files)
+        thread.start()
+
+        self.install_files_button = customtkinter.CTkButton(
+            master=self.detect_files_frame,
+            text="Install Missing Files",
+            width=float(self.button_data["width"]),
+            height=float(self.button_data["height"]),
+            corner_radius=float(self.button_data["corner_radius"]),
+            bg_color=self.button_data["bg_color"],
+            fg_color=self.button_data["fg_color"],
+            hover_color=self.button_data["hover_color"],
+            text_color=self.button_data["text_color"],
+            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
+            command=self.install_files,
+        )
+
+        self.recheck_button = customtkinter.CTkButton(
+            master=home_page_frame,
+            width=40,
+            height=40,
+            text="",
+            fg_color= "#FFFFFF",
+            command=self.recheck_files,  # Bind the recheck_files method
+            image=self.reload_icon
+        )
+        self.recheck_button.grid(row=6, column=0, padx=0, pady=0, columnspan=2, sticky="")
+
 
     """
         //////////////////////////////
@@ -274,9 +316,61 @@ class home_page(customtkinter.CTkFrame):
         //////////////////////////////
                                         """
 
+    def load_gif(self):
+        kareler = []
+        sayac = 0
+        while True:
+            try:
+                
+                # kare = customtkinter.CTkImage(
+                #     light_image=Image.open(
+                #         "../RealFire_Installer/assets/icons/block_spin.gif"
+                #     ),
+                #     dark_image=Image.open(
+                #         "../RealFire_Installer/assets/icons/block_spin.gif"
+                #     ),
+                #     size=(20, 20),
+                # )
+                kare = tk.PhotoImage(file="../RealFire_Installer/assets/icons/block_spin.gif", format=f'gif -index {sayac}')
+                kareler.append(kare)
+                sayac += 2
+            except tk.TclError:
+                break
+        return cycle(kareler)  # Kareleri döngüsel bir şekilde döndür
+
+    def update_fps(self, kareler):
+        kare = next(kareler)
+        self.detect_files_text.configure(image=kare)
+        self.animasyon_id = self.master.after(100, self.update_fps, kareler)
+
+    def recheck_files(self):
+        self.detect_files_text.configure(text="Checking The Files  ", text_color="#000000")
+        self.install_button.configure(state="disabled")
+        self.install_files_button.grid_remove()
+        thread = Thread(target=self.locate_files)
+        thread.start()
+
+
+    def install_files(self):
+        modal = FileInstallerModal(self)
+        self.wait_window(modal)  # modal.top, modal pencerenizin üst seviye widget'ını temsil etmelidir.
+        print("Modal Closed")
+        self.recheck_files()
+
+
+    def locate_files(self):
+        kareler = self.load_gif()
+        self.update_fps(kareler)
+        time.sleep(1)
+        self.file_check_result = FileManager("../RealFire_Installer/data/installer_files_data.json").check_files_exist()
+        self.master.after_cancel(self.animasyon_id)
+        if len(self.file_check_result) == 0:
+            self.detect_files_text.configure(text="All Files İnstalled  ", text_color="#10dc60", image=self.check_icon,)
+            self.install_button.configure(state="enabled")
+        else:
+            self.detect_files_text.configure(text="Some Files Are Missing  ", text_color="#f04141", image=self.attention_icon)
+            self.install_files_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
+        
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed
         pass
-
-    # def locate_files(self):
-        
