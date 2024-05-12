@@ -1,8 +1,8 @@
-import json
-import time
-import tkinter as tk
+from json import load
+from time import sleep
+from tkinter import PhotoImage, Label, TclError
 from itertools import cycle
-import customtkinter
+from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFrame, CTkButton
 from PIL import Image
 from modals.check_files_modal import FileInstallerModal
 from modals.combined_modal import CombinedModal
@@ -12,15 +12,15 @@ from functions.detect_files import FileManager
 
 
 
-class home_page(customtkinter.CTkFrame):
+class home_page(CTkFrame):
     os_values = OSProperties().get_values()
 
     def __init__(self, parent, controller):
-        customtkinter.CTkFrame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         self.controller = controller
         self.text_data = {}
         with open("../RealFire_Installer/data/installer_data.json", "r") as file:
-            self.text_data = json.load(file)
+            self.text_data = load(file)
 
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
 
@@ -30,7 +30,7 @@ class home_page(customtkinter.CTkFrame):
             /Image Location Declarations/
             /////////////////////////////
                                         """
-        self.header_title_background = customtkinter.CTkImage(
+        self.header_title_background = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/header_title_background.png"
             ),
@@ -40,7 +40,7 @@ class home_page(customtkinter.CTkFrame):
             size=(390, 64),
         )
 
-        self.line_top_image = customtkinter.CTkImage(
+        self.line_top_image = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/line_top.png"
             ),
@@ -50,13 +50,13 @@ class home_page(customtkinter.CTkFrame):
             size=(650, 6),
         )
 
-        self.os_icon_image = customtkinter.CTkImage(
+        self.os_icon_image = CTkImage(
             dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
             light_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             size=(20, 24)
         )
 
-        self.select_action_image = customtkinter.CTkImage(
+        self.select_action_image = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/header_title_background.png"
             ),
@@ -66,40 +66,24 @@ class home_page(customtkinter.CTkFrame):
             size=(270, 36),
         )
 
-        self.remove_button_image = customtkinter.CTkImage(
+        self.remove_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/remove_icon.png"), 
             light_image=Image.open("../RealFire_Installer/assets/icons/remove_icon.png"), 
             size=(20, 24)
         )
 
-        self.install_button_image = customtkinter.CTkImage(
+        self.install_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/install_icon.png"), 
             light_image=Image.open("../RealFire_Installer/assets/icons/install_icon.png"), 
             size=(20, 20)
         )
 
-        self.exit_button_image = customtkinter.CTkImage(
+        self.exit_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"), 
             light_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"), 
             size=(20, 20)
         )
-
-        self.attention_icon = customtkinter.CTkImage(
-            light_image=Image.open("../RealFire_Installer/assets/icons/attention.png"),
-            dark_image=Image.open("../RealFire_Installer/assets/icons/attention.png"),
-            size=(24, 24),
-        )
-
-        self.check_icon = customtkinter.CTkImage(
-            light_image=Image.open(
-                "../RealFire_Installer/assets/icons/check.png"
-            ),
-            dark_image=Image.open(
-                "../RealFire_Installer/assets/icons/check.png"
-            ),
-            size=(20, 20),
-        )
-        self.reload_icon = customtkinter.CTkImage(
+        self.reload_icon = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/icons/reload_icon.png"
             ),
@@ -109,13 +93,16 @@ class home_page(customtkinter.CTkFrame):
             size=(20, 20),
         )
 
+
+        self.attention_icon = PhotoImage(file="../RealFire_Installer/assets/icons/attention.png", height=24, width=24)
+        self.check_icon = PhotoImage(file="../RealFire_Installer/assets/icons/check.png", height=20, width=20)
 
         """
             //////////////////////////////
             ////Home Page Declarations////
             //////////////////////////////
                                             """
-        home_page_frame = customtkinter.CTkFrame(
+        home_page_frame = CTkFrame(
             self,
             fg_color="#2B2631",
             # border_width=4,
@@ -127,7 +114,7 @@ class home_page(customtkinter.CTkFrame):
         )
         home_page_frame.columnconfigure(0, weight=1)
 
-        self.header_title_background_label = customtkinter.CTkLabel(
+        self.header_title_background_label = CTkLabel(
             master=home_page_frame,
             text="Welcome the RealFire Installer",
             image=self.header_title_background,
@@ -138,7 +125,7 @@ class home_page(customtkinter.CTkFrame):
             row=0, column=0, columnspan=2, padx=203, pady=(75,0), sticky="NSEW"
         )
 
-        self.line_top_image_label = customtkinter.CTkLabel(
+        self.line_top_image_label = CTkLabel(
             master=home_page_frame,
             text="",
             image=self.line_top_image,
@@ -151,7 +138,7 @@ class home_page(customtkinter.CTkFrame):
             /Operation System Declarations/
             ///////////////////////////////
                                             """
-        operation_system = customtkinter.CTkLabel(
+        operation_system = CTkLabel(
             master=home_page_frame,
             text="Detected Operation System: ",
             text_color="White",
@@ -159,7 +146,7 @@ class home_page(customtkinter.CTkFrame):
         )
         operation_system.grid(row=2, column=0, columnspan=1, padx=(175,0), sticky="ew")
 
-        os_frame = customtkinter.CTkFrame(
+        os_frame = CTkFrame(
             master=home_page_frame,
             # width=440,  # Adjust initial width as needed
             # height=54,
@@ -168,7 +155,7 @@ class home_page(customtkinter.CTkFrame):
         )
         os_frame.grid(row=2, column=1, columnspan=1, padx=(0,185), sticky="ew")
 
-        os_label = customtkinter.CTkLabel(
+        os_label = CTkLabel(
             master=os_frame,
             text=self.os_values["os_name"] + " ",  # Initial text (can be empty)
             text_color=self.os_values["os_color"],
@@ -189,7 +176,7 @@ class home_page(customtkinter.CTkFrame):
             ///Navigation Declarations///
             /////////////////////////////
                                         """
-        self.select_action_label = customtkinter.CTkLabel(
+        self.select_action_label = CTkLabel(
             master=home_page_frame,
             text="Please Select the Action",
             image=self.select_action_image,
@@ -200,7 +187,7 @@ class home_page(customtkinter.CTkFrame):
             row=3, column=0, columnspan=2, padx=60, pady=(70,30), sticky="ew"
         )
 
-        navigation_frame = customtkinter.CTkFrame(
+        navigation_frame = CTkFrame(
             master=home_page_frame,
             width=460,
             height=54,
@@ -211,7 +198,7 @@ class home_page(customtkinter.CTkFrame):
         )
         navigation_frame.grid(row=4, column=0, columnspan=2, sticky="")
 
-        remove_button = customtkinter.CTkButton(
+        remove_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -228,7 +215,7 @@ class home_page(customtkinter.CTkFrame):
         )
         remove_button.pack(padx=(5, 20), pady=10, side="right")
 
-        self.install_button = customtkinter.CTkButton(
+        self.install_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -245,7 +232,7 @@ class home_page(customtkinter.CTkFrame):
         )
         self.install_button.pack(padx=5, pady=10, side="right")
 
-        exit_button = customtkinter.CTkButton(
+        exit_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -266,17 +253,18 @@ class home_page(customtkinter.CTkFrame):
             /Detect Files Declarations/
             ///////////////////////////
                                         """
-        self.detect_files_frame = customtkinter.CTkFrame(
+        self.detect_files_frame = CTkFrame(
             master=home_page_frame,
             corner_radius=12,
             fg_color="white",
         )
         self.detect_files_frame.grid(row=5, column=0, padx=0, pady=(20,10), columnspan=2, sticky="")
 
-        self.detect_files_text = customtkinter.CTkLabel(
+        self.detect_files_text = Label(
             master=self.detect_files_frame,
             text="Checking The Files   ",
-            text_color="#000000",
+            fg="#000000",
+            bg="#FFFFFF",
             font=("Arial", 16, "bold"),
             compound="right",
         )
@@ -284,7 +272,7 @@ class home_page(customtkinter.CTkFrame):
         thread = Thread(target=self.locate_files)
         thread.start()
 
-        self.install_files_button = customtkinter.CTkButton(
+        self.install_files_button = CTkButton(
             master=self.detect_files_frame,
             text="Install Missing Files",
             width=float(self.button_data["width"]),
@@ -298,7 +286,7 @@ class home_page(customtkinter.CTkFrame):
             command=self.install_files,
         )
 
-        self.recheck_button = customtkinter.CTkButton(
+        self.recheck_button = CTkButton(
             master=home_page_frame,
             width=40,
             height=40,
@@ -321,54 +309,43 @@ class home_page(customtkinter.CTkFrame):
         sayac = 0
         while True:
             try:
-                
-                # kare = customtkinter.CTkImage(
-                #     light_image=Image.open(
-                #         "../RealFire_Installer/assets/icons/block_spin.gif"
-                #     ),
-                #     dark_image=Image.open(
-                #         "../RealFire_Installer/assets/icons/block_spin.gif"
-                #     ),
-                #     size=(20, 20),
-                # )
-                kare = tk.PhotoImage(file="../RealFire_Installer/assets/icons/block_spin.gif", format=f'gif -index {sayac}')
+                kare = PhotoImage(file="../RealFire_Installer/assets/icons/block_spin.gif", format=f'gif -index {sayac}')
                 kareler.append(kare)
                 sayac += 2
-            except tk.TclError:
+            except TclError:
                 break
-        return cycle(kareler)  # Kareleri döngüsel bir şekilde döndür
+        return cycle(kareler)
 
     def update_fps(self, kareler):
         kare = next(kareler)
-        self.detect_files_text.configure(image=kare)
+        self.detect_files_text.config(image=kare)
         self.animasyon_id = self.master.after(100, self.update_fps, kareler)
 
     def recheck_files(self):
-        self.detect_files_text.configure(text="Checking The Files  ", text_color="#000000")
+        self.detect_files_text.config(text="Checking The Files  ", fg="#000000")
         self.install_button.configure(state="disabled")
         self.install_files_button.grid_remove()
         thread = Thread(target=self.locate_files)
         thread.start()
 
-
     def install_files(self):
         modal = FileInstallerModal(self)
-        self.wait_window(modal)  # modal.top, modal pencerenizin üst seviye widget'ını temsil etmelidir.
-        print("Modal Closed")
+        self.wait_window(modal)
         self.recheck_files()
-
 
     def locate_files(self):
         kareler = self.load_gif()
         self.update_fps(kareler)
-        time.sleep(1)
+        sleep(1)
         self.file_check_result = FileManager("../RealFire_Installer/data/installer_files_data.json").check_files_exist()
         self.master.after_cancel(self.animasyon_id)
         if len(self.file_check_result) == 0:
-            self.detect_files_text.configure(text="All Files İnstalled  ", text_color="#10dc60", image=self.check_icon,)
-            self.install_button.configure(state="enabled")
+            self.master.after_cancel(self.animasyon_id)
+            self.detect_files_text.config(text="All Files Installed  ", fg="#10dc60", image=self.check_icon)
+            self.install_button.configure(state="normal")
         else:
-            self.detect_files_text.configure(text="Some Files Are Missing  ", text_color="#f04141", image=self.attention_icon)
+            self.master.after_cancel(self.animasyon_id)
+            self.detect_files_text.config(text="Some Files Are Missing  ", fg="#f04141", image=self.attention_icon)
             self.install_files_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
         
     def update_parameters(self, **kwargs):

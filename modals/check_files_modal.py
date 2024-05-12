@@ -21,22 +21,6 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         self.create_widgets()
 
     def create_widgets(self):
-        # self.tree = ttk.Treeview(self.root)
-        # self.tree.pack(expand=True, fill="both")
-
-        # # Define columns
-        # self.tree["columns"] = ("Status",)
-        # self.tree.column("#0", width=300)
-        # self.tree.column("Status", width=80)
-        # self.tree.heading("#0", text="File/Folder")
-        # self.tree.heading("Status", text="Status")
-
-        # # Configure tags
-        # self.tree.tag_configure("missing", foreground="red")
-        # self.tree.tag_configure("installed", foreground="green")
-
-        # # Populate the tree
-        # self.populate_tree("", self.file_check_result, self.all_files)
 
         self.files_modal_frame = customtkinter.CTkFrame(self, fg_color="#2B2631")
         self.files_modal_frame.pack(padx=20, pady=10)
@@ -102,38 +86,13 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         )
         self.install_files_button.grid(row=0, column=1, padx=20, pady=0)
 
-    # def populate_tree(self, parent, file_check_result, all_files):
-    #         # Configure Tags
-    #         self.tree.tag_configure('missing', foreground='red')
-    #         self.tree.tag_configure('installed', foreground='green')
-
-    #         for key, value in all_files.items():
-    #             # print(f"Key: {key}\nValue: {value}")
-    #             if isinstance(value, dict):  # If value is a dict, it's a subfolder
-    #                 folder_id = self.tree.insert(parent, 'end', text=key, open=True)
-    #                 # Get the corresponding subfolder's missing files from file_check_result
-    #                 # sub_file_check_result = file_check_result.get(key, {})
-    #                 # print(sub_file_check_result)
-    #                 # If sub_file_check_result is a dict, recursively populate the tree
-    #                 # print(isinstance(sub_file_check_result, dict))
-    #                 if isinstance(all_files, dict):
-    #                     self.populate_tree(folder_id, all_files, value)
-    #                 else:
-    #                     # If sub_file_check_result is not a dict, it means the whole folder is missing
-    #                     status = 'Missing'
-    #                     self.tree.insert(folder_id, 'end', text=key, values=(status,), tags=('missing',))
-    #             else:
-    #                 # If value is not a dict, it's a file
-    #                 status = 'Missing' if key in file_check_result else 'Installed'
-    #                 tag = 'missing' if status == 'Missing' else 'installed'
-    #                 self.tree.insert(parent, 'end', text=key, values=(status,), tags=(tag,))
-
     def check_all_files_installed(self):
         return len(self.file_check_result) == 0
 
     def on_install_button_click(self):
-        install_thread = Thread(target=self.file_manager.check_and_download())
-        install_thread.start()
+        self.install_files_button.configure(text="Installing", state="disabled")
+        self.file_manager.check_and_download()
+        self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
 
     def on_next_button_click(self):
         all_files_installed = self.check_all_files_installed()
@@ -141,4 +100,4 @@ class FileInstallerModal(customtkinter.CTkToplevel):
             CombinedModal(self, "Exit")
             # Here you would add your code to go to the next page of the installer
         else:
-            CombinedModal(self, "attention")
+            self.destroy()

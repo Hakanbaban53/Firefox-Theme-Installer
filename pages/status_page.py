@@ -1,16 +1,20 @@
 import json
-import customtkinter
+import threading
+from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkProgressBar, CTkTextbox, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
+from functions.install_files import FileActions
 
 
-class status_page(customtkinter.CTkFrame):
+class status_page(CTkFrame):
     os_values = OSProperties().get_values()
 
     def __init__(self, parent, controller):
-        customtkinter.CTkFrame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         self.controller = controller
+        self.file_actions = FileActions()
+
         self.come_from_which_page = None
         with open("../RealFire_Installer/data/installer_data.json", "r") as file:
             self.text_data = json.load(file)
@@ -24,7 +28,7 @@ class status_page(customtkinter.CTkFrame):
             /Image Location Declarations/
             /////////////////////////////
                                         """
-        self.header_title_background = customtkinter.CTkImage(
+        self.header_title_background = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/header_title_background.png"
             ),
@@ -33,7 +37,7 @@ class status_page(customtkinter.CTkFrame):
             ),
             size=(250, 64),
         )
-        self.line_top_image = customtkinter.CTkImage(
+        self.line_top_image = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/line_top.png"
             ),
@@ -42,12 +46,12 @@ class status_page(customtkinter.CTkFrame):
             ),
             size=(650, 6),
         )
-        self.os_icon_image = customtkinter.CTkImage(
-            dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
+        self.os_icon_image = CTkImage(
+            dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             light_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             size=(20, 24)
         )
-        self.check_icon = customtkinter.CTkImage(
+        self.check_icon = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/icons/check.png"
             ),
@@ -56,7 +60,7 @@ class status_page(customtkinter.CTkFrame):
             ),
             size=(20, 20),
         )
-        self.finish_button_image = customtkinter.CTkImage(
+        self.finish_button_image = CTkImage(
             dark_image=Image.open(
                 "../RealFire_Installer/assets/icons/finish_icon.png"
                 ),
@@ -65,12 +69,12 @@ class status_page(customtkinter.CTkFrame):
             ),
             size=(20, 20),
         )
-        self.back_button_image = customtkinter.CTkImage(
+        self.back_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
             light_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
             size=(20, 20),
         )
-        self.exit_button_image = customtkinter.CTkImage(
+        self.exit_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
             light_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
             size=(20, 20),
@@ -82,7 +86,7 @@ class status_page(customtkinter.CTkFrame):
             ///Status Page Declarations///
             //////////////////////////////
                                             """
-        status_page_frame = customtkinter.CTkFrame(
+        status_page_frame = CTkFrame(
             self,
             fg_color="#2B2631",
             # border_width=4,
@@ -92,18 +96,18 @@ class status_page(customtkinter.CTkFrame):
         status_page_frame.grid(row=0, column=1, sticky="SW")
         status_page_frame.columnconfigure(0, weight=1)
 
-        self.header_title_background_label = customtkinter.CTkLabel(
+        self.header_title_background_label = CTkLabel(
             master=status_page_frame,
             text="Status",
             image=self.header_title_background,
             text_color="White",
-            font=customtkinter.CTkFont(family="Inter", size=24, weight="bold"),
+            font=CTkFont(family="Inter", size=24, weight="bold"),
         )
         self.header_title_background_label.grid(
             row=0, column=0, columnspan=2, padx=273, pady=(75, 0), sticky="NSEW"
         )
 
-        self.line_top_image_label = customtkinter.CTkLabel(
+        self.line_top_image_label = CTkLabel(
             master=status_page_frame,
             text="",
             image=self.line_top_image,
@@ -112,19 +116,19 @@ class status_page(customtkinter.CTkFrame):
             row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
         )
 
-       
-        self.action_label = customtkinter.CTkLabel(
+
+        self.action_label = CTkLabel(
             master=status_page_frame,
             fg_color="#2B2631",
             text_color="#FFFFFF",
             text="",
             image=None,
             compound="right",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            font=CTkFont(family="Inter", size=18, weight="bold"),
         )
         self.action_label.grid(row=2, column=0, padx=60, pady=10, sticky="W")
 
-        self.progress_bar = customtkinter.CTkProgressBar(
+        self.progress_bar = CTkProgressBar(
             master=status_page_frame,
             orientation="horizontal",
             height=24,
@@ -134,7 +138,7 @@ class status_page(customtkinter.CTkFrame):
         self.progress_bar.grid(row=3, column=0, padx=50, pady=10, sticky="NSEW")
         self.progress_bar.set(0)
 
-        self.output_entry = customtkinter.CTkTextbox(
+        self.output_entry = CTkTextbox(
             master=status_page_frame,
             height=190,
             fg_color="white",
@@ -149,13 +153,13 @@ class status_page(customtkinter.CTkFrame):
             /Bottom Widgets Declarations/
             /////////////////////////////
                                             """
-        bottom_frame = customtkinter.CTkFrame(
+        bottom_frame = CTkFrame(
             self,
             fg_color="#2B2631",
         )
         bottom_frame.place(x=200.0, y=600.0)
 
-        navigation_frame = customtkinter.CTkFrame(
+        navigation_frame = CTkFrame(
             master=bottom_frame,
             width=440,
             height=54,
@@ -166,7 +170,7 @@ class status_page(customtkinter.CTkFrame):
         )
         navigation_frame.grid(row=0, column=1, padx=20, sticky="E")
 
-        finish_button = customtkinter.CTkButton(
+        finish_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -183,7 +187,7 @@ class status_page(customtkinter.CTkFrame):
         )
         finish_button.pack(padx=(5, 20), pady=10, side="right")
 
-        self.back_button = customtkinter.CTkButton(
+        self.back_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -194,13 +198,13 @@ class status_page(customtkinter.CTkFrame):
             text_color=self.button_data["text_color"],
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
             text="Back",
-            # state="disabled",
+            state="disabled",
             image=self.back_button_image,
         )
         self.back_button.pack(padx=5, pady=10, side="right")
 
 
-        exit_button = customtkinter.CTkButton(
+        exit_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -222,7 +226,7 @@ class status_page(customtkinter.CTkFrame):
             /Operation System Declarations/
             ///////////////////////////////
                                             """
-        os_frame = customtkinter.CTkFrame(
+        os_frame = CTkFrame(
             master=bottom_frame,
             # width=440,  # Adjust initial width as needed
             # height=54,
@@ -231,7 +235,7 @@ class status_page(customtkinter.CTkFrame):
         )
         os_frame.grid(row=0, column=0, padx=20, sticky="W")
 
-        os_label = customtkinter.CTkLabel(
+        os_label = CTkLabel(
             master=os_frame,
             text=self.os_values["os_name"] + " ",  # Initial text (can be empty)
             text_color=self.os_values["os_color"],
@@ -241,34 +245,7 @@ class status_page(customtkinter.CTkFrame):
         )
 
         os_label.pack(padx=10, pady=10, side="right")  # Pad the label within the frame
-        # self.bind("<Visibility>", self.start_simulate_progress)
 
-
-    def start_simulate_progress(self, event):
-        # Unbind the event so that this function is not called again when the page becomes visible again
-        self.unbind("<Visibility>")
-        # Start the progress simulation
-        self.simulate_progress(self.progress_bar)
-
-    def simulate_progress(self, progress_bar):
-        print("Status page simulate_progress func")
-        """Simulates a task with a progress bar.
-
-        Args:
-            progress_bar (ctk.CTkProgressBar): The progress bar to update.
-        """
-
-        for i in range(101):
-            progress_bar.set(i / 100)  # Update progress as a percentage
-            self.update_idletasks()
-            self.after(5)  # Adjust delay between updates (milliseconds)
-            self.output_entry.insert("end", "Your text goes here\n")
-
-        if self.come_from_which_page == "install":
-            self.action_label.configure(text="Installed  ", image=self.check_icon)
-        elif self.come_from_which_page == "remove":
-            self.action_label.configure(text="Removed  ", image=self.check_icon)
-        
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
         self.profile_folder = kwargs.get("profile_folder")
@@ -278,11 +255,21 @@ class status_page(customtkinter.CTkFrame):
 
         if self.come_from_which_page == "install":
             self.action_label.configure(text="Instaling...")
+            self.file_actions.move_file("/home/hakan/Documents/GitHub/RealFire_Installer/chrome/programs/user.js", self.profile_folder)
+            self.file_actions.move_file("/home/hakan/Documents/GitHub/RealFire_Installer/chrome/programs/user.js", self.profile_folder)
+            self.file_actions.move_folder("/home/hakan/Documents/GitHub/RealFire_Installer/chrome", self.profile_folder)
+            operation_thread = threading.Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
+            operation_thread.start()
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")
+            self.file_actions.delete_file(f"{self.profile_folder}/user.js")
+            self.file_actions.delete_folder(f"{self.profile_folder}/chrome")
+            operation_thread = threading.Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
+            operation_thread.start()
 
-        self.back_button.configure(
-            command=lambda: self.controller.show_frame(
-                f"{self.come_from_which_page}_page"
-            ),
-        )
+        # For Testing
+        # self.back_button.configure(
+        #     command=lambda: self.controller.show_frame(
+        #         f"{self.come_from_which_page}_page"
+        #     ),
+        # )

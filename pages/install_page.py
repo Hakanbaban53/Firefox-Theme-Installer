@@ -1,6 +1,6 @@
 import json
 from tkinter import colorchooser
-import customtkinter
+from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton, CTkEntry, CTkCheckBox, StringVar, CTkComboBox
 from PIL import Image
 from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
@@ -9,13 +9,13 @@ from functions.special_input_functions import SpecialInputFunc
 
 
 
-class install_page(customtkinter.CTkFrame):
+class install_page(CTkFrame):
     os_values = OSProperties().get_values()
     input_values = OSProperties().get_locations()
     profile_folder_location = get_profile_folder()
 
     def __init__(self, parent, controller):
-        customtkinter.CTkFrame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         self.controller = controller
 
         with open("../RealFire_Installer/data/installer_data.json", "r") as file:
@@ -29,7 +29,7 @@ class install_page(customtkinter.CTkFrame):
             /Image Location Declarations/
             /////////////////////////////
                                         """
-        self.header_title_background = customtkinter.CTkImage(
+        self.header_title_background = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/header_title_background.png"
             ),
@@ -38,7 +38,7 @@ class install_page(customtkinter.CTkFrame):
             ),
             size=(300, 64),
         )
-        self.line_top_image = customtkinter.CTkImage(
+        self.line_top_image = CTkImage(
             light_image=Image.open(
                 "../RealFire_Installer/assets/backgrounds/line_top.png"
             ),
@@ -47,17 +47,17 @@ class install_page(customtkinter.CTkFrame):
             ),
             size=(650, 6),
         )
-        self.os_icon_image = customtkinter.CTkImage(
+        self.os_icon_image = CTkImage(
             dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
             light_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             size=(20, 24)
         )
-        self.attention_icon = customtkinter.CTkImage(
+        self.attention_icon = CTkImage(
             light_image=Image.open("../RealFire_Installer/assets/icons/attention.png"),
             dark_image=Image.open("../RealFire_Installer/assets/icons/attention.png"),
             size=(24, 24),
         )
-        self.install_button_image = customtkinter.CTkImage(
+        self.install_button_image = CTkImage(
             dark_image=Image.open(
                 "../RealFire_Installer/assets/icons/install_icon.png"
                 ),
@@ -66,12 +66,12 @@ class install_page(customtkinter.CTkFrame):
             ),
             size=(20, 24),
         )
-        self.back_button_image = customtkinter.CTkImage(
+        self.back_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
             light_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
             size=(20, 20),
         )
-        self.exit_button_image = customtkinter.CTkImage(
+        self.exit_button_image = CTkImage(
             dark_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
             light_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
             size=(20, 20),
@@ -79,7 +79,7 @@ class install_page(customtkinter.CTkFrame):
 
 
 
-        install_page_frame = customtkinter.CTkFrame(
+        install_page_frame = CTkFrame(
             self,
             fg_color="#2B2631",
             # border_width=4,
@@ -88,19 +88,19 @@ class install_page(customtkinter.CTkFrame):
         )
         install_page_frame.grid(row=0, column=1, sticky="NE")
         install_page_frame.columnconfigure(0, weight=1)
-        self.header_title_background_label = customtkinter.CTkLabel(
+        self.header_title_background_label = CTkLabel(
             master=install_page_frame,
             text="Install RealFire",
             image=self.header_title_background,
             text_color="White",
-            font=customtkinter.CTkFont(family="Inter", size=24, weight="bold"),
+            font=CTkFont(family="Inter", size=24, weight="bold"),
             bg_color="#2B2631",
         )
         self.header_title_background_label.grid(
             row=0, column=0, columnspan=2, padx=248, pady=(75, 0), sticky="NSEW"
         )
 
-        self.line_top_image_label = customtkinter.CTkLabel(
+        self.line_top_image_label = CTkLabel(
             master=install_page_frame,
             text="",
             image=self.line_top_image,
@@ -109,7 +109,7 @@ class install_page(customtkinter.CTkFrame):
             row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
         )
 
-        inputs_frame = customtkinter.CTkFrame(
+        inputs_frame = CTkFrame(
             master=install_page_frame,
             width=440,
             height=54,
@@ -121,15 +121,15 @@ class install_page(customtkinter.CTkFrame):
         )
 
         # Profile Name
-        self.profile_folder_name_label = customtkinter.CTkLabel(
+        self.profile_folder_name_label = CTkLabel(
             master=inputs_frame,
             text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Profile Folder",
         )
         self.profile_folder_name_label.grid(row=0, column=0, padx=(10, 4), sticky="w")
 
-        self.profile_folder_name_entry = customtkinter.CTkEntry(
+        self.profile_folder_name_entry = CTkEntry(
             master=inputs_frame,
             width=int(self.input_data["width"]),
             height=int(self.input_data["height"]),
@@ -146,15 +146,15 @@ class install_page(customtkinter.CTkFrame):
         )
 
         # Application Folder
-        self.application_folder_label = customtkinter.CTkLabel(
+        self.application_folder_label = CTkLabel(
             master=inputs_frame,
             text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Application Folder",
         )
         self.application_folder_label.grid(row=0, column=1, padx=(10, 4), sticky="w")
 
-        self.application_folder_entry = customtkinter.CTkEntry(
+        self.application_folder_entry = CTkEntry(
             master=inputs_frame,
             width=int(self.input_data["width"]),
             height=int(self.input_data["height"]),
@@ -171,15 +171,15 @@ class install_page(customtkinter.CTkFrame):
         )
 
         # New tab wallpaper
-        self.newtab_wallpaper_label = customtkinter.CTkLabel(
+        self.newtab_wallpaper_label = CTkLabel(
             master=inputs_frame,
             text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            font=CTkFont(family="Inter", size=18, weight="bold"),
             text="New Tab Wallpaper Location",
         )
         self.newtab_wallpaper_label.grid(row=2, column=0, padx=(10, 4), sticky="w")
 
-        self.newtab_wallpaper_entry = customtkinter.CTkEntry(
+        self.newtab_wallpaper_entry = CTkEntry(
             master=inputs_frame,
             width=int(self.input_data["width"]),
             height=int(self.input_data["height"]),
@@ -197,17 +197,17 @@ class install_page(customtkinter.CTkFrame):
 
 
         # Accent Color
-        self.accent_color_label = customtkinter.CTkLabel(
+        self.accent_color_label = CTkLabel(
             master=inputs_frame,
             text_color="white",
-            font=customtkinter.CTkFont(family="Inter", size=18, weight="bold"),
+            font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Accent Color",
         )
         self.accent_color_label.grid(row=2, column=1, padx=(10, 4), sticky="w")
         self.accent_color_values = ["Blue", "Red", "AccentColor", "Custom"]  # Initial values
         self.selected_color = None  # Store custom color
 
-        self.accent_color_combobox = customtkinter.CTkComboBox(
+        self.accent_color_combobox = CTkComboBox(
             master=inputs_frame,
             width=int(self.input_data["width"]),
             height=int(self.input_data["height"]),
@@ -222,8 +222,8 @@ class install_page(customtkinter.CTkFrame):
         )
 
         # Checkbox
-        self.check_var = customtkinter.StringVar(value="off")
-        self.edit_checkbox = customtkinter.CTkCheckBox(
+        self.check_var = StringVar(value="off")
+        self.edit_checkbox = CTkCheckBox(
             master=inputs_frame,
             text="Edit Inputs",
             command=self.checkbox_event,
@@ -264,7 +264,7 @@ class install_page(customtkinter.CTkFrame):
             ////Invalid Entry Declarations////
             //////////////////////////////////
                                                 """
-        self.invalid_entry_frame = customtkinter.CTkFrame(
+        self.invalid_entry_frame = CTkFrame(
             master=inputs_frame,
             width=440,  # Adjust initial width as needed
             height=54,
@@ -277,7 +277,7 @@ class install_page(customtkinter.CTkFrame):
         )
 
         # Create the label to display the invalid entries count
-        self.invalid_entries_text = customtkinter.CTkLabel(
+        self.invalid_entries_text = CTkLabel(
             master=self.invalid_entry_frame,
             text="",
             text_color="#f04141",
@@ -292,13 +292,13 @@ class install_page(customtkinter.CTkFrame):
             /Bottom Widgets Declarations/
             /////////////////////////////
                                             """
-        bottom_frame = customtkinter.CTkFrame(
+        bottom_frame = CTkFrame(
             self,
             fg_color="#2B2631",
         )
         bottom_frame.place(x=200.0, y=600.0)
 
-        navigation_frame = customtkinter.CTkFrame(
+        navigation_frame = CTkFrame(
             master=bottom_frame,
             width=440,
             height=54,
@@ -311,7 +311,7 @@ class install_page(customtkinter.CTkFrame):
 
         navigation_frame.grid(row=0, column=1, padx=20, sticky="E")
 
-        self.install_button = customtkinter.CTkButton(
+        self.install_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -336,7 +336,7 @@ class install_page(customtkinter.CTkFrame):
 
         self.install_button.pack(padx=(5, 20), pady=10, side="right")
 
-        back_button = customtkinter.CTkButton(
+        back_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -353,7 +353,7 @@ class install_page(customtkinter.CTkFrame):
 
         back_button.pack(padx=5, pady=10, side="right")
 
-        exit_button = customtkinter.CTkButton(
+        exit_button = CTkButton(
             master=navigation_frame,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
@@ -375,7 +375,7 @@ class install_page(customtkinter.CTkFrame):
             /Operation System Declarations/
             ///////////////////////////////
                                             """
-        os_frame = customtkinter.CTkFrame(
+        os_frame = CTkFrame(
             master=bottom_frame,
             # width=440,  # Adjust initial width as needed
             # height=54,
@@ -384,7 +384,7 @@ class install_page(customtkinter.CTkFrame):
         )
         os_frame.grid(row=0, column=0, padx=20, sticky="W")
 
-        os_label = customtkinter.CTkLabel(
+        os_label = CTkLabel(
             master=os_frame,
             text=self.os_values["os_name"] + " ",  # Initial text (can be empty)
             text_color=self.os_values["os_color"],

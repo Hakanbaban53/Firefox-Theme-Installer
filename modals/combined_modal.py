@@ -5,6 +5,7 @@ import customtkinter
 class CombinedModal(customtkinter.CTkToplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
+        self.transient(parent)
         self.configure(fg_color="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
