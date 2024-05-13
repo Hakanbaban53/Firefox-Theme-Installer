@@ -329,7 +329,7 @@ class home_page(CTkFrame):
         thread.start()
 
     def install_files(self):
-        modal = FileInstallerModal(self)
+        modal = FileInstallerModal(self, self.detect_files_text, self.install_button)
         self.wait_window(modal)
         self.recheck_files()
 

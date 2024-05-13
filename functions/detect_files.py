@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from concurrent.futures import ThreadPoolExecutor
-
+import logging
 
 class FileManager:
     def __init__(self, json_file_path):
@@ -32,9 +32,7 @@ class FileManager:
                     print(f"Downloaded {destination}")
                     return
                 else:
-                    print(
-                        f"Failed to download {download_link}. Status code: {response.status_code}"
-                    )
+                    print(f"Failed to download {download_link}. Status code: {response.status_code}")
                     retries += 1
             except requests.exceptions.RequestException as e:
                 print(f"An error occurred: {e}")
@@ -51,61 +49,50 @@ class FileManager:
         except OSError as e:
             print(f"An error occurred while creating folder: {e}")
 
-    def check_and_download(self, folder_file_data=None, root="."):
-        if folder_file_data is None:
-            folder_file_data = self.folder_file_data
 
+
+    def download_missing_files(self, missing_files):
+        logging.basicConfig(level=logging.INFO)
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
-            for folder, contents in folder_file_data.items():
-                if isinstance(
-                    contents, dict
-                ):  # If contents is a dict, it's a subfolder
-                    subfolder_path = os.path.join(root, folder)
-                    self.create_folder(
-                        subfolder_path
-                    )  # Create subfolder if it doesn't exist
-                    # Recursively check the subfolder
-                    futures.append(
-                        executor.submit(
-                            self.check_and_download, contents, subfolder_path
-                        )
-                    )
-                else:  # If contents is not a dict, it's assumed to be a file link
-                    file_path = os.path.join(root, folder)
-                    if not os.path.isfile(file_path):
-                        # Submit download task to the thread pool
-                        futures.append(
-                            executor.submit(
-                                self.download_from_github, contents, file_path
-                            )
-                        )
+            for folder_path, files in missing_files.items():
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
+                    print(f"Folder generated: {folder_path}")
+                for file_info in files:
+                    file_path = os.path.join(folder_path, file_info['file'])
+                    download_link = file_info['url']
+                    logging.info(f"Downloading {file_path} from {download_link}")
+                    futures.append(executor.submit(self.download_from_github, download_link, file_path))
 
-            # Wait for all futures to complete
             for future in futures:
-                future.result()
+                try:
+                    future.result()
+                except Exception as e:
+                    logging.error(f"An error occurred: {e}")
+
 
     def check_files_exist(self, folder_file_data=None, root="."):
         if folder_file_data is None:
             folder_file_data = self.folder_file_data
-            self.missing_files = {}  # Her kontrolde sözlüğü sıfırla
+            self.missing_files = {}  # Reset the dictionary for each check
 
         for folder, contents in folder_file_data.items():
             folder_path = os.path.join(root, folder)
-            if isinstance(
-                contents, dict
-            ):  # Eğer içerik bir sözlükse, bu bir alt klasördür
+            if isinstance(contents, dict):  # If the content is a dictionary, it's a subfolder
                 self.check_files_exist(contents, folder_path)
-            else:  # Eğer içerik bir sözlük değilse, bu bir dosya bağlantısı olarak kabul edilir
+            else:  # If the content is not a dictionary, it's considered a file link
                 if not os.path.isfile(folder_path):
-                    # Eksik dosyanın bulunduğu klasör adını al
-                    missing_folder_name = (
-                        os.path.basename(root) if root != "." else folder
-                    )
-                    # Eksik dosyayı klasör adı altında grupla
-                    if missing_folder_name not in self.missing_files:
-                        self.missing_files[missing_folder_name] = []
-                    self.missing_files[missing_folder_name].append(folder)
+                    if root not in self.missing_files:
+                        self.missing_files[root] = []
+                    self.missing_files[root].append({
+                        'file': folder,
+                        'url': contents
+                    })
 
         return self.missing_files
 
+# filemanager = FileManager("../RealFire_Installer/data/installer_files_data.json")
+# missing_files = filemanager.check_files_exist()
+# filemanager.download_missing_files(missing_files)
+# print(missing_files)

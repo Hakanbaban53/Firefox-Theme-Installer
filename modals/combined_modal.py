@@ -1,82 +1,91 @@
 import json
 import customtkinter
 
-
 class CombinedModal(customtkinter.CTkToplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
+        self._configure_window(parent)
+        self._load_data()
+        self.create_modal(modal)
+
+    def _configure_window(self, parent):
         self.transient(parent)
         self.configure(fg_color="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
 
-        with open("../RealFire_Installer/data/installer_data.json", "r") as file:
-            self.installer_data = json.load(file)
+    def _load_data(self):
+        try:
+            with open("../RealFire_Installer/data/installer_data.json", "r") as file:
+                self.installer_data = json.load(file)
+            self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
+        except FileNotFoundError:
+            raise FileNotFoundError("The installer data file was not found.")
 
-        self.text_data = self.installer_data.get("common_values")
-
-        self.button_font = customtkinter.CTkFont(family="Arial", size=18)
-
-        modal_mapping = {"exit": "exit_modal", "attention": "attention_modal"}
+    def create_modal(self, modal):
+        modal_mapping = {
+            "exit": "exit_modal",
+            "attention": "attention_modal",
+            "admin_req": "admin_req_modal",
+            "check_files_installed": "check_files_installed_modal",
+            "check_files_not_installed": "check_files_not_installed_modal",
+        }
 
         modal_key = modal_mapping.get(modal.lower())
-        if modal_key is None:
-            raise ValueError(f"Unknown modal type: {modal}")
-
         modal_data = self.text_data.get(modal_key)
-        if modal_data is None:
-            raise KeyError(f"Modal data not found for key: {modal_key}")
+
+        # For testing purposes, I will comment out the following lines
+        # if modal_key is None:
+        #     raise ValueError(f"Unknown modal type: '{modal}'")
+
+        # if modal_data is None:
+        #     raise KeyError(f"Modal data not found for key: '{modal_key}'")
 
         self.title(modal_data["modal_title"])
+        self.create_label(modal_data["modal_label"])
+        self.create_buttons(modal)
+
+    def create_label(self, text):
         self.message_label = customtkinter.CTkLabel(
             self,
-            text=modal_data["modal_label"],
+            text=text,
             text_color="white",
             font=customtkinter.CTkFont(family="Arial", size=16),
         )
         self.message_label.pack(padx=10, pady=10)
 
+    def create_buttons(self, modal):
         if modal.lower() == "exit":
-            self.create_exit_modal()
+            self.create_exit_buttons()
         elif modal.lower() == "attention":
-            self.create_attention_modal()
+            self.create_attention_exit_button()
+        else:
+            self.ok_button = self.create_button("Ok", "#10dc60", self.cancel_action)
+            self.ok_button.pack(pady=20)
 
-    def create_exit_modal(self):
-        self.ok_button = customtkinter.CTkButton(
-            self,
-            text="Yes",
-            text_color="white",
-            command=self.ok_action,
-            bg_color="#2B2631",
-            fg_color="#f04141",
-            font=self.button_font,
-        )
+    def create_exit_buttons(self):
+        self.ok_button = self.create_button("Yes", "#f04141", self.ok_action)
         self.ok_button.pack(side="left", padx=10, pady=20)
 
-        self.cancel_button = customtkinter.CTkButton(
-            self,
-            text="No",
-            text_color="white",
-            command=self.cancel_action,
-            bg_color="#2B2631",
-            fg_color="#10dc60",
-            font=self.button_font,
-        )
+        self.cancel_button = self.create_button("No", "#10dc60", self.cancel_action)
         self.cancel_button.pack(side="right", padx=10, pady=20)
 
-    def create_attention_modal(self):
+    def create_attention_exit_button(self):
         self.protocol("WM_DELETE_WINDOW", self.ok_action)
-        self.ok_button = customtkinter.CTkButton(
-            self,
-            text="Ok",
-            text_color="white",
-            command=self.ok_action,
-            bg_color="#2B2631",
-            fg_color="#10dc60",
-            font=self.button_font,
-        )
+        self.ok_button = self.create_button("Ok", "#10dc60", self.ok_action)
         self.ok_button.pack(pady=20)
+
+    def create_button(self, text, fg_color, command):
+        return customtkinter.CTkButton(
+            self,
+            text=text,
+            text_color="white",
+            command=command,
+            bg_color="#2B2631",
+            fg_color=fg_color,
+            font=customtkinter.CTkFont(family="Arial", size=18),
+        )
 
     def ok_action(self):
         self.master.quit()

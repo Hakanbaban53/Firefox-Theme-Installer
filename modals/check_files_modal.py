@@ -1,13 +1,14 @@
 from threading import Thread
 import customtkinter
-from tkinter import messagebox, ttk
+from tkinter import StringVar, ttk
 from functions.detect_files import FileManager
 from modals.combined_modal import CombinedModal
 
 
 class FileInstallerModal(customtkinter.CTkToplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, detect_files_text, install_button):
         super().__init__(parent)
+        self.transient(parent)
         self.configure(fg_color="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
@@ -17,7 +18,6 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         self.file_manager = FileManager(
             "../RealFire_Installer/data/installer_files_data.json"
         )
-        self.file_check_result = self.file_manager.check_files_exist()  # Missing files
         self.create_widgets()
 
     def create_widgets(self):
@@ -48,16 +48,21 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         treeview.heading("File(s) Name", text="File(s) Name", anchor="w")
 
         # Sözlük elemanlarını treeview'a ekle
-        for kategori, dosyalar in self.file_check_result.items():
+        for kategori, dosyalar in self.check_all_files_installed().items():
             kategori_id = treeview.insert("", "end", text=kategori)
             for dosya in dosyalar:
                 treeview.insert(kategori_id, "end", text="", values=(dosya,))
 
+        self.check_var = StringVar(value="off")
         self.user_know_what_do = customtkinter.CTkCheckBox(
             master=self.files_modal_frame,
             text="I know what I do",
             text_color="#FFFFFF",
             font=("Arial", 16, "bold"),
+            command=self.checkbox_event,
+            variable=self.check_var,
+            onvalue="on",
+            offvalue="off",
         )
         self.user_know_what_do.grid(row=2, column=0, padx=0, pady=(20, 10))
 
@@ -87,17 +92,59 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         self.install_files_button.grid(row=0, column=1, padx=20, pady=0)
 
     def check_all_files_installed(self):
-        return len(self.file_check_result) == 0
+        self.file_check_result = self.file_manager.check_files_exist()
+        return self.file_check_result
+
 
     def on_install_button_click(self):
+        # Disable the Install button and change its text to "Installing"
         self.install_files_button.configure(text="Installing", state="disabled")
-        self.file_manager.check_and_download()
+
+        # Start the download process in a separate thread
+        thread = Thread(target=self.start_download_process)
+        thread.start()
+        thread.join()  # Wait for the thread to finish
+
+        # After downloading, update the Install button's text and color
         self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
 
+    def start_download_process(self):
+        missing_files = self.check_all_files_installed()
+
+        self.file_manager.download_missing_files(missing_files)
+
     def on_next_button_click(self):
-        all_files_installed = self.check_all_files_installed()
-        if all_files_installed:
-            CombinedModal(self, "Exit")
-            # Here you would add your code to go to the next page of the installer
-        else:
+        all_files_installed = len(self.check_all_files_installed())
+        if all_files_installed == 0:
+            modal = CombinedModal(self, "check_files_installed")
+            self.wait_window(modal)
             self.destroy()
+        else:
+            CombinedModal(self, "check_files_not_installed")
+
+    def checkbox_event(self):
+        if self.user_know_what_do.get() == "on":
+            self.install_files_button.configure(
+                text="Exit",
+                fg_color="white",
+                text_color="black",
+                command=self.destroy
+            )
+            self.check_button.configure(
+                text="Skipped",
+                state="disabled",
+                fg_color="white"
+            )
+        else:
+            self.install_files_button.configure(
+                text="Install",
+                fg_color="#10dc60",
+                bg_color="#2B2631",
+                text_color="white",
+                command=self.on_install_button_click
+            )
+            self.check_button.configure(
+                text="Check",
+                state="normal",
+                fg_color="#f04141"
+            )

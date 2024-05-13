@@ -45,10 +45,10 @@ class MultiPageApp(CTk):
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
         self.frames = {}
-        if not self.is_admin():
-            modal = CombinedModal(self, "attention")
-            self.wait_window(modal)
-            sys.exit()
+        # if not self.is_admin():
+        #     modal = CombinedModal(self, "admin_req")
+        #     self.wait_window(modal)
+        #     sys.exit()
 
     def create_frame(self, page_class):
         frame = page_class(self.container, self)
