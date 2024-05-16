@@ -19,7 +19,7 @@
     },
     "check_files_installed_modal": {
       "modal_title": "All Files Installed",
-      "modal_label": "You can continou now."
+      "modal_label": "You can continue now."
     },
     "check_files_not_installed_modal": {
       "modal_title": "All Files Not Installed!",

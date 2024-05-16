@@ -1,4 +1,4 @@
-import json
+from json import load
 from tkinter import colorchooser
 from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton, CTkEntry, CTkCheckBox, StringVar, CTkComboBox
 from PIL import Image
@@ -18,8 +18,8 @@ class install_page(CTkFrame):
         CTkFrame.__init__(self, parent)
         self.controller = controller
 
-        with open("../RealFire_Installer/data/installer_data.json", "r") as file:
-            self.text_data = json.load(file)
+        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+            self.text_data = load(file)
 
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
         self.input_data = self.text_data.get("common_values")["inputs"]
@@ -31,49 +31,49 @@ class install_page(CTkFrame):
                                         """
         self.header_title_background = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             size=(300, 64),
         )
         self.line_top_image = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/line_top.png"
+                "../RealFire-Installer/assets/backgrounds/line_top.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/line_top.png"
+                "../RealFire-Installer/assets/backgrounds/line_top.png"
             ),
             size=(650, 6),
         )
         self.os_icon_image = CTkImage(
-            dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
-            light_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
+            dark_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
+            light_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             size=(20, 24)
         )
         self.attention_icon = CTkImage(
-            light_image=Image.open("../RealFire_Installer/assets/icons/attention.png"),
-            dark_image=Image.open("../RealFire_Installer/assets/icons/attention.png"),
+            light_image=Image.open("../RealFire-Installer/assets/icons/attention.png"),
+            dark_image=Image.open("../RealFire-Installer/assets/icons/attention.png"),
             size=(24, 24),
         )
         self.install_button_image = CTkImage(
             dark_image=Image.open(
-                "../RealFire_Installer/assets/icons/install_icon.png"
+                "../RealFire-Installer/assets/icons/install_icon.png"
                 ),
             light_image=Image.open(
-                "../RealFire_Installer/assets/icons/install_icon.png"
+                "../RealFire-Installer/assets/icons/install_icon.png"
             ),
             size=(20, 24),
         )
         self.back_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
-            light_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
+            dark_image=Image.open("../RealFire-Installer/assets/icons/back_icon.png"),
+            light_image=Image.open("../RealFire-Installer/assets/icons/back_icon.png"),
             size=(20, 20),
         )
         self.exit_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
-            light_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
+            dark_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"),
+            light_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"),
             size=(20, 20),
         )
 

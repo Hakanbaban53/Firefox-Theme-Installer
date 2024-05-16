@@ -1,4 +1,4 @@
-import subprocess
+from subprocess import run
 from functions.get_os_properties import OSProperties
 
 class FileActions:
@@ -26,7 +26,7 @@ class FileActions:
         else:
             print("Unsupported operating system.")
 
-    def delete_file(self, file_path):
+    def remove_file(self, file_path):
         if self.os_name == "Windows":
             self.commands.append(f'del "{file_path}"')
         elif self.os_name == "Linux":
@@ -36,7 +36,7 @@ class FileActions:
         else:
             print("Unsupported operating system.")
 
-    def delete_folder(self, folder_path):
+    def remove_folder(self, folder_path):
         if self.os_name == "Windows":
             self.commands.append(f'rd /s /q "{folder_path}"')
         elif self.os_name == "Linux" or self.os_name == "Darwin":  # macOS
@@ -48,7 +48,7 @@ class FileActions:
         total_operations = len(self.commands)
         for i, command in enumerate(self.commands):
             try:
-                subprocess.run(command, shell=True, check=True)
+                run(command, shell=True, check=True)
 
                 # Update progress bar and output entry after each operation
                 progress = (i + 1) / total_operations

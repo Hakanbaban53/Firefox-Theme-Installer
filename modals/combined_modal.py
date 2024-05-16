@@ -1,7 +1,7 @@
-import json
-import customtkinter
+from json import load
+from customtkinter import CTkToplevel, CTkLabel, CTkButton
 
-class CombinedModal(customtkinter.CTkToplevel):
+class CombinedModal(CTkToplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
         self._configure_window(parent)
@@ -17,8 +17,8 @@ class CombinedModal(customtkinter.CTkToplevel):
 
     def _load_data(self):
         try:
-            with open("../RealFire_Installer/data/installer_data.json", "r") as file:
-                self.installer_data = json.load(file)
+            with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+                self.installer_data = load(file)
             self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
         except FileNotFoundError:
             raise FileNotFoundError("The installer data file was not found.")
@@ -47,11 +47,11 @@ class CombinedModal(customtkinter.CTkToplevel):
         self.create_buttons(modal)
 
     def create_label(self, text):
-        self.message_label = customtkinter.CTkLabel(
+        self.message_label = CTkLabel(
             self,
             text=text,
             text_color="white",
-            font=customtkinter.CTkFont(family="Arial", size=16),
+            font=("Arial", 16),
         )
         self.message_label.pack(padx=10, pady=10)
 
@@ -77,14 +77,14 @@ class CombinedModal(customtkinter.CTkToplevel):
         self.ok_button.pack(pady=20)
 
     def create_button(self, text, fg_color, command):
-        return customtkinter.CTkButton(
+        return CTkButton(
             self,
             text=text,
             text_color="white",
             command=command,
             bg_color="#2B2631",
             fg_color=fg_color,
-            font=customtkinter.CTkFont(family="Arial", size=18),
+            font=("Arial", 18),
         )
 
     def ok_action(self):

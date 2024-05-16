@@ -1,4 +1,4 @@
-import os
+from os import path
 
 class SpecialInputFunc:
     invalid_entries = []
@@ -6,13 +6,13 @@ class SpecialInputFunc:
     def validate_file_location(self, entry_widget, file_extension=None):
         location = entry_widget.get()
 
-        if (os.path.exists(location) or location == "") and file_extension == None:
+        if (path.exists(location) or location == "") and file_extension == None:
             entry_widget.configure(border_color="#10dc60")
             # Remove entry from invalid_entries if it exists
             if entry_widget in self.invalid_entries:
                 self.invalid_entries.remove(entry_widget)
         elif (
-            os.path.isfile(location)
+            path.isfile(location)
             and location.lower().endswith(".png")
             or location == ""
         ) and file_extension == ".png":

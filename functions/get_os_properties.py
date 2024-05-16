@@ -1,14 +1,14 @@
-import json
-import platform
+from json import load
+from platform import system
 
 class OSProperties:
     OS_NAME = None  
-    with open("../RealFire_Installer/data/installer_data.json", "r") as file:
-        os_data = json.load(file)
+    with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+        os_data = load(file)
 
     def get_os(self):
         """Detects the operating system and returns a string."""
-        self.OS_NAME = platform.system()
+        self.OS_NAME = system()
         if self.OS_NAME == 'Windows':
             return 'Windows'
         elif self.OS_NAME == 'Darwin':  # macOS detection

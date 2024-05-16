@@ -2,7 +2,7 @@ from json import load
 from time import sleep
 from tkinter import PhotoImage, Label, TclError
 from itertools import cycle
-from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFrame, CTkButton
+from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFrame, CTkButton, StringVar, CTkCheckBox
 from PIL import Image
 from modals.check_files_modal import FileInstallerModal
 from modals.combined_modal import CombinedModal
@@ -19,7 +19,7 @@ class home_page(CTkFrame):
         CTkFrame.__init__(self, parent)
         self.controller = controller
         self.text_data = {}
-        with open("../RealFire_Installer/data/installer_data.json", "r") as file:
+        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
             self.text_data = load(file)
 
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
@@ -32,70 +32,70 @@ class home_page(CTkFrame):
                                         """
         self.header_title_background = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             size=(390, 64),
         )
 
         self.line_top_image = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/line_top.png"
+                "../RealFire-Installer/assets/backgrounds/line_top.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/line_top.png"
+                "../RealFire-Installer/assets/backgrounds/line_top.png"
             ),
             size=(650, 6),
         )
 
         self.os_icon_image = CTkImage(
-            dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
-            light_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
+            dark_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"), 
+            light_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             size=(20, 24)
         )
 
         self.select_action_image = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             size=(270, 36),
         )
 
         self.remove_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/remove_icon.png"), 
-            light_image=Image.open("../RealFire_Installer/assets/icons/remove_icon.png"), 
+            dark_image=Image.open("../RealFire-Installer/assets/icons/remove_icon.png"), 
+            light_image=Image.open("../RealFire-Installer/assets/icons/remove_icon.png"), 
             size=(20, 24)
         )
 
         self.install_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/install_icon.png"), 
-            light_image=Image.open("../RealFire_Installer/assets/icons/install_icon.png"), 
+            dark_image=Image.open("../RealFire-Installer/assets/icons/install_icon.png"), 
+            light_image=Image.open("../RealFire-Installer/assets/icons/install_icon.png"), 
             size=(20, 20)
         )
 
         self.exit_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"), 
-            light_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"), 
+            dark_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"), 
+            light_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"), 
             size=(20, 20)
         )
         self.reload_icon = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/icons/reload_icon.png"
+                "../RealFire-Installer/assets/icons/reload_icon.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/icons/reload_icon.png"
+                "../RealFire-Installer/assets/icons/reload_icon.png"
             ),
             size=(20, 20),
         )
 
 
-        self.attention_icon = PhotoImage(file="../RealFire_Installer/assets/icons/attention.png", height=24, width=24)
-        self.check_icon = PhotoImage(file="../RealFire_Installer/assets/icons/check.png", height=20, width=20)
+        self.attention_icon = PhotoImage(file="../RealFire-Installer/assets/icons/attention.png", height=24, width=24)
+        self.check_icon = PhotoImage(file="../RealFire-Installer/assets/icons/check.png", height=20, width=20)
 
         """
             //////////////////////////////
@@ -285,9 +285,27 @@ class home_page(CTkFrame):
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
             command=self.install_files,
         )
+        
+        self.recheck_skip_frame = CTkFrame(
+            master=home_page_frame,
+            fg_color= "#2B2631"
+        )
+        self.recheck_skip_frame.grid(row=6, column=0, padx=0, pady=0, columnspan=2, sticky="")
+        
+        self.check_var = StringVar(value="off")
+        self.user_know_what_do = CTkCheckBox(
+            self.recheck_skip_frame,
+            text="I know what I do",
+            text_color="#FFFFFF",
+            font=("Arial", 16, "bold"),
+            command=self.checkbox_event,
+            variable=self.check_var,
+            onvalue="on",
+            offvalue="off",
+        )
 
         self.recheck_button = CTkButton(
-            master=home_page_frame,
+            self.recheck_skip_frame,
             width=40,
             height=40,
             text="",
@@ -295,7 +313,7 @@ class home_page(CTkFrame):
             command=self.recheck_files,  # Bind the recheck_files method
             image=self.reload_icon
         )
-        self.recheck_button.grid(row=6, column=0, padx=0, pady=0, columnspan=2, sticky="")
+        self.recheck_button.grid(row=1, column=0, padx=0, pady=0, columnspan=2, sticky="")
 
 
     """
@@ -309,7 +327,7 @@ class home_page(CTkFrame):
         sayac = 0
         while True:
             try:
-                kare = PhotoImage(file="../RealFire_Installer/assets/icons/block_spin.gif", format=f'gif -index {sayac}')
+                kare = PhotoImage(file="../RealFire-Installer/assets/icons/block_spin.gif", format=f'gif -index {sayac}')
                 kareler.append(kare)
                 sayac += 2
             except TclError:
@@ -325,6 +343,7 @@ class home_page(CTkFrame):
         self.detect_files_text.config(text="Checking The Files  ", fg="#000000")
         self.install_button.configure(state="disabled")
         self.install_files_button.grid_remove()
+        self.user_know_what_do.grid_remove()
         thread = Thread(target=self.locate_files)
         thread.start()
 
@@ -337,17 +356,55 @@ class home_page(CTkFrame):
         kareler = self.load_gif()
         self.update_fps(kareler)
         sleep(1)
-        self.file_check_result = FileManager("../RealFire_Installer/data/installer_files_data.json").check_files_exist()
+        self.file_check_result = FileManager("../RealFire-Installer/data/installer_files_data.json").check_files_exist()
         self.master.after_cancel(self.animasyon_id)
         if len(self.file_check_result) == 0:
             self.master.after_cancel(self.animasyon_id)
             self.detect_files_text.config(text="All Files Installed  ", fg="#10dc60", image=self.check_icon)
             self.install_button.configure(state="normal")
+            self.recheck_button.grid(row=6, column=0, padx=0, pady=0, sticky="")
+            self.user_know_what_do.grid_remove()
+
         else:
             self.master.after_cancel(self.animasyon_id)
             self.detect_files_text.config(text="Some Files Are Missing  ", fg="#f04141", image=self.attention_icon)
             self.install_files_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
+            self.user_know_what_do.grid(row=6, column=0, padx=10, pady=0, sticky="")
+            self.recheck_button.grid(row=6, column=1, padx=10, pady=0, sticky="")
+
         
+    def checkbox_event(self):
+        if self.user_know_what_do.get() == "on":
+            self.install_button.configure( 
+                state="normal"
+            )
+            self.install_files_button.configure(
+                state="disabled"
+            )
+            self.detect_files_text.config(
+                text="Skipped by User  ",
+                fg="#f04141",
+                image=self.attention_icon
+            )
+            self.recheck_button.configure(
+                state="disabled"
+            )
+        else:
+            self.install_button.configure(
+                state="disabled"
+            )
+            self.install_files_button.configure(
+                state="normal"
+            )
+            self.detect_files_text.config(
+                text="Some Files Are Missing  ",
+                fg="#f04141",
+                image=self.attention_icon
+            )
+            self.recheck_button.configure(
+                state="normal"
+            )
+
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed
         pass

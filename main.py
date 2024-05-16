@@ -1,6 +1,7 @@
 from json import load
-import os
-import sys
+from os import name, getuid
+from sys import exit
+from subprocess import run
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame
 from PIL import Image
 from modals.combined_modal import CombinedModal
@@ -13,7 +14,7 @@ class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
         CTk.__init__(self, *args, **kwargs)
         
-        with open("../RealFire_Installer/data/installer_data.json", "r") as file:
+        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
             self.text_data = load(file)
 
         self.title(self.text_data["common_values"]["installer_info"]["installer_title"])
@@ -21,13 +22,18 @@ class MultiPageApp(CTk):
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
 
+        if not self.is_admin():
+            modal = CombinedModal(self, "admin_req")
+            self.wait_window(modal)
+            exit()
+
         # Create the image label to be displayed across all pages
         self.installer_img = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/installer_img.png"
+                "../RealFire-Installer/assets/backgrounds/installer_img.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/installer_img.png"
+                "../RealFire-Installer/assets/backgrounds/installer_img.png"
             ),
             size=(315, 666),
         )
@@ -45,10 +51,6 @@ class MultiPageApp(CTk):
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
         self.frames = {}
-        # if not self.is_admin():
-        #     modal = CombinedModal(self, "admin_req")
-        #     self.wait_window(modal)
-        #     sys.exit()
 
     def create_frame(self, page_class):
         frame = page_class(self.container, self)
@@ -119,11 +121,11 @@ class MultiPageApp(CTk):
     def is_admin(self):
         try:
             # Windows: Check for admin rights
-            if os.name == 'nt':
-                return subprocess.run(['net', 'session'], capture_output=True, check=False).returncode == 0
+            if name == 'nt':
+                return run(['net', 'session'], capture_output=True, check=False).returncode == 0
             # Linux and macOS: Check for root user
             else:
-                return os.getuid() == 0
+                return getuid() == 0
         except Exception as e:
             print(f"Error checking admin rights: {e}")
             return False

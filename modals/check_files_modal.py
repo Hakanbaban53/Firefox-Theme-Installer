@@ -1,6 +1,6 @@
 from threading import Thread
 import customtkinter
-from tkinter import StringVar, ttk
+from tkinter import ttk
 from functions.detect_files import FileManager
 from modals.combined_modal import CombinedModal
 
@@ -16,7 +16,7 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         self.title("Install Missing Files")
 
         self.file_manager = FileManager(
-            "../RealFire_Installer/data/installer_files_data.json"
+            "../RealFire-Installer/data/installer_files_data.json"
         )
         self.create_widgets()
 
@@ -53,23 +53,10 @@ class FileInstallerModal(customtkinter.CTkToplevel):
             for dosya in dosyalar:
                 treeview.insert(kategori_id, "end", text="", values=(dosya,))
 
-        self.check_var = StringVar(value="off")
-        self.user_know_what_do = customtkinter.CTkCheckBox(
-            master=self.files_modal_frame,
-            text="I know what I do",
-            text_color="#FFFFFF",
-            font=("Arial", 16, "bold"),
-            command=self.checkbox_event,
-            variable=self.check_var,
-            onvalue="on",
-            offvalue="off",
-        )
-        self.user_know_what_do.grid(row=2, column=0, padx=0, pady=(20, 10))
-
         self.buttons_frame = customtkinter.CTkFrame(
             master=self.files_modal_frame, fg_color="#2B2631"
         )
-        self.buttons_frame.grid(row=3, column=0, padx=0, pady=(20, 10))
+        self.buttons_frame.grid(row=2, column=0, padx=0, pady=(20, 10))
 
         self.check_button = customtkinter.CTkButton(
             master=self.buttons_frame,
@@ -121,30 +108,3 @@ class FileInstallerModal(customtkinter.CTkToplevel):
             self.destroy()
         else:
             CombinedModal(self, "check_files_not_installed")
-
-    def checkbox_event(self):
-        if self.user_know_what_do.get() == "on":
-            self.install_files_button.configure(
-                text="Exit",
-                fg_color="white",
-                text_color="black",
-                command=self.destroy
-            )
-            self.check_button.configure(
-                text="Skipped",
-                state="disabled",
-                fg_color="white"
-            )
-        else:
-            self.install_files_button.configure(
-                text="Install",
-                fg_color="#10dc60",
-                bg_color="#2B2631",
-                text_color="white",
-                command=self.on_install_button_click
-            )
-            self.check_button.configure(
-                text="Check",
-                state="normal",
-                fg_color="#f04141"
-            )

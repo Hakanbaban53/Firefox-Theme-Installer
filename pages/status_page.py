@@ -1,5 +1,5 @@
-import json
-import threading
+from json import load
+from threading import Thread
 from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkProgressBar, CTkTextbox, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
@@ -16,8 +16,8 @@ class status_page(CTkFrame):
         self.file_actions = FileActions()
 
         self.come_from_which_page = None
-        with open("../RealFire_Installer/data/installer_data.json", "r") as file:
-            self.text_data = json.load(file)
+        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+            self.text_data = load(file)
 
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
 
@@ -30,53 +30,53 @@ class status_page(CTkFrame):
                                         """
         self.header_title_background = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/header_title_background.png"
+                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
             ),
             size=(250, 64),
         )
         self.line_top_image = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/line_top.png"
+                "../RealFire-Installer/assets/backgrounds/line_top.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/backgrounds/line_top.png"
+                "../RealFire-Installer/assets/backgrounds/line_top.png"
             ),
             size=(650, 6),
         )
         self.os_icon_image = CTkImage(
-            dark_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
-            light_image=Image.open(f"../RealFire_Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
+            dark_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
+            light_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
             size=(20, 24)
         )
         self.check_icon = CTkImage(
             light_image=Image.open(
-                "../RealFire_Installer/assets/icons/check.png"
+                "../RealFire-Installer/assets/icons/check.png"
             ),
             dark_image=Image.open(
-                "../RealFire_Installer/assets/icons/check.png"
+                "../RealFire-Installer/assets/icons/check.png"
             ),
             size=(20, 20),
         )
         self.finish_button_image = CTkImage(
             dark_image=Image.open(
-                "../RealFire_Installer/assets/icons/finish_icon.png"
+                "../RealFire-Installer/assets/icons/finish_icon.png"
                 ),
             light_image=Image.open(
-                "../RealFire_Installer/assets/icons/finish_icon.png"
+                "../RealFire-Installer/assets/icons/finish_icon.png"
             ),
             size=(20, 20),
         )
         self.back_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
-            light_image=Image.open("../RealFire_Installer/assets/icons/back_icon.png"),
+            dark_image=Image.open("../RealFire-Installer/assets/icons/back_icon.png"),
+            light_image=Image.open("../RealFire-Installer/assets/icons/back_icon.png"),
             size=(20, 20),
         )
         self.exit_button_image = CTkImage(
-            dark_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
-            light_image=Image.open("../RealFire_Installer/assets/icons/exit_icon.png"),
+            dark_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"),
+            light_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"),
             size=(20, 20),
         )
 
@@ -255,16 +255,28 @@ class status_page(CTkFrame):
 
         if self.come_from_which_page == "install":
             self.action_label.configure(text="Instaling...")
-            self.file_actions.move_file("/home/hakan/Documents/GitHub/RealFire_Installer/chrome/programs/user.js", self.profile_folder)
-            self.file_actions.move_file("/home/hakan/Documents/GitHub/RealFire_Installer/chrome/programs/user.js", self.profile_folder)
-            self.file_actions.move_folder("/home/hakan/Documents/GitHub/RealFire_Installer/chrome", self.profile_folder)
-            operation_thread = threading.Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
+            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/config.js", self.application_folder)
+            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/mozilla.cfg", self.application_folder)
+
+            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/config-prefs.js", f"{self.application_folder}/defaults/pref/")
+            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/local-settings.js", f"{self.application_folder}/defaults/pref/")
+
+            self.file_actions.move_folder("../RealFire-Installer/chrome", self.profile_folder)
+            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/user.js", self.profile_folder)
+            operation_thread = Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
             operation_thread.start()
+
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")
-            self.file_actions.delete_file(f"{self.profile_folder}/user.js")
-            self.file_actions.delete_folder(f"{self.profile_folder}/chrome")
-            operation_thread = threading.Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
+            self.file_actions.remove_file(f"{self.application_folder}/config.js")
+            self.file_actions.remove_file(f"{self.application_folder}/mozilla.cfg")
+
+            self.file_actions.remove_file(f"{self.application_folder}/defaults/pref/config-prefs.js")
+            self.file_actions.remove_file(f"{self.application_folder}/defaults/pref/local-settings.js")
+
+            self.file_actions.remove_file(f"{self.profile_folder}/user.js")
+            self.file_actions.remove_folder(f"{self.profile_folder}/chrome")
+            operation_thread = Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
             operation_thread.start()
 
         # For Testing
