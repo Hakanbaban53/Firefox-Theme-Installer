@@ -1,4 +1,5 @@
-from subprocess import run
+import os
+from subprocess import run, CalledProcessError, PIPE
 from functions.get_os_properties import OSProperties
 
 class FileActions:
@@ -7,53 +8,80 @@ class FileActions:
         self.commands = []
 
     def move_file(self, source, destination):
+        if not os.path.exists(source):
+            return
+        command = ''
         if self.os_name == "Windows":
-            self.commands.append(f'move "{source}" "{destination}"')
+            command = f'move "{source.replace("/", "\\")}" "{destination.replace("/", "\\")}"'
         elif self.os_name == "Linux":
-            self.commands.append(f'cp "{source}" "{destination}"')
+            command = f'cp "{source}" "{destination}"'
         elif self.os_name == "Darwin":  # macOS
-            self.commands.append(f'mv "{source}" "{destination}"')
+            command = f'mv "{source}" "{destination}"'
         else:
-            print("Unsupported operating system.")
+            return
+        self.commands.append(command)
 
     def move_folder(self, source, destination):
+        if not os.path.exists(source):
+            return
+        command = ''
         if self.os_name == "Windows":
-            self.commands.append(f'move "{source}" "{destination}"')
+            command = f'move "{source.replace("/", "\\")}" "{destination.replace("/", "\\")}"'
         elif self.os_name == "Linux":
-            self.commands.append(f'cp -rf "{source}" "{destination}"')
+            command = f'cp -rf "{source}" "{destination}"'
         elif self.os_name == "Darwin":  # macOS
-            self.commands.append(f'mv "{source}" "{destination}"')
+            command = f'mv "{source}" "{destination}"'
         else:
-            print("Unsupported operating system.")
+            return
+        self.commands.append(command)
 
     def remove_file(self, file_path):
+        if not os.path.exists(file_path):
+            return
+        command = ''
         if self.os_name == "Windows":
-            self.commands.append(f'del "{file_path}"')
+            command = f'del "{file_path.replace("/", "\\")}"'
         elif self.os_name == "Linux":
-            self.commands.append(f'rm "{file_path}"')
+            command = f'rm "{file_path}"'
         elif self.os_name == "Darwin":  # macOS
-            self.commands.append(f'rm "{file_path}"')
+            command = f'rm "{file_path}"'
         else:
-            print("Unsupported operating system.")
+            return
+        self.commands.append(command)
 
     def remove_folder(self, folder_path):
+        if not os.path.exists(folder_path):
+            return
+        command = ''
         if self.os_name == "Windows":
-            self.commands.append(f'rd /s /q "{folder_path}"')
+            command = f'rd /s /q "{folder_path.replace("/", "\\")}"'
         elif self.os_name == "Linux" or self.os_name == "Darwin":  # macOS
-            self.commands.append(f'rm -rf "{folder_path}"')
+            command = f'rm -rf "{folder_path}"'
         else:
-            print("Unsupported operating system.")
+            return
+        self.commands.append(command)
 
     def execute_operations(self, progress_bar, output_entry):
         total_operations = len(self.commands)
+        
         for i, command in enumerate(self.commands):
             try:
-                run(command, shell=True, check=True)
+                result = run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
+                output = result.stdout.decode('utf-8').strip()
+                error = result.stderr.decode('utf-8').strip()
 
                 # Update progress bar and output entry after each operation
                 progress = (i + 1) / total_operations
                 progress_bar.set(progress)
                 output_entry.insert("end", f"Completed: {command}\n")
+                
+                if output:
+                    output_entry.insert("end", f"Output: {output}\n")
+                if error:
+                    output_entry.insert("end", f"Error: {error}\n")
+
+            except CalledProcessError as e:
+                output_entry.insert("end", f"Failed: {command} with error {e.output.decode('utf-8').strip()}\n")
             except Exception as e:
                 output_entry.insert("end", f"Failed: {command} with error {e}\n")
             finally:
@@ -62,7 +90,3 @@ class FileActions:
 
         # Clear the commands list after all commands have been executed
         self.commands.clear()
-
-
-
-

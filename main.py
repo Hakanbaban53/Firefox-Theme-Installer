@@ -1,7 +1,8 @@
+import os
+import ctypes
 from json import load
-from os import name, getuid
 from sys import exit
-from subprocess import run
+from subprocess import run, CalledProcessError
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame
 from PIL import Image
 from modals.combined_modal import CombinedModal
@@ -88,7 +89,6 @@ class MultiPageApp(CTk):
         else:
             current_frame.place_forget()
 
-
     def show_frame(self, page_name, **kwargs):
         self.installer_img_label.lift()
         
@@ -120,16 +120,18 @@ class MultiPageApp(CTk):
 
     def is_admin(self):
         try:
-            # Windows: Check for admin rights
-            if name == 'nt':
-                return run(['net', 'session'], capture_output=True, check=False).returncode == 0
-            # Linux and macOS: Check for root user
-            else:
-                return getuid() == 0
+            if os.name == 'nt':  # Windows
+                try:
+                    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+                except AttributeError:
+                    is_admin = False
+                return is_admin
+            else:  # Unix-like systems
+                return os.getuid() == 0
         except Exception as e:
             print(f"Error checking admin rights: {e}")
             return False
-        
+
     def exit_confirmation(self):
         CombinedModal(self, "Exit")
 
@@ -138,4 +140,3 @@ if __name__ == "__main__":
     app = MultiPageApp()
     app.show_frame("home_page")
     app.mainloop()
-
