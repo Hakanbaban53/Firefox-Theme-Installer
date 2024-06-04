@@ -1,9 +1,8 @@
-import tkinter as tk
-from customtkinter import CTkButton
-
+from customtkinter import CTkToplevel, CTkLabel, CTkButton
 from json import load
 
-class CombinedModal(tk.Toplevel):
+
+class CombinedModal(CTkToplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
         self._configure_window(parent)
@@ -13,11 +12,12 @@ class CombinedModal(tk.Toplevel):
 
     def _configure_window(self, parent):
         self.transient(parent)
-        self.configure(bg="#2B2631")
+        self.configure(fg_color="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
+        self.wm_iconbitmap()
+        self.after(201, lambda :self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico"))
 
     def _load_data(self):
         try:
@@ -26,7 +26,6 @@ class CombinedModal(tk.Toplevel):
             self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
         except FileNotFoundError:
             raise FileNotFoundError("The installer data file was not found.")
-        
 
     def create_modal(self, modal):
         modal_mapping = {
@@ -52,11 +51,10 @@ class CombinedModal(tk.Toplevel):
         self.create_buttons(modal)
 
     def create_label(self, text):
-        self.message_label = tk.Label(
+        self.message_label = CTkLabel(
             self,
             text=text,
-            fg="white",
-            background="#2B2631",
+            text_color="white",
             font=("Arial", 16),
         )
         self.message_label.pack(padx=10, pady=10)
@@ -92,7 +90,7 @@ class CombinedModal(tk.Toplevel):
             fg_color=fg_color,
             font=("Arial", 18),
         )
-
+    
     def ok_action(self):
         self.master.quit()
         self.destroy()
