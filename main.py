@@ -2,7 +2,7 @@ import ctypes
 import os
 from json import load
 from sys import exit
-from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame
+from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
 from pages.home_page import home_page
@@ -25,8 +25,7 @@ class MultiPageApp(CTk):
         self.center_window()
 
         if not self.is_admin():
-            modal = CombinedModal(self, "admin_req")
-            self.wait_window(modal)
+            self.show_admin_error_modal()
             exit()
 
         # Create the image label to be displayed across all pages
@@ -148,6 +147,44 @@ class MultiPageApp(CTk):
         y = (screen_height - window_height) // 2
         
         self.geometry("+{}+{}".format(x, y))
+
+    def show_admin_error_modal(self):
+        modal = CTk()
+        modal.title("Admin Error")
+        modal.geometry("300x150")
+        modal.configure(fg_color="#2B2631")
+        modal.resizable(False, False)
+        modal.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")  # Change the path to your icon file
+
+        label = CTkLabel(
+            modal,
+            text="Administrative privileges are required.",
+            text_color="white",
+            font=("Arial", 14)
+        )
+        label.pack(padx=20, pady=20)
+
+        ok_button = CTkButton(
+            modal,
+            text="OK",
+            text_color="white",
+            command=exit,
+            bg_color="#2B2631",
+            fg_color="#f04141",
+            font=("Arial", 14)
+        )
+        ok_button.pack(pady=10)
+
+        # Center the modal window
+        modal.update_idletasks()
+        width = modal.winfo_width()
+        height = modal.winfo_height()
+        x = (modal.winfo_screenwidth() // 2) - (width // 2)
+        y = (modal.winfo_screenheight() // 2) - (height // 2)
+        modal.geometry(f"{width}x{height}+{x}+{y}")
+
+        modal.grab_set()
+        modal.mainloop()
 
 if __name__ == "__main__":
     app = MultiPageApp()

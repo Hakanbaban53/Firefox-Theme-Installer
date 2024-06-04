@@ -1,8 +1,9 @@
-from customtkinter import CTkToplevel, CTkLabel, CTkButton
+import tkinter as tk
+from customtkinter import CTkButton
+
 from json import load
 
-
-class CombinedModal(CTkToplevel):
+class CombinedModal(tk.Toplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
         self._configure_window(parent)
@@ -12,12 +13,11 @@ class CombinedModal(CTkToplevel):
 
     def _configure_window(self, parent):
         self.transient(parent)
-        self.configure(fg_color="#2B2631")
+        self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        self.wm_iconbitmap()
-        self.after(201, lambda :self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico"))
+        self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
 
     def _load_data(self):
         try:
@@ -26,12 +26,12 @@ class CombinedModal(CTkToplevel):
             self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
         except FileNotFoundError:
             raise FileNotFoundError("The installer data file was not found.")
+        
 
     def create_modal(self, modal):
         modal_mapping = {
             "exit": "exit_modal",
             "attention": "attention_modal",
-            "admin_req": "admin_req_modal",
             "check_files_installed": "check_files_installed_modal",
             "check_files_not_installed": "check_files_not_installed_modal",
         }
@@ -51,10 +51,11 @@ class CombinedModal(CTkToplevel):
         self.create_buttons(modal)
 
     def create_label(self, text):
-        self.message_label = CTkLabel(
+        self.message_label = tk.Label(
             self,
             text=text,
-            text_color="white",
+            fg="white",
+            background="#2B2631",
             font=("Arial", 16),
         )
         self.message_label.pack(padx=10, pady=10)
@@ -90,7 +91,7 @@ class CombinedModal(CTkToplevel):
             fg_color=fg_color,
             font=("Arial", 18),
         )
-    
+
     def ok_action(self):
         self.master.quit()
         self.destroy()
