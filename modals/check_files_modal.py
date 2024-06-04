@@ -1,19 +1,21 @@
 from threading import Thread
+import tkinter as tk
 import customtkinter
 from tkinter import ttk
 from functions.detect_files import FileManager
 from modals.combined_modal import CombinedModal
 
-
-class FileInstallerModal(customtkinter.CTkToplevel):
+class FileInstallerModal(tk.Toplevel):
     def __init__(self, parent, detect_files_text, install_button):
         super().__init__(parent)
         self.transient(parent)
-        self.configure(fg_color="#2B2631")
+        self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
         self.title("Install Missing Files")
+        self.iconbitmap("../RealFire-Installer/assets/icons/firefox.ico")
+        self.center_window()
 
         self.file_manager = FileManager(
             "../RealFire-Installer/data/installer_files_data.json"
@@ -22,13 +24,14 @@ class FileInstallerModal(customtkinter.CTkToplevel):
 
     def create_widgets(self):
 
-        self.files_modal_frame = customtkinter.CTkFrame(self, fg_color="#2B2631")
+        self.files_modal_frame = tk.Frame(self, bg="#2B2631")
         self.files_modal_frame.pack(padx=20, pady=10)
 
-        self.missing_files_label = customtkinter.CTkLabel(
+        self.missing_files_label = tk.Label(
             master=self.files_modal_frame,
             text="Some Files Are Missing. Do you want to Install?",
-            text_color="#FFFFFF",
+            fg="#FFFFFF",
+            bg="#2B2631",
             font=("Arial", 16, "bold"),
         )
         self.missing_files_label.grid(row=0, column=0, padx=0, pady=(10, 20))
@@ -38,23 +41,23 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         )
         treeview.grid(row=1, column=0, padx=20, pady=0)
 
-        # Sütunları tanımla
+        # Define columns
         treeview["columns"] = ("File(s) Name",)
         treeview.column("#0")
         treeview.column("File(s) Name", anchor="w")
 
-        # Başlıkları tanımla
+        # Define headings
         treeview.heading("#0", text="Folder(s) Name", anchor="w")
         treeview.heading("File(s) Name", text="File(s) Name", anchor="w")
 
-        # Sözlük elemanlarını treeview'a ekle
+        # Add dictionary items to treeview
         for kategori, dosyalar in self.check_all_files_installed().items():
             kategori_id = treeview.insert("", "end", text=kategori)
             for dosya in dosyalar:
                 treeview.insert(kategori_id, "end", text="", values=(dosya,))
 
-        self.buttons_frame = customtkinter.CTkFrame(
-            master=self.files_modal_frame, fg_color="#2B2631"
+        self.buttons_frame = tk.Frame(
+            master=self.files_modal_frame, bg="#2B2631"
         )
         self.buttons_frame.grid(row=2, column=0, padx=0, pady=(20, 10))
 
@@ -82,7 +85,6 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         self.file_check_result = self.file_manager.check_files_exist()
         return self.file_check_result
 
-
     def on_install_button_click(self):
         # Disable the Install button and change its text to "Installing"
         self.install_files_button.configure(text="Installing", state="disabled")
@@ -93,7 +95,7 @@ class FileInstallerModal(customtkinter.CTkToplevel):
         thread.join()  # Wait for the thread to finish
 
         # After downloading, update the Install button's text and color
-        self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
+        self.install_files_button.configure(text="Installed", fg="#D9D9D9")
 
     def start_download_process(self):
         missing_files = self.check_all_files_installed()
@@ -108,3 +110,14 @@ class FileInstallerModal(customtkinter.CTkToplevel):
             self.destroy()
         else:
             CombinedModal(self, "check_files_not_installed")
+
+    def center_window(self):
+        # Calculate the position to center the window
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        self.geometry("+{}+{}".format(x, y))
+

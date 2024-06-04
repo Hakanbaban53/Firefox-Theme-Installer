@@ -1,19 +1,23 @@
-from json import load
-from customtkinter import CTkToplevel, CTkLabel, CTkButton
+import tkinter as tk
+from customtkinter import CTkButton
 
-class CombinedModal(CTkToplevel):
+from json import load
+
+class CombinedModal(tk.Toplevel):
     def __init__(self, parent, modal):
         super().__init__(parent)
         self._configure_window(parent)
         self._load_data()
         self.create_modal(modal)
+        self.center_window()
 
     def _configure_window(self, parent):
         self.transient(parent)
-        self.configure(fg_color="#2B2631")
+        self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
+        self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
 
     def _load_data(self):
         try:
@@ -22,6 +26,7 @@ class CombinedModal(CTkToplevel):
             self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
         except FileNotFoundError:
             raise FileNotFoundError("The installer data file was not found.")
+        
 
     def create_modal(self, modal):
         modal_mapping = {
@@ -47,10 +52,11 @@ class CombinedModal(CTkToplevel):
         self.create_buttons(modal)
 
     def create_label(self, text):
-        self.message_label = CTkLabel(
+        self.message_label = tk.Label(
             self,
             text=text,
-            text_color="white",
+            fg="white",
+            background="#2B2631",
             font=("Arial", 16),
         )
         self.message_label.pack(padx=10, pady=10)
@@ -93,3 +99,15 @@ class CombinedModal(CTkToplevel):
 
     def cancel_action(self):
         self.destroy()
+
+    def center_window(self):
+        self.update_idletasks()  # Ensure that window dimensions are updated
+        parent_width = self.master.winfo_width()
+        parent_height = self.master.winfo_height()
+        width = self.winfo_width()
+        height = self.winfo_height()
+        x = (parent_width - width) // 2
+        y = (parent_height - height) // 2
+        self.geometry(f"+{self.master.winfo_rootx() + x}+{self.master.winfo_rooty() + y}")
+        
+

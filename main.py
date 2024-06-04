@@ -1,8 +1,7 @@
-import os
 import ctypes
+import os
 from json import load
 from sys import exit
-from subprocess import run, CalledProcessError
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame
 from PIL import Image
 from modals.combined_modal import CombinedModal
@@ -22,6 +21,8 @@ class MultiPageApp(CTk):
         self.geometry("1115x666")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
+        self.iconbitmap("../RealFire-Installer/assets/icons/firefox.ico")
+        self.center_window()
 
         if not self.is_admin():
             modal = CombinedModal(self, "admin_req")
@@ -135,6 +136,18 @@ class MultiPageApp(CTk):
     def exit_confirmation(self):
         CombinedModal(self, "Exit")
 
+    def center_window(self):
+        self.update_idletasks()
+
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        
+        self.geometry("+{}+{}".format(x, y))
 
 if __name__ == "__main__":
     app = MultiPageApp()

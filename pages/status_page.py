@@ -132,7 +132,7 @@ class status_page(CTkFrame):
             master=status_page_frame,
             orientation="horizontal",
             height=24,
-            fg_color="white",
+            fg_color="#666666",
             progress_color="#9747FF",
         )
         self.progress_bar.grid(row=3, column=0, padx=50, pady=10, sticky="NSEW")
@@ -168,7 +168,7 @@ class status_page(CTkFrame):
             fg_color="white",
             border_color="#F89F24",
         )
-        navigation_frame.grid(row=0, column=1, padx=20, sticky="E")
+        navigation_frame.grid(row=0, column=1, sticky="E")
 
         finish_button = CTkButton(
             master=navigation_frame,
@@ -245,6 +245,12 @@ class status_page(CTkFrame):
         )
 
         os_label.pack(padx=10, pady=10, side="right")  # Pad the label within the frame
+        
+    def update_text(self):
+        if self.come_from_which_page == "install":
+            self.action_label.configure(text="Installed  ", image=self.check_icon, compound="right")
+        elif self.come_from_which_page == "remove":
+            self.action_label.configure(text="Removed  ", image=self.check_icon, compound="right")
 
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
@@ -263,8 +269,7 @@ class status_page(CTkFrame):
 
             self.file_actions.move_folder("../RealFire-Installer/chrome", self.profile_folder)
             self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/user.js", self.profile_folder)
-            operation_thread = Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
-            operation_thread.start()
+
 
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")
@@ -276,8 +281,12 @@ class status_page(CTkFrame):
 
             self.file_actions.remove_file(f"{self.profile_folder}/user.js")
             self.file_actions.remove_folder(f"{self.profile_folder}/chrome")
-            operation_thread = Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
-            operation_thread.start()
+
+        operation_thread = Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
+        operation_thread.start()
+        
+        self.after(500, self.update_text)
+
 
         # For Testing
         # self.back_button.configure(

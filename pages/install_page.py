@@ -309,7 +309,7 @@ class install_page(CTkFrame):
             border_color="#F89F24",
         )
 
-        navigation_frame.grid(row=0, column=1, padx=20, sticky="E")
+        navigation_frame.grid(row=0, column=1, sticky="E")
 
         self.install_button = CTkButton(
             master=navigation_frame,
