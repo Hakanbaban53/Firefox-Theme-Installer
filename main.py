@@ -1,5 +1,5 @@
-import ctypes
 import os
+import ctypes
 from json import load
 from sys import exit
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
@@ -12,9 +12,9 @@ from pages.status_page import status_page
 
 class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
-        CTk.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         
-        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+        with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
             self.text_data = load(file)
 
         self.title(self.text_data["common_values"]["installer_info"]["installer_title"])
@@ -25,7 +25,7 @@ class MultiPageApp(CTk):
         self.center_window()
 
         if not self.is_admin():
-            self.show_admin_error_modal()
+            self.show_admin_error()
             exit()
 
         # Create the image label to be displayed across all pages
@@ -148,19 +148,19 @@ class MultiPageApp(CTk):
         
         self.geometry("+{}+{}".format(x, y))
 
-    def show_admin_error_modal(self):
+    def show_admin_error(self):
         modal = CTk()
         modal.title("Admin Error")
         modal.geometry("300x150")
         modal.configure(fg_color="#2B2631")
         modal.resizable(False, False)
-        modal.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")  # Change the path to your icon file
+        modal.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
 
         label = CTkLabel(
             modal,
             text="Administrative privileges are required.",
             text_color="white",
-            font=("Arial", 14)
+            font=CTkFont(family="Segoe UI", size=15),
         )
         label.pack(padx=20, pady=20)
 
@@ -174,6 +174,9 @@ class MultiPageApp(CTk):
             font=("Arial", 14)
         )
         ok_button.pack(pady=10)
+
+        # Bind the close event to the exit function
+        modal.protocol("WM_DELETE_WINDOW", exit)
 
         # Center the modal window
         modal.update_idletasks()

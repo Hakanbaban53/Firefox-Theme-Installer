@@ -15,7 +15,7 @@ class remove_page(CTkFrame):
     def __init__(self, parent, controller):
         CTkFrame.__init__(self, parent)
         self.controller = controller
-        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+        with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
             self.text_data = load(file)
 
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]

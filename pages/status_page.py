@@ -16,7 +16,7 @@ class status_page(CTkFrame):
         self.file_actions = FileActions()
 
         self.come_from_which_page = None
-        with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+        with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
             self.text_data = load(file)
 
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]

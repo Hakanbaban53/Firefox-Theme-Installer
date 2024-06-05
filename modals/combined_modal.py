@@ -21,7 +21,7 @@ class CombinedModal(tk.Toplevel):
 
     def _load_data(self):
         try:
-            with open("../RealFire-Installer/data/installer_data.json", "r") as file:
+            with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
                 self.installer_data = load(file)
             self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
         except FileNotFoundError:
