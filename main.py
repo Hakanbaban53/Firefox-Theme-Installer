@@ -5,7 +5,7 @@ from sys import exit
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
-from pages.home_page import home_page
+from pages.home_page import HomePage
 from pages.install_page import install_page
 from pages.remove_page import remove_page
 from pages.status_page import status_page
@@ -24,9 +24,9 @@ class MultiPageApp(CTk):
         self.iconbitmap("../RealFire-Installer/assets/icons/firefox.ico")
         self.center_window()
 
-        if not self.is_admin():
-            self.show_admin_error()
-            exit()
+        # if not self.is_admin():
+        #     self.show_admin_error()
+        #     exit()
 
         # Create the image label to be displayed across all pages
         self.installer_img = CTkImage(
@@ -93,7 +93,7 @@ class MultiPageApp(CTk):
         self.installer_img_label.lift()
         
         page_class = {
-            "home_page": home_page,
+            "home_page": HomePage,
             "install_page": install_page,
             "remove_page": remove_page,
             "status_page": status_page,

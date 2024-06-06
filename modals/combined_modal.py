@@ -56,7 +56,7 @@ class CombinedModal(tk.Toplevel):
             text=text,
             fg="white",
             background="#2B2631",
-            font=("Arial", 16),
+            font=("Segoe UI", 15),
         )
         self.message_label.pack(padx=10, pady=10)
 
@@ -89,7 +89,7 @@ class CombinedModal(tk.Toplevel):
             command=command,
             bg_color="#2B2631",
             fg_color=fg_color,
-            font=("Arial", 18),
+            font=("Segoe UI", 15),
         )
 
     def ok_action(self):

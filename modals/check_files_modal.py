@@ -6,7 +6,7 @@ from functions.detect_files import FileManager
 from modals.combined_modal import CombinedModal
 
 class FileInstallerModal(tk.Toplevel):
-    def __init__(self, parent, detect_files_text, install_button):
+    def __init__(self, parent):
         super().__init__(parent)
         self.transient(parent)
         self.configure(bg="#2B2631")
@@ -95,7 +95,7 @@ class FileInstallerModal(tk.Toplevel):
         thread.join()  # Wait for the thread to finish
 
         # After downloading, update the Install button's text and color
-        self.install_files_button.configure(text="Installed", fg="#D9D9D9")
+        self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
 
     def start_download_process(self):
         missing_files = self.check_all_files_installed()
