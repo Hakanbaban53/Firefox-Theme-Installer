@@ -1,124 +1,94 @@
 from json import load
 from threading import Thread
-from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkProgressBar, CTkTextbox, CTkButton
+from customtkinter import (
+    CTkFrame,
+    CTkImage,
+    CTkLabel,
+    CTkFont,
+    CTkProgressBar,
+    CTkTextbox,
+    CTkButton,
+)
 from PIL import Image
 from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
 from functions.install_files import FileActions
 
-
-class status_page(CTkFrame):
-    os_values = OSProperties().get_values()
+class StatusPage(CTkFrame):
+    ICON_PATH = "../RealFire-Installer/assets/icons/"
+    BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
+    DATA_PATH = "../RealFire-Installer/data/installer_data.json"
 
     def __init__(self, parent, controller):
-        CTkFrame.__init__(self, parent)
+        super().__init__(parent)
         self.controller = controller
         self.file_actions = FileActions()
+        self.os_values = OSProperties().get_values()
 
         self.come_from_which_page = None
-        with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
-            self.text_data = load(file)
-
+        self.load_text_data()
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
 
-        #self.bind("<Visibility>", self.start_simulate_progress)
+        self.configure_layout()
+        self.create_widgets()
 
-        """
-            /////////////////////////////
-            /Image Location Declarations/
-            /////////////////////////////
-                                        """
-        self.header_title_background = CTkImage(
-            light_image=Image.open(
-                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
-            ),
-            dark_image=Image.open(
-                "../RealFire-Installer/assets/backgrounds/header_title_background.png"
-            ),
-            size=(250, 64),
-        )
-        self.line_top_image = CTkImage(
-            light_image=Image.open(
-                "../RealFire-Installer/assets/backgrounds/line_top.png"
-            ),
-            dark_image=Image.open(
-                "../RealFire-Installer/assets/backgrounds/line_top.png"
-            ),
-            size=(650, 6),
-        )
-        self.os_icon_image = CTkImage(
-            dark_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
-            light_image=Image.open(f"../RealFire-Installer/assets/icons/{self.os_values["os_name"].lower()}.png"),
-            size=(20, 24)
-        )
-        self.check_icon = CTkImage(
-            light_image=Image.open(
-                "../RealFire-Installer/assets/icons/check.png"
-            ),
-            dark_image=Image.open(
-                "../RealFire-Installer/assets/icons/check.png"
-            ),
-            size=(20, 20),
-        )
-        self.finish_button_image = CTkImage(
-            dark_image=Image.open(
-                "../RealFire-Installer/assets/icons/finish_icon.png"
-                ),
-            light_image=Image.open(
-                "../RealFire-Installer/assets/icons/finish_icon.png"
-            ),
-            size=(20, 20),
-        )
-        self.back_button_image = CTkImage(
-            dark_image=Image.open("../RealFire-Installer/assets/icons/back_icon.png"),
-            light_image=Image.open("../RealFire-Installer/assets/icons/back_icon.png"),
-            size=(20, 20),
-        )
-        self.exit_button_image = CTkImage(
-            dark_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"),
-            light_image=Image.open("../RealFire-Installer/assets/icons/exit_icon.png"),
-            size=(20, 20),
+    def load_text_data(self):
+        with open(self.DATA_PATH, "r", encoding="utf-8") as file:
+            self.text_data = load(file)
+
+    def load_image(self, file_name, size):
+        return CTkImage(
+            light_image=Image.open(file_name),
+            dark_image=Image.open(file_name),
+            size=size,
         )
 
+    def configure_layout(self):
+        self.fg_color = "#2B2631"
+        self.grid(row=0, column=1, sticky="SW")
+        self.columnconfigure(0, weight=1)
 
-        """
-            //////////////////////////////
-            ///Status Page Declarations///
-            //////////////////////////////
-                                            """
-        status_page_frame = CTkFrame(
+    def create_widgets(self):
+        self.create_status_page_frame()
+        self.create_header()
+        self.create_action_status()
+        self.create_progress_bar()
+        self.create_output_entry()
+        self.create_bottom_widgets()
+
+    def create_status_page_frame(self):
+        self.status_page_frame = CTkFrame(
             self,
             fg_color="#2B2631",
-            # border_width=4,
-            # bg_color="#2B2631",
-            # border_color="#F89F24",
         )
-        status_page_frame.grid(row=0, column=1, sticky="SW")
-        status_page_frame.columnconfigure(0, weight=1)
+        self.status_page_frame.grid(row=0, column=0, sticky="SW")
+        self.status_page_frame.columnconfigure(0, weight=1)
 
-        self.header_title_background_label = CTkLabel(
-            master=status_page_frame,
+    def create_header(self):
+        header_title_bg = self.load_image(
+            f"{self.BACKGROUND_PATH}header_title_background.png", (250, 64)
+        )
+        line_top_img = self.load_image(f"{self.BACKGROUND_PATH}line_top.png", (650, 6))
+
+        header_label = CTkLabel(
+            self.status_page_frame,
             text="Status",
-            image=self.header_title_background,
+            image=header_title_bg,
             text_color="White",
             font=CTkFont(family="Inter", size=24, weight="bold"),
         )
-        self.header_title_background_label.grid(
+        header_label.grid(
             row=0, column=0, columnspan=2, padx=273, pady=(75, 0), sticky="NSEW"
         )
 
-        self.line_top_image_label = CTkLabel(
-            master=status_page_frame,
-            text="",
-            image=self.line_top_image,
-        )
-        self.line_top_image_label.grid(
+        line_top_label = CTkLabel(self.status_page_frame, text="", image=line_top_img)
+        line_top_label.grid(
             row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
         )
 
-
+    def create_action_status(self):
         self.action_label = CTkLabel(
-            master=status_page_frame,
+            self.status_page_frame,
             fg_color="#2B2631",
             text_color="#FFFFFF",
             text="",
@@ -128,8 +98,9 @@ class status_page(CTkFrame):
         )
         self.action_label.grid(row=2, column=0, padx=60, pady=10, sticky="W")
 
+    def create_progress_bar(self):
         self.progress_bar = CTkProgressBar(
-            master=status_page_frame,
+            self.status_page_frame,
             orientation="horizontal",
             height=24,
             fg_color="#666666",
@@ -138,8 +109,9 @@ class status_page(CTkFrame):
         self.progress_bar.grid(row=3, column=0, padx=50, pady=10, sticky="NSEW")
         self.progress_bar.set(0)
 
+    def create_output_entry(self):
         self.output_entry = CTkTextbox(
-            master=status_page_frame,
+            self.status_page_frame,
             height=190,
             fg_color="white",
             text_color="black",
@@ -147,20 +119,12 @@ class status_page(CTkFrame):
         )
         self.output_entry.grid(row=4, column=0, padx=60, pady=20, sticky="NSEW")
 
-
-        """
-            /////////////////////////////
-            /Bottom Widgets Declarations/
-            /////////////////////////////
-                                            """
-        bottom_frame = CTkFrame(
-            self,
-            fg_color="#2B2631",
-        )
+    def create_bottom_widgets(self):
+        bottom_frame = CTkFrame(self, fg_color="#2B2631")
         bottom_frame.place(x=200.0, y=600.0)
 
         navigation_frame = CTkFrame(
-            master=bottom_frame,
+            bottom_frame,
             width=440,
             height=54,
             corner_radius=12,
@@ -170,42 +134,55 @@ class status_page(CTkFrame):
         )
         navigation_frame.grid(row=0, column=1, sticky="E")
 
-        finish_button = CTkButton(
-            master=navigation_frame,
-            width=float(self.button_data["width"]),
-            height=float(self.button_data["height"]),
-            corner_radius=float(self.button_data["corner_radius"]),
-            bg_color=self.button_data["bg_color"],
-            fg_color=self.button_data["fg_color"],
-            hover_color=self.button_data["hover_color"],
-            text_color=self.button_data["text_color"],
-            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
-            text="Finish",
-            compound="right",
-            command=lambda: CombinedModal(self, "Attention"),
-            image=self.finish_button_image,
-        )
-        finish_button.pack(padx=(5, 20), pady=10, side="right")
+        self.create_navigation_buttons(navigation_frame)
+        self.create_os_info(bottom_frame)
 
-        self.back_button = CTkButton(
-            master=navigation_frame,
-            width=float(self.button_data["width"]),
-            height=float(self.button_data["height"]),
-            corner_radius=float(self.button_data["corner_radius"]),
-            bg_color=self.button_data["bg_color"],
-            fg_color=self.button_data["fg_color"],
-            hover_color=self.button_data["hover_color"],
-            text_color=self.button_data["text_color"],
-            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
-            text="Back",
+    def create_navigation_buttons(self, parent):
+
+        self.create_navigation_button(
+            parent,
+            "Finish",
+            self.ICON_PATH + "finish_icon.png",
+            lambda: CombinedModal(self, "Attention"),
+            padding_x=(10, 20),
+            side="right",
+            img_side="right",
+        )
+
+        self.back_button = self.create_navigation_button(
+            parent,
+            "Back",
+            self.ICON_PATH + "back_icon.png",
+            padding_x=(5, 5),
+            side="right",
+            command=lambda: self.controller.show_frame(
+                f"{self.come_from_which_page}_page"
+            ),
             state="disabled",
-            image=self.back_button_image,
         )
-        self.back_button.pack(padx=5, pady=10, side="right")
+        self.create_navigation_button(
+            parent,
+            "Exit",
+            self.ICON_PATH + "exit_icon.png",
+            lambda: CombinedModal(self, "Exit"),
+            padding_x=(20, 10),
+            side="left",
+        )
 
-
-        exit_button = CTkButton(
-            master=navigation_frame,
+    def create_navigation_button(
+        self,
+        parent,
+        text,
+        image_path,
+        command,
+        padding_x,
+        side,
+        img_side="left",
+        **kwargs,
+    ):
+        button_image = self.load_image(image_path, (20, 20))
+        button = CTkButton(
+            parent,
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
             corner_radius=float(self.button_data["corner_radius"]),
@@ -214,43 +191,46 @@ class status_page(CTkFrame):
             hover_color=self.button_data["hover_color"],
             text_color=self.button_data["text_color"],
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
-            text="Exit",
-            image=self.exit_button_image,
-            command=lambda: CombinedModal(self, "Exit"),
+            image=button_image,
+            text=text,
+            compound=img_side,
+            command=command,
+            **kwargs,
         )
-        exit_button.pack(padx=(20, 5), pady=10, side="left")
+        button.pack(padx=padding_x, pady=10, side=side)
+        return button
 
-
-        """
-            ///////////////////////////////
-            /Operation System Declarations/
-            ///////////////////////////////
-                                            """
-        os_frame = CTkFrame(
-            master=bottom_frame,
-            # width=440,  # Adjust initial width as needed
-            # height=54,
-            corner_radius=12,
-            fg_color="white",
+    def create_os_info(self, parent):
+        os_icon_image = self.load_image(
+            f"{self.ICON_PATH}{self.os_values['os_name'].lower()}.png", (20, 24)
         )
+
+        os_frame = CTkFrame(parent, corner_radius=12, fg_color="white")
         os_frame.grid(row=0, column=0, padx=20, sticky="W")
 
         os_label = CTkLabel(
-            master=os_frame,
-            text=self.os_values["os_name"] + " ",  # Initial text (can be empty)
+            os_frame,
+            text=f"{self.os_values['os_name']} ",
             text_color=self.os_values["os_color"],
-            font=("Arial", 20, "bold"),  # Adjust font size and family as needed
-            image=self.os_icon_image,
+            font=("Arial", 20, "bold"),
+            image=os_icon_image,
             compound="right",
         )
+        os_label.pack(padx=10, pady=10, side="right")
 
-        os_label.pack(padx=10, pady=10, side="right")  # Pad the label within the frame
-        
     def update_text(self):
         if self.come_from_which_page == "install":
-            self.action_label.configure(text="Installed  ", image=self.check_icon, compound="right")
+            self.action_label.configure(
+                text="Installed  ",
+                image=self.load_image(f"{self.ICON_PATH}check.png", (20, 20)),
+                compound="right",
+            )
         elif self.come_from_which_page == "remove":
-            self.action_label.configure(text="Removed  ", image=self.check_icon, compound="right")
+            self.action_label.configure(
+                text="Removed  ",
+                image=self.load_image(f"{self.ICON_PATH}check.png", (20, 20)),
+                compound="right",
+            )
 
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
@@ -260,33 +240,48 @@ class status_page(CTkFrame):
         self.accent_color = kwargs.get("accent_color")
 
         if self.come_from_which_page == "install":
-            self.action_label.configure(text="Instaling...")
-            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/config.js", self.application_folder)
-            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/mozilla.cfg", self.application_folder)
-
-            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/config-prefs.js", f"{self.application_folder}/defaults/pref/")
-            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/local-settings.js", f"{self.application_folder}/defaults/pref/")
-
-            self.file_actions.move_folder("../RealFire-Installer/chrome", self.profile_folder)
-            self.file_actions.move_file("../RealFire-Installer/fx-autoconfig/user.js", self.profile_folder)
-
-
+            self.action_label.configure(text="Installing...")
+            self.file_actions.move_file(
+                "../RealFire-Installer/fx-autoconfig/config.js", self.application_folder
+            )
+            self.file_actions.move_file(
+                "../RealFire-Installer/fx-autoconfig/mozilla.cfg",
+                self.application_folder,
+            )
+            self.file_actions.move_file(
+                "../RealFire-Installer/fx-autoconfig/config-prefs.js",
+                f"{self.application_folder}/defaults/pref/",
+            )
+            self.file_actions.move_file(
+                "../RealFire-Installer/fx-autoconfig/local-settings.js",
+                f"{self.application_folder}/defaults/pref/",
+            )
+            self.file_actions.move_folder(
+                "../RealFire-Installer/chrome", self.profile_folder
+            )
+            self.file_actions.move_file(
+                "../RealFire-Installer/fx-autoconfig/user.js", self.profile_folder
+            )
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")
             self.file_actions.remove_file(f"{self.application_folder}/config.js")
             self.file_actions.remove_file(f"{self.application_folder}/mozilla.cfg")
-
-            self.file_actions.remove_file(f"{self.application_folder}/defaults/pref/config-prefs.js")
-            self.file_actions.remove_file(f"{self.application_folder}/defaults/pref/local-settings.js")
-
+            self.file_actions.remove_file(
+                f"{self.application_folder}/defaults/pref/config-prefs.js"
+            )
+            self.file_actions.remove_file(
+                f"{self.application_folder}/defaults/pref/local-settings.js"
+            )
             self.file_actions.remove_file(f"{self.profile_folder}/user.js")
             self.file_actions.remove_folder(f"{self.profile_folder}/chrome")
 
-        operation_thread = Thread(target=self.file_actions.execute_operations, args=(self.progress_bar, self.output_entry))
+        operation_thread = Thread(
+            target=self.file_actions.execute_operations,
+            args=(self.progress_bar, self.output_entry),
+        )
         operation_thread.start()
-        
-        self.after(500, self.update_text)
 
+        self.after(500, self.update_text)
 
         # For Testing
         # self.back_button.configure(

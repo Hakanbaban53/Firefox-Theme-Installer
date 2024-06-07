@@ -6,9 +6,9 @@ from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
 from pages.home_page import HomePage
-from pages.install_page import install_page
-from pages.remove_page import remove_page
-from pages.status_page import status_page
+from pages.install_page import InstallPage
+from pages.remove_page import RemovePage
+from pages.status_page import StatusPage
 
 class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
@@ -94,9 +94,9 @@ class MultiPageApp(CTk):
         
         page_class = {
             "home_page": HomePage,
-            "install_page": install_page,
-            "remove_page": remove_page,
-            "status_page": status_page,
+            "install_page": InstallPage,
+            "remove_page": RemovePage,
+            "status_page": StatusPage,
         }.get(page_name) 
 
         if page_class:

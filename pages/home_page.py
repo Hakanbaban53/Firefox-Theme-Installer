@@ -1,11 +1,17 @@
-import os
 from json import load
 from time import sleep
 from tkinter import PhotoImage, Label, TclError
 from itertools import cycle
 from threading import Thread
 
-from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkButton, StringVar, CTkCheckBox
+from customtkinter import (
+    CTkFrame,
+    CTkImage,
+    CTkLabel,
+    CTkButton,
+    StringVar,
+    CTkCheckBox,
+)
 from PIL import Image
 
 from modals.check_files_modal import FileInstallerModal
@@ -31,19 +37,23 @@ class HomePage(CTkFrame):
         self.configure_layout()
         self.create_widgets()
 
-        self.attention_icon = PhotoImage(file="../RealFire-Installer/assets/icons/attention.png", height=24, width=24)
-        self.check_icon = PhotoImage(file="../RealFire-Installer/assets/icons/check.png", height=20, width=20)
+        self.attention_icon = PhotoImage(
+            file="../RealFire-Installer/assets/icons/attention.png", height=24, width=24
+        )
+        self.check_icon = PhotoImage(
+            file="../RealFire-Installer/assets/icons/check.png", height=20, width=20
+        )
 
     def load_json_data(self, path):
         with open(path, "r") as file:
             return load(file)
 
     def load_image(self, file_name, size):
-            return CTkImage(
-                light_image=Image.open(file_name),
-                dark_image=Image.open(file_name),
-                size=size,
-            )
+        return CTkImage(
+            light_image=Image.open(file_name),
+            dark_image=Image.open(file_name),
+            size=size,
+        )
 
     def configure_layout(self):
         home_page_frame = CTkFrame(
@@ -74,10 +84,14 @@ class HomePage(CTkFrame):
             text_color="White",
             font=("Inter", 22, "bold"),
         )
-        header_label.grid(row=0, column=0, columnspan=2, padx=203, pady=(75, 0), sticky="NSEW")
+        header_label.grid(
+            row=0, column=0, columnspan=2, padx=203, pady=(75, 0), sticky="NSEW"
+        )
 
         line_top_label = CTkLabel(self.home_page_frame, text="", image=line_top_img)
-        line_top_label.grid(row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW")
+        line_top_label.grid(
+            row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+        )
 
     def create_os_info(self):
         os_icon_image = self.load_image(
@@ -117,7 +131,9 @@ class HomePage(CTkFrame):
             text_color="White",
             font=("Inter", 20, "bold"),
         )
-        select_action_label.grid(row=3, column=0, columnspan=2, padx=60, pady=(70, 30), sticky="ew")
+        select_action_label.grid(
+            row=3, column=0, columnspan=2, padx=60, pady=(70, 30), sticky="ew"
+        )
 
         navigation_frame = CTkFrame(
             self.home_page_frame,
@@ -135,7 +151,7 @@ class HomePage(CTkFrame):
             "Remove",
             self.ICON_PATH + "remove_icon.png",
             lambda: self.controller.show_frame("remove_page"),
-            padding_x=(10,20),
+            padding_x=(10, 20),
             side="right",
         )
         self.install_button = self.create_navigation_button(
@@ -143,7 +159,7 @@ class HomePage(CTkFrame):
             "Install",
             self.ICON_PATH + "install_icon.png",
             lambda: self.controller.show_frame("install_page"),
-            padding_x=(5,5),
+            padding_x=(5, 5),
             side="right",
             state="disabled",
         )
@@ -152,11 +168,21 @@ class HomePage(CTkFrame):
             "Exit",
             self.ICON_PATH + "exit_icon.png",
             lambda: CombinedModal(self, "Exit"),
-            padding_x=(20,10),
+            padding_x=(20, 10),
             side="left",
         )
 
-    def create_navigation_button(self, parent, text, image_path, command, padding_x, side, **kwargs):
+    def create_navigation_button(
+        self,
+        parent,
+        text,
+        image_path,
+        command,
+        padding_x,
+        side,
+        img_side="left",
+        **kwargs,
+    ):
         button_image = self.load_image(image_path, (20, 20))
         button = CTkButton(
             parent,
@@ -170,7 +196,7 @@ class HomePage(CTkFrame):
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
             image=button_image,
             text=text,
-            compound=side,
+            compound=img_side,
             command=command,
             **kwargs,
         )
@@ -178,8 +204,12 @@ class HomePage(CTkFrame):
         return button
 
     def create_file_detection(self):
-        self.detect_files_frame = CTkFrame(self.home_page_frame, corner_radius=12, fg_color="white")
-        self.detect_files_frame.grid(row=5, column=0, padx=0, pady=(20, 10), columnspan=2, sticky="")
+        self.detect_files_frame = CTkFrame(
+            self.home_page_frame, corner_radius=12, fg_color="white"
+        )
+        self.detect_files_frame.grid(
+            row=5, column=0, padx=0, pady=(20, 10), columnspan=2, sticky=""
+        )
 
         self.detect_files_text = Label(
             self.detect_files_frame,
@@ -191,7 +221,9 @@ class HomePage(CTkFrame):
         )
         self.detect_files_text.grid(row=0, column=0, padx=10, pady=10, sticky="")
 
-        install_icon = self.load_image(self.ICON_PATH + "get_from_internet.png", (24, 24))
+        install_icon = self.load_image(
+            self.ICON_PATH + "get_from_internet.png", (24, 24)
+        )
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
             text="Install Missing Files",
@@ -213,7 +245,9 @@ class HomePage(CTkFrame):
 
     def create_recheck_skip_section(self):
         self.recheck_skip_frame = CTkFrame(self.home_page_frame, fg_color="#2B2631")
-        self.recheck_skip_frame.grid(row=6, column=0, padx=0, pady=0, columnspan=2, sticky="")
+        self.recheck_skip_frame.grid(
+            row=6, column=0, padx=0, pady=0, columnspan=2, sticky=""
+        )
 
         self.check_var = StringVar(value="off")
         self.user_know_what_do = CTkCheckBox(
@@ -226,8 +260,7 @@ class HomePage(CTkFrame):
             onvalue="on",
             offvalue="off",
         )
-        self.user_know_what_do.grid(row=0, column=0, padx=10, pady=10, sticky="")
-
+        
         reload_icon = self.load_image(self.ICON_PATH + "reload_icon.png", (20, 20))
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
@@ -238,14 +271,19 @@ class HomePage(CTkFrame):
             command=self.recheck_files,
             image=reload_icon,
         )
-        self.recheck_button.grid(row=1, column=0, padx=0, pady=0, columnspan=2, sticky="")
+        self.recheck_button.grid(
+            row=1, column=0, padx=0, pady=0, columnspan=2, sticky=""
+        )
 
     def load_gif(self):
         frames = []
         index = 0
         while True:
             try:
-                frame = PhotoImage(file="../RealFire-Installer/assets/icons/block_spin.gif", format=f'gif -index {index}')
+                frame = PhotoImage(
+                    file="../RealFire-Installer/assets/icons/block_spin.gif",
+                    format=f"gif -index {index}",
+                )
                 frames.append(frame)
                 index += 2
             except TclError:

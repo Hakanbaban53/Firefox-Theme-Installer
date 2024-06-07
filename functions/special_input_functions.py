@@ -35,7 +35,6 @@ class SpecialInputFunc:
         else:
             return False
         
-
     def get_variables(self, entry):
         input_value = entry.get()
         placeholder_text = entry.cget("placeholder_text")

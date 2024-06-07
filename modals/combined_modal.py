@@ -1,6 +1,5 @@
 import tkinter as tk
 from customtkinter import CTkButton
-
 from json import load
 
 class CombinedModal(tk.Toplevel):
@@ -12,6 +11,7 @@ class CombinedModal(tk.Toplevel):
         self.center_window()
 
     def _configure_window(self, parent):
+        """Configure the modal window properties."""
         self.transient(parent)
         self.configure(bg="#2B2631")
         self.resizable(False, False)
@@ -20,15 +20,18 @@ class CombinedModal(tk.Toplevel):
         self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
 
     def _load_data(self):
+        """Load data from JSON file."""
         try:
             with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
                 self.installer_data = load(file)
             self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
         except FileNotFoundError:
             raise FileNotFoundError("The installer data file was not found.")
-        
+        except Exception as e:
+            raise Exception(f"An error occurred while loading the data file: {e}")
 
     def create_modal(self, modal):
+        """Create the modal based on the type specified."""
         modal_mapping = {
             "exit": "exit_modal",
             "attention": "attention_modal",
@@ -37,20 +40,19 @@ class CombinedModal(tk.Toplevel):
         }
 
         modal_key = modal_mapping.get(modal.lower())
-        modal_data = self.text_data.get(modal_key)
-
-        # For testing purposes, I will comment out the following lines
-        # if modal_key is None:
-        #     raise ValueError(f"Unknown modal type: '{modal}'")
-
-        # if modal_data is None:
-        #     raise KeyError(f"Modal data not found for key: '{modal_key}'")
-
-        self.title(modal_data["modal_title"])
-        self.create_label(modal_data["modal_label"])
-        self.create_buttons(modal)
+        if modal_key:
+            modal_data = self.text_data.get(modal_key)
+            if modal_data:
+                self.title(modal_data["modal_title"])
+                self.create_label(modal_data["modal_label"])
+                self.create_buttons(modal)
+            else:
+                raise ValueError(f"No data found for the modal type: {modal}")
+        else:
+            raise ValueError(f"Invalid modal type: {modal}")
 
     def create_label(self, text):
+        """Create a label for the modal."""
         self.message_label = tk.Label(
             self,
             text=text,
@@ -61,27 +63,26 @@ class CombinedModal(tk.Toplevel):
         self.message_label.pack(padx=10, pady=10)
 
     def create_buttons(self, modal):
+        """Create buttons based on the modal type."""
         if modal.lower() == "exit":
             self.create_exit_buttons()
         elif modal.lower() == "attention":
             self.create_attention_exit_button()
         else:
-            self.ok_button = self.create_button("Ok", "#10dc60", self.cancel_action)
-            self.ok_button.pack(pady=20)
+            self.create_button("Ok", "#10dc60", self.cancel_action).pack(pady=20)
 
     def create_exit_buttons(self):
-        self.ok_button = self.create_button("Yes", "#f04141", self.ok_action)
-        self.ok_button.pack(side="left", padx=10, pady=20)
-
-        self.cancel_button = self.create_button("No", "#10dc60", self.cancel_action)
-        self.cancel_button.pack(side="right", padx=10, pady=20)
+        """Create Yes and No buttons for exit modal."""
+        self.create_button("Yes", "#f04141", self.ok_action).pack(side="left", padx=10, pady=20)
+        self.create_button("No", "#10dc60", self.cancel_action).pack(side="right", padx=10, pady=20)
 
     def create_attention_exit_button(self):
+        """Create Ok button for attention modal."""
         self.protocol("WM_DELETE_WINDOW", self.ok_action)
-        self.ok_button = self.create_button("Ok", "#10dc60", self.ok_action)
-        self.ok_button.pack(pady=20)
+        self.create_button("Ok", "#10dc60", self.ok_action).pack(pady=20)
 
     def create_button(self, text, fg_color, command):
+        """Create a CTkButton with specified text, color, and command."""
         return CTkButton(
             self,
             text=text,
@@ -93,13 +94,16 @@ class CombinedModal(tk.Toplevel):
         )
 
     def ok_action(self):
+        """Action to be taken when Ok button is pressed."""
         self.master.quit()
         self.destroy()
 
     def cancel_action(self):
+        """Action to be taken when Cancel button is pressed."""
         self.destroy()
 
     def center_window(self):
+        """Center the modal window on the parent window."""
         self.update_idletasks()  # Ensure that window dimensions are updated
         parent_width = self.master.winfo_width()
         parent_height = self.master.winfo_height()
@@ -108,5 +112,4 @@ class CombinedModal(tk.Toplevel):
         x = (parent_width - width) // 2
         y = (parent_height - height) // 2
         self.geometry(f"+{self.master.winfo_rootx() + x}+{self.master.winfo_rooty() + y}")
-        
 
