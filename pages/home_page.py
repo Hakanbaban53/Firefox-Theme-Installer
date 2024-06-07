@@ -25,6 +25,7 @@ class HomePage(CTkFrame):
     BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
     DATA_PATH = "../RealFire-Installer/data/installer_data.json"
     FILES_DATA_PATH = "../RealFire-Installer/data/installer_files_data.json"
+    FILES_DATA_URL = "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/installer_files_data.json"
     ANIMATION_SPEED = 100
 
     def __init__(self, parent, controller):
@@ -260,7 +261,7 @@ class HomePage(CTkFrame):
             onvalue="on",
             offvalue="off",
         )
-        
+
         reload_icon = self.load_image(self.ICON_PATH + "reload_icon.png", (20, 20))
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
@@ -299,7 +300,7 @@ class HomePage(CTkFrame):
         frames = self.load_gif()
         self.update_gif(frames)
         sleep(1)
-        file_check_result = FileManager(self.FILES_DATA_PATH).check_files_exist()
+        file_check_result = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).check_files_exist()
         self.master.after_cancel(self.animation_id)
         if not file_check_result:
             self.detect_files_text.configure(
