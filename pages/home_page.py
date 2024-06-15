@@ -241,7 +241,7 @@ class HomePage(CTkFrame):
             state="disabled",
         )
 
-        thread = Thread(target=self.locate_files)
+        thread = Thread(target=self.fetch_files)
         thread.start()
 
     def create_recheck_skip_section(self):
@@ -269,7 +269,7 @@ class HomePage(CTkFrame):
             height=40,
             text="",
             fg_color="#FFFFFF",
-            command=self.recheck_files,
+            command=self.refetch_files,
             image=reload_icon,
         )
         self.recheck_button.grid(
@@ -296,10 +296,26 @@ class HomePage(CTkFrame):
         self.detect_files_text.config(image=frame)
         self.animation_id = self.after(self.ANIMATION_SPEED, self.update_gif, frames)
 
+    def fetch_files(self):
+        frames = self.load_gif()
+        self.update_gif(frames)
+        fetch_files_data = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).load_json_data()
+        self.master.after_cancel(self.animation_id)
+        if fetch_files_data == {}:
+            self.detect_files_text.configure(
+                text="Failed to Fetch Files Data  ", fg="#f04141", image=self.attention_icon
+            )
+            self.install_files_button.configure(state="disabled")
+            self.recheck_button.configure(state="normal")
+            self.user_know_what_do.grid(row=5, column=0, padx=10, pady=0, sticky="")
+            self.recheck_button.grid(row=5, column=1, padx=10, pady=0, sticky="")
+        else:
+            Thread(target=self.locate_files).start()
+
+
     def locate_files(self):
         frames = self.load_gif()
         self.update_gif(frames)
-        sleep(1)
         file_check_result = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).check_files_exist()
         self.master.after_cancel(self.animation_id)
         if not file_check_result:
@@ -329,15 +345,21 @@ class HomePage(CTkFrame):
         else:
             self.install_button.configure(state="disabled")
             self.install_files_button.configure(state="normal")
-            self.detect_files_text.configure(
-                text="Some Files Are Missing  ", fg="#f04141", image=self.attention_icon
-            )
+            self.refetch_files()
             self.recheck_button.configure(state="normal")
 
     def install_files(self):
         modal = FileInstallerModal(self)
         self.wait_window(modal)
         self.recheck_files()
+
+    def refetch_files(self):
+        self.detect_files_text.configure(text="Fetching The Files  ", fg="#000000")
+        self.install_button.configure(state="disabled")
+        self.install_files_button.grid_remove()
+        self.user_know_what_do.grid_remove()
+        thread = Thread(target=self.fetch_files)
+        thread.start()
 
     def recheck_files(self):
         self.detect_files_text.configure(text="Checking The Files  ", fg="#000000")

@@ -10,11 +10,14 @@ from pages.install_page import InstallPage
 from pages.remove_page import RemovePage
 from pages.status_page import StatusPage
 
+
 class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
+
+        with open(
+            "../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8"
+        ) as file:
             self.text_data = load(file)
 
         self.title(self.text_data["common_values"]["installer_info"]["installer_title"])
@@ -24,11 +27,10 @@ class MultiPageApp(CTk):
         self.iconbitmap("../RealFire-Installer/assets/icons/firefox.ico")
         self.center_window()
 
-        # if not self.is_admin():
-        #     self.show_admin_error()
-        #     exit()
+        if not self.is_admin():
+            self.show_admin_error()
+            exit()
 
-        # Create the image label to be displayed across all pages
         self.installer_img = CTkImage(
             light_image=Image.open(
                 "../RealFire-Installer/assets/backgrounds/installer_img.png"
@@ -71,10 +73,10 @@ class MultiPageApp(CTk):
 
         if direction == "right":
             next_x = self.winfo_width() - x
-            current_x = - x + 315
+            current_x = -x + 315
         else:
             next_x = x - self.winfo_width() + 625
-            current_x = x + 2*315
+            current_x = x + 2 * 315
 
         next_frame.place(x=next_x, y=0, relwidth=1, relheight=1)
         current_frame.place(x=current_x, y=0, relwidth=1, relheight=1)
@@ -83,21 +85,37 @@ class MultiPageApp(CTk):
         self.update()
 
         if direction == "left" and x <= self.winfo_width() - 315:
-            self.after(1, self.slide_to_frame, current_frame, next_frame, x + speed, speed, direction)
+            self.after(
+                1,
+                self.slide_to_frame,
+                current_frame,
+                next_frame,
+                x + speed,
+                speed,
+                direction,
+            )
         elif direction == "right" and x <= self.winfo_width() - 315:
-            self.after(1, self.slide_to_frame, current_frame, next_frame, x + speed, speed, direction)
+            self.after(
+                1,
+                self.slide_to_frame,
+                current_frame,
+                next_frame,
+                x + speed,
+                speed,
+                direction,
+            )
         else:
             current_frame.place_forget()
 
     def show_frame(self, page_name, **kwargs):
         self.installer_img_label.lift()
-        
+
         page_class = {
             "home_page": HomePage,
             "install_page": InstallPage,
             "remove_page": RemovePage,
             "status_page": StatusPage,
-        }.get(page_name) 
+        }.get(page_name)
 
         if page_class:
             if page_class not in self.frames:
@@ -120,7 +138,7 @@ class MultiPageApp(CTk):
 
     def is_admin(self):
         try:
-            if os.name == 'nt':  # Windows
+            if os.name == "nt":  # Windows
                 try:
                     is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
                 except AttributeError:
@@ -145,7 +163,7 @@ class MultiPageApp(CTk):
         screen_height = self.winfo_screenheight()
         x = (screen_width - window_width) // 2
         y = (screen_height - window_height) // 2
-        
+
         self.geometry("+{}+{}".format(x, y))
 
     def show_admin_error(self):
@@ -154,7 +172,9 @@ class MultiPageApp(CTk):
         modal.geometry("300x150")
         modal.configure(fg_color="#2B2631")
         modal.resizable(False, False)
-        modal.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
+        modal.iconbitmap(
+            "C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico"
+        )
 
         label = CTkLabel(
             modal,
@@ -171,7 +191,7 @@ class MultiPageApp(CTk):
             command=exit,
             bg_color="#2B2631",
             fg_color="#f04141",
-            font=("Arial", 14)
+            font=("Arial", 14),
         )
         ok_button.pack(pady=10)
 
@@ -188,6 +208,7 @@ class MultiPageApp(CTk):
 
         modal.grab_set()
         modal.mainloop()
+
 
 if __name__ == "__main__":
     app = MultiPageApp()

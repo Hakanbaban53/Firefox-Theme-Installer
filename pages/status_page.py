@@ -5,6 +5,7 @@ from customtkinter import (
     CTkImage,
     CTkLabel,
     CTkFont,
+    CTkFrame,
     CTkProgressBar,
     CTkTextbox,
     CTkButton,
@@ -14,16 +15,18 @@ from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
 from functions.install_files import FileActions
 
+
 class StatusPage(CTkFrame):
     ICON_PATH = "../RealFire-Installer/assets/icons/"
     BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
     DATA_PATH = "../RealFire-Installer/data/installer_data.json"
 
+    os_values = OSProperties().get_values()
+
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         self.file_actions = FileActions()
-        self.os_values = OSProperties().get_values()
 
         self.come_from_which_page = None
         self.load_text_data()
@@ -44,25 +47,19 @@ class StatusPage(CTkFrame):
         )
 
     def configure_layout(self):
-        self.fg_color = "#2B2631"
-        self.grid(row=0, column=1, sticky="SW")
-        self.columnconfigure(0, weight=1)
+        self.status_page_frame = CTkFrame(
+            self,
+            fg_color="#2B2631",
+        )
+        self.status_page_frame.grid(row=0, column=1, sticky="SW")
+        self.status_page_frame.columnconfigure(0, weight=1)
 
     def create_widgets(self):
-        self.create_status_page_frame()
         self.create_header()
         self.create_action_status()
         self.create_progress_bar()
         self.create_output_entry()
         self.create_bottom_widgets()
-
-    def create_status_page_frame(self):
-        self.status_page_frame = CTkFrame(
-            self,
-            fg_color="#2B2631",
-        )
-        self.status_page_frame.grid(row=0, column=0, sticky="SW")
-        self.status_page_frame.columnconfigure(0, weight=1)
 
     def create_header(self):
         header_title_bg = self.load_image(
@@ -121,7 +118,7 @@ class StatusPage(CTkFrame):
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
-        bottom_frame.place(x=200.0, y=600.0)
+        bottom_frame.place(x=190.0, y=600.0)
 
         navigation_frame = CTkFrame(
             bottom_frame,
@@ -138,7 +135,6 @@ class StatusPage(CTkFrame):
         self.create_os_info(bottom_frame)
 
     def create_navigation_buttons(self, parent):
-
         self.create_navigation_button(
             parent,
             "Finish",
@@ -262,6 +258,7 @@ class StatusPage(CTkFrame):
             self.file_actions.move_file(
                 "../RealFire-Installer/fx-autoconfig/user.js", self.profile_folder
             )
+
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")
             self.file_actions.remove_file(f"{self.application_folder}/config.js")

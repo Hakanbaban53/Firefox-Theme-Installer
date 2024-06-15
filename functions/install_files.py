@@ -70,9 +70,11 @@ class FileActions:
                 output = result.stdout.decode('utf-8').strip()
                 error = result.stderr.decode('utf-8').strip()
 
-                # Update progress bar and output entry after each operation
                 progress = (i + 1) / total_operations
                 progress_bar.set(progress)
+
+                output_entry.configure(state='normal')
+                
                 output_entry.insert("end", f"Completed: {command}\n")
                 
                 if output:
@@ -81,12 +83,15 @@ class FileActions:
                     output_entry.insert("end", f"Error: {error}\n")
 
             except CalledProcessError as e:
-                output_entry.insert("end", f"Failed: {command} with error {e.output.decode('utf-8').strip()}\n")
+                output_entry.configure(state='normal')
+                output_entry.insert("end", f"Failed: {command} with error {e.stderr.decode('utf-8').strip()}\n")
             except Exception as e:
+                output_entry.configure(state='normal')
                 output_entry.insert("end", f"Failed: {command} with error {e}\n")
             finally:
-                # Ensure the UI is updated
+                output_entry.configure(state='disabled')
+                output_entry.see("end")
+
                 progress_bar.master.update_idletasks()
 
-        # Clear the commands list after all commands have been executed
         self.commands.clear()

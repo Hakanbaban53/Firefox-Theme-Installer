@@ -268,7 +268,7 @@ class InstallPage(CTkFrame):
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
-        bottom_frame.place(x=200.0, y=600.0)
+        bottom_frame.place(x=190.0, y=600.0)
 
         navigation_frame = CTkFrame(
             bottom_frame,

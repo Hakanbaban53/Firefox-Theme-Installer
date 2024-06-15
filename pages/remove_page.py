@@ -47,15 +47,11 @@ class RemovePage(CTkFrame):
         )
 
     def configure_layout(self):
-        self.fg_color = "#2B2631"
-        self.grid(row=0, column=1, sticky="SW")
-        self.columnconfigure(0, weight=1)
-
         self.remove_page_frame = CTkFrame(
             self,
             fg_color="#2B2631",
         )
-        self.remove_page_frame.grid(row=0, column=0, sticky="SW")
+        self.remove_page_frame.grid(row=0, column=1, sticky="SW")
         self.remove_page_frame.columnconfigure(0, weight=1)
 
     def create_widgets(self):
@@ -202,7 +198,7 @@ class RemovePage(CTkFrame):
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
-        bottom_frame.place(x=200.0, y=600.0)
+        bottom_frame.place(x=180.0, y=600.0)
 
         navigation_frame = CTkFrame(
             bottom_frame,
