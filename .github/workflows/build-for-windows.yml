@@ -30,9 +30,14 @@ jobs:
         run: |
           pyinstaller --onefile .\main.py --icon=assets\icons\firefox.ico --add-data "data\installer_data.json;data" --add-data "assets\icons;assets/icons" --add-data "RealFire-Installer\assets\backgrounds;assets/backgrounds"
 
+      - name: Create self-signed certificate
+        run: |
+          openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=RealFire"
+          openssl pkcs12 -export -out cert.pfx -inkey key.pem -in cert.pem -passout pass:password
+
       - name: Sign the executable
         run: |
-          signtool sign /a /tr http://timestamp.digicert.com /td sha256 /fd sha256 /f ${{ secrets.CERT_PFX }} /p ${{ secrets.CERT_PASSWORD }} dist\main.exe
+          signtool sign /f cert.pfx /p password /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\main.exe
           
       - name: Upload Windows build artifact
         uses: actions/upload-artifact@v3
