@@ -28,7 +28,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile .\main.py --icon=RealFire-Installer\RealFire-Installer\assets\icons\firefox.ico --add-data "RealFire-Installer\RealFire-Installer\data\installer_data.json;data" --add-data "RealFire-Installer\RealFire-Installer\assets\icons;assets/icons" --add-data "RealFire-Installer\RealFire-Installer\assets\backgrounds;assets/backgrounds"
+          pyinstaller --onefile .\main.py --icon=RealFire-Installer\assets\icons\firefox.ico --add-data "RealFire-Installer\data\installer_data.json;data" --add-data RealFire-Installer\assets\icons;assets/icons" --add-data "RealFire-Installer\assets\backgrounds;assets/backgrounds"
           
       - name: Upload Windows build artifact
         uses: actions/upload-artifact@v3
