@@ -24,8 +24,8 @@ class CombinedModal(tk.Toplevel):
         self.wait_visibility()
         self.grab_set()
 
+        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
         if os.name == "nt":
-            icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
             self.iconbitmap(icon_path)
         else:
             icon = Image.open(icon_path)
