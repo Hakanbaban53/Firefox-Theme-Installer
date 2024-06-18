@@ -28,7 +28,11 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile .\main.py --icon=assets\icons\firefox.ico --add-data="data\installer_data.json:data" --add-data="assets\icons:assets/icons" --add-data="assets\backgrounds:assets/backgrounds"
+          pyinstaller --onefile .\main.py --icon=assets\icons\firefox.ico --add-data "data\installer_data.json;data" --add-data "assets\icons;assets/icons" --add-data "RealFire-Installer\assets\backgrounds;assets/backgrounds"
+
+      - name: Sign the executable
+        run: |
+          signtool sign /a /tr http://timestamp.digicert.com /td sha256 /fd sha256 /f ${{ secrets.CERT_PFX }} /p ${{ secrets.CERT_PASSWORD }} dist\main.exe
           
       - name: Upload Windows build artifact
         uses: actions/upload-artifact@v3
