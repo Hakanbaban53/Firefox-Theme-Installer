@@ -270,7 +270,7 @@ class StatusPage(CTkFrame):
                 )
 
             VariableUpdater(
-                path.join(".", "chrome", "includes", "realfire-colours.css")
+                path.join(self.base_dir, "chrome", "includes", "realfire-colours.css")
             ).update_variable("--accent-color", accent_color)
 
         elif self.come_from_which_page == "remove":

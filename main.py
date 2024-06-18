@@ -3,9 +3,8 @@ import ctypes
 from json import load
 from sys import exit
 import sys
-from tkinter import Tk
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
-from PIL import Image
+from PIL import Image, ImageTk
 from modals.combined_modal import CombinedModal
 from pages.home_page import HomePage
 from pages.install_page import InstallPage
@@ -22,7 +21,7 @@ class MultiPageApp(CTk):
         )  # Also I send the other pages and functions this path.
 
         if not self.is_admin():
-            self.show_admin_error()
+            self.show_admin_error(self)
             exit()
 
         installer_data_path = os.path.join(self.base_dir, "data", "installer_data.json")
@@ -37,6 +36,9 @@ class MultiPageApp(CTk):
         if os.name == "nt":
             icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
             self.iconbitmap(icon_path)
+        else:
+            icon = Image.open(icon_path)
+            self.iconphoto(True, ImageTk.PhotoImage(icon))
 
         self.center_window()
 
@@ -181,19 +183,21 @@ class MultiPageApp(CTk):
 
         self.geometry("+{}+{}".format(x, y))
 
-    def show_admin_error(self):
-        modal = Tk()
-        modal.title("Admin Error")
-        modal.geometry("300x150")
-        modal.configure(bg="#2B2631")
-        modal.resizable(False, False)
+    def show_admin_error(self, master):
+        master.title("Admin Error")
+        master.geometry("300x150")
+        master.configure(fg_color="#2B2631")
+        master.resizable(False, False)
 
         if os.name == "nt":
             icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-            modal.iconbitmap(icon_path)
+            self.iconbitmap(icon_path)
+        else:
+            icon = Image.open(icon_path)
+            self.iconphoto(True, ImageTk.PhotoImage(icon))
 
         label = CTkLabel(
-            modal,
+            master,
             text="Administrative privileges are required.",
             text_color="white",
             font=CTkFont(family="Segoe UI", size=15),
@@ -201,7 +205,7 @@ class MultiPageApp(CTk):
         label.pack(padx=20, pady=20)
 
         ok_button = CTkButton(
-            modal,
+            master,
             text="OK",
             text_color="white",
             command=exit,
@@ -212,18 +216,18 @@ class MultiPageApp(CTk):
         ok_button.pack(pady=10)
 
         # Bind the close event to the exit function
-        modal.protocol("WM_DELETE_WINDOW", exit)
+        master.protocol("WM_DELETE_WINDOW", exit)
 
-        # Center the modal window
-        modal.update_idletasks()
-        width = modal.winfo_width()
-        height = modal.winfo_height()
-        x = (modal.winfo_screenwidth() // 2) - (width // 2)
-        y = (modal.winfo_screenheight() // 2) - (height // 2)
-        modal.geometry(f"{width}x{height}+{x}+{y}")
+        # Center the master window
+        master.update_idletasks()
+        width = master.winfo_width()
+        height = master.winfo_height()
+        x = (master.winfo_screenwidth() // 2) - (width // 2)
+        y = (master.winfo_screenheight() // 2) - (height // 2)
+        master.geometry(f"{width}x{height}+{x}+{y}")
 
-        modal.grab_set()
-        modal.mainloop()
+        master.grab_set()
+        master.mainloop()
 
 
 if __name__ == "__main__":
