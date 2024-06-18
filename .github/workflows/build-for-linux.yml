@@ -28,7 +28,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile main.py --add-data=/home/runner/work/RealFire-Installer/data/installer_data.json:data --add-data=/home/runner/work/RealFire-Installer/assets/icons:assets/icons --add-data=/home/runner/work/RealFire-Installer/assets/backgrounds:assets/backgrounds --hidden-import='PIL._tkinter_finder'
+          pyinstaller --onefile main.py --add-data=/home/runner/work/RealFire-Installer/RealFire-Installer/data/installer_data.json:data --add-data=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons:assets/icons --add-data=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/backgrounds:assets/backgrounds --hidden-import='PIL._tkinter_finder'
           
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v3
