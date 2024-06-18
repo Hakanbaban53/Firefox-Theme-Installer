@@ -189,8 +189,8 @@ class MultiPageApp(CTk):
         master.configure(fg_color="#2B2631")
         master.resizable(False, False)
 
+        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
         if os.name == "nt":
-            icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
             self.iconbitmap(icon_path)
         else:
             icon = Image.open(icon_path)
