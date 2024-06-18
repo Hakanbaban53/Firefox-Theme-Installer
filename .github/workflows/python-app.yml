@@ -30,6 +30,6 @@ jobs:
     - name: Build RealFire For Linux
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        pyinstaller --onefile main.py --add-data="../RealFire-Installer/data/installer_data.json:data" --add-data="../RealFire-Installer/assets/icons:assets/icons" --add-data="..\RealFire-Installer\assets\backgrounds:assets\backgrounds" --hidden-import='PIL._tkinter_finder'
+        pyinstaller --onefile main.py --add-data="/data/installer_data.json:data" --add-data="assets/icons:assets/icons" --add-data="assets/backgrounds:assets/backgrounds" --hidden-import='PIL._tkinter_finder'
 
 
