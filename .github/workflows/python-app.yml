@@ -1,0 +1,35 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install customtkinter tk pillow requests pyinstaller
+    - name: Build RealFire For Linux
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        pyinstaller --onefile .\main.py --add-data="../RealFire-Installer/data/installer_data.json:data" --add-data="../RealFire-Installer/assets/icons:assets/icons" --add-data="..\RealFire-Installer\assets\backgrounds:assets\backgrounds" --hidden-import='PIL._tkinter_finder'
+
+
