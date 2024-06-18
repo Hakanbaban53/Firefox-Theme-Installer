@@ -30,6 +30,11 @@ jobs:
         run: |
           pyinstaller --onefile .\main.py --icon=assets\icons\firefox.ico --add-data "data\installer_data.json;data" --add-data "assets\icons;assets/icons" --add-data "assets\backgrounds;assets/backgrounds"
 
+      - name: Install Windows SDK
+        run: |
+          choco install windows-sdk-10.0 --confirm
+        shell: powershell
+
       - name: Create self-signed certificate
         run: |
           openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=RealFire"
@@ -37,8 +42,10 @@ jobs:
 
       - name: Sign the executable
         run: |
+          $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\x64"
           signtool sign /f cert.pfx /p password /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\main.exe
-          
+        shell: powershell
+
       - name: Upload Windows build artifact
         uses: actions/upload-artifact@v3
         with:
