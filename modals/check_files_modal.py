@@ -1,4 +1,5 @@
 from os import path
+import os
 import tkinter as tk
 from tkinter import ttk
 from threading import Thread
@@ -18,6 +19,11 @@ class FileInstallerModal(tk.Toplevel):
 
         self.base_dir = base_dir
         self.load_data()
+
+        if os.name == "nt":
+            icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+            self.iconbitmap(icon_path)
+
 
         self.file_manager = FileManager(self.data_file_path)
         self.title("Install Missing Files")

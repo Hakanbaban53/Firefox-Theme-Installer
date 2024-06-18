@@ -3,6 +3,7 @@ import ctypes
 from json import load
 from sys import exit
 import sys
+from tkinter import Tk
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
@@ -15,15 +16,14 @@ from pages.status_page import StatusPage
 class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if not self.is_admin():
-            self.show_admin_error()
-            exit()
-
         # Determine base directory using _MEIPASS or current script directory
         self.base_dir = getattr(
             sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
         )  # Also I send the other pages and functions this path.
+
+        if not self.is_admin():
+            self.show_admin_error()
+            exit()
 
         installer_data_path = os.path.join(self.base_dir, "data", "installer_data.json")
         with open(installer_data_path, "r", encoding="utf-8") as file:
@@ -34,8 +34,9 @@ class MultiPageApp(CTk):
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
 
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        self.iconbitmap(icon_path)
+        if os.name == "nt":
+            icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+            self.iconbitmap(icon_path)
 
         self.center_window()
 
@@ -181,14 +182,15 @@ class MultiPageApp(CTk):
         self.geometry("+{}+{}".format(x, y))
 
     def show_admin_error(self):
-        modal = CTk()
+        modal = Tk()
         modal.title("Admin Error")
         modal.geometry("300x150")
-        modal.configure(fg_color="#2B2631")
+        modal.configure(bg="#2B2631")
         modal.resizable(False, False)
-        modal.iconbitmap(
-            "C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico"
-        )
+
+        if os.name == "nt":
+            icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+            modal.iconbitmap(icon_path)
 
         label = CTkLabel(
             modal,

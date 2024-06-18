@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from customtkinter import CTkButton
 from json import load
@@ -22,10 +23,9 @@ class CombinedModal(tk.Toplevel):
         self.wait_visibility()
         self.grab_set()
 
-        icon_path = path.join(
-            self.base_dir, "assets", "icons", "firefox.ico"
-        )
-        self.iconbitmap(icon_path)
+        if os.name == "nt":
+            icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+            self.iconbitmap(icon_path)
 
     def _load_data(self):
         """Load data from JSON file."""
