@@ -1,0 +1,38 @@
+name: Build RealFire Installer
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install customtkinter tk pillow requests pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onefile main.py --add-data=RealFire-Installer/data/installer_data.json:data --add-data=RealFire-Installer/assets/icons:assets/icons --add-data=RealFire-Installer/assets/backgrounds:assets/backgrounds --hidden-import='PIL._tkinter_finder'
+          
+      - name: Upload Linux build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: RealFire-Installer-Linux
+          path: dist/main
+
