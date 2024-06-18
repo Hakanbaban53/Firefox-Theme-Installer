@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <br>
-  <a><img src="" alt="RealFire Installer" width="200"></a>
+  <a><img src="assets/Preview_Images/home_page.png" alt="RealFire Installer" width="800"></a>
   <br>
   RealFire Installer
   <br>
@@ -35,16 +35,19 @@ To clone and run this application, you'll need [Git](https://git-scm.com), Pytho
 $ git clone https://github.com/Hakanbaban53/RealFire-Installer
 
 # Go into the repository
-$ 
+$ cd RealFire-Installer
 
 # Install dependencies
-$ 
+$ pip3 install customtkinter tk pillow requests
 
 # Run the app
-$ 
+$ python ./main.py
 ```
-
 > **Note**
+> If App want to admin request urn the line [here](https://github.com/Hakanbaban53/RealFire-Installer/blob/c2f6685af88cb3729435ab97fbaea4b7cbdf59a9/main.py#L19C9-L21C19) into a comment line.
+
+
+> **Note 2**
 > If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `Python` from the command prompt.
 
 
