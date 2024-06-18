@@ -1,0 +1,37 @@
+name: Build RealFire Installer
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install customtkinter tk pillow requests pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onefile .\main.py --icon=RealFire-Installer\RealFire-Installer\assets\icons\firefox.ico --add-data "RealFire-Installer\RealFire-Installer\data\installer_data.json;data" --add-data "RealFire-Installer\RealFire-Installer\assets\icons;assets/icons" --add-data "RealFire-Installer\RealFire-Installer\assets\backgrounds;assets/backgrounds"
+          
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: RealFire-Installer-Windows
+          path: dist\main.exe
