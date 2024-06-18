@@ -1,26 +1,40 @@
+from os import path
 import tkinter as tk
 from tkinter import ttk
-from customtkinter import CTkButton
 from threading import Thread
-from functions.detect_files import FileManager
+from customtkinter import CTkButton
+from functions.detect_and_download_files import FileManager
 from modals.combined_modal import CombinedModal
 
+
 class FileInstallerModal(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, base_dir):
         super().__init__(parent)
         self.transient(parent)
         self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        self.title("Install Missing Files")
-        self.iconbitmap("../RealFire-Installer/assets/icons/firefox.ico")
-        self.center_window()
 
-        self.file_manager = FileManager(
-            "../RealFire-Installer/data/installer_files_data.json"
-        )
+        self.base_dir = base_dir
+        self.load_data()
+
+        self.file_manager = FileManager(self.data_file_path)
+        self.title("Install Missing Files")
+        self.center_window()
         self.create_widgets()
+
+    def load_data(self):
+        """Load data from JSON file."""
+        try:
+            # Load installer data using base_dir
+            self.data_file_path = path.join(
+                self.base_dir, "data", "installer_files_data.json"
+            )
+        except FileNotFoundError:
+            raise FileNotFoundError("The installer data file was not found.")
+        except Exception as e:
+            raise Exception(f"An error occurred while loading the data file: {e}")
 
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""
@@ -63,8 +77,7 @@ class FileInstallerModal(tk.Toplevel):
             text="Check",
             text_color="white",
             command=self.on_check_button_click,
-            bg_color="#2B2631",
-            fg_color="#f04141",
+            fg_color="#771D76",
         )
         self.check_button.grid(row=0, column=0, padx=20, pady=0)
 
@@ -73,14 +86,13 @@ class FileInstallerModal(tk.Toplevel):
             text="Install",
             text_color="white",
             command=self.on_install_button_click,
-            bg_color="#2B2631",
-            fg_color="#10dc60",
+            fg_color="#F08D27",
         )
         self.install_files_button.grid(row=0, column=1, padx=20, pady=0)
 
     def check_all_files_installed(self):
         """Check if all files are installed and return the missing files."""
-        self.file_check_result = self.file_manager.check_files_exist()
+        self.file_check_result = self.file_manager.check_files_exist(root=self.base_dir) # If we dont pass base_dir, it will take the default value of root as "." and check for the files in the current directory.
         return self.file_check_result
 
     def on_install_button_click(self):
@@ -109,13 +121,15 @@ class FileInstallerModal(tk.Toplevel):
 
     def on_check_button_click(self):
         """Handle the check button click event."""
-        all_files_installed = len(self.check_all_files_installed())
+        all_files_installed = len(
+            self.check_all_files_installed()
+        )
         if all_files_installed == 0:
-            modal = CombinedModal(self, "check_files_installed")
+            modal = CombinedModal(self, self.base_dir, "check_files_installed")
             self.wait_window(modal)
             self.destroy()
         else:
-            CombinedModal(self, "check_files_not_installed")
+            CombinedModal(self, self.base_dir, "check_files_not_installed")
 
     def center_window(self):
         """Center the modal window on the screen."""

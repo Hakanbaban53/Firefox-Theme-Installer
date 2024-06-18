@@ -1,10 +1,14 @@
 import tkinter as tk
 from customtkinter import CTkButton
 from json import load
+from os import path
 
 class CombinedModal(tk.Toplevel):
-    def __init__(self, parent, modal):
+    def __init__(self, parent, base_dir, modal):
         super().__init__(parent)
+        
+        self.base_dir = base_dir
+
         self._configure_window(parent)
         self._load_data()
         self.create_modal(modal)
@@ -17,14 +21,23 @@ class CombinedModal(tk.Toplevel):
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        self.iconbitmap("C:/Users/hakan/Documents/GitHub/RealFire-Installer/assets/icons/firefox.ico")
+
+        icon_path = path.join(
+            self.base_dir, "assets", "icons", "firefox.ico"
+        )
+        self.iconbitmap(icon_path)
 
     def _load_data(self):
         """Load data from JSON file."""
         try:
-            with open("../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8") as file:
+            data_file_path = path.join(
+                self.base_dir, "data", "installer_data.json"
+            )
+            with open(data_file_path, "r", encoding="utf-8") as file:
                 self.installer_data = load(file)
-            self.text_data = self.installer_data.get("common_values", {}).get("modals", {})
+            self.text_data = self.installer_data.get("common_values", {}).get(
+                "modals", {}
+            )
         except FileNotFoundError:
             raise FileNotFoundError("The installer data file was not found.")
         except Exception as e:
@@ -73,8 +86,12 @@ class CombinedModal(tk.Toplevel):
 
     def create_exit_buttons(self):
         """Create Yes and No buttons for exit modal."""
-        self.create_button("Yes", "#f04141", self.ok_action).pack(side="left", padx=10, pady=20)
-        self.create_button("No", "#10dc60", self.cancel_action).pack(side="right", padx=10, pady=20)
+        self.create_button("Yes", "#f04141", self.ok_action).pack(
+            side="left", padx=10, pady=20
+        )
+        self.create_button("No", "#10dc60", self.cancel_action).pack(
+            side="right", padx=10, pady=20
+        )
 
     def create_attention_exit_button(self):
         """Create Ok button for attention modal."""
@@ -111,5 +128,6 @@ class CombinedModal(tk.Toplevel):
         height = self.winfo_height()
         x = (parent_width - width) // 2
         y = (parent_height - height) // 2
-        self.geometry(f"+{self.master.winfo_rootx() + x}+{self.master.winfo_rooty() + y}")
-
+        self.geometry(
+            f"+{self.master.winfo_rootx() + x}+{self.master.winfo_rooty() + y}"
+        )

@@ -1,4 +1,6 @@
 from json import load
+import os
+import sys
 from customtkinter import (
     CTkFrame,
     CTkImage,
@@ -17,17 +19,19 @@ from functions.special_input_functions import SpecialInputFunc
 
 
 class RemovePage(CTkFrame):
-    ICON_PATH = "../RealFire-Installer/assets/icons/"
-    BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
-    DATA_PATH = "../RealFire-Installer/data/installer_data.json"
-
-    os_values = OSProperties().get_values()
-    input_values = OSProperties().get_locations()
-    profile_folder_location = get_profile_folder()
-
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         self.controller = controller
+        self.base_dir = base_dir
+        
+        self.ICON_PATH = os.path.join(base_dir, "assets", "icons")
+        self.BACKGROUND_PATH = os.path.join(base_dir, "assets", "backgrounds")
+        self.DATA_PATH = os.path.join(base_dir, "data", "installer_data.json")
+
+        self.os_values = OSProperties(self.DATA_PATH).get_values()
+        self.input_values = OSProperties(self.DATA_PATH).get_locations()
+        self.profile_folder_location = get_profile_folder(self.DATA_PATH)
+
         self.load_text_data()
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
         self.input_data = self.text_data.get("common_values")["inputs"]
@@ -64,9 +68,9 @@ class RemovePage(CTkFrame):
 
     def create_header(self):
         header_title_bg = self.load_image(
-            f"{self.BACKGROUND_PATH}header_title_background.png", (300, 64)
+            os.path.join(self.BACKGROUND_PATH, "header_title_background.png"), (300, 64)
         )
-        line_top_img = self.load_image(f"{self.BACKGROUND_PATH}line_top.png", (650, 6))
+        line_top_img = self.load_image(os.path.join(self.BACKGROUND_PATH, "line_top.png"), (650, 6))
 
         header_label = CTkLabel(
             self.remove_page_frame,
@@ -94,7 +98,7 @@ class RemovePage(CTkFrame):
             fg_color="#2B2631",
         )
         inputs_frame.grid(
-            row=2, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+            row=2, column=0, columnspan=2, padx=40, pady=(20, 30), sticky="NSEW"
         )
 
         self.create_input_widgets(inputs_frame)
@@ -107,7 +111,7 @@ class RemovePage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Profile Folder",
         )
-        profile_folder_label.grid(row=0, column=0, padx=(10, 4), sticky="w")
+        profile_folder_label.grid(row=0, column=0, padx=(10, 4), pady=(14,2), sticky="w")
 
         self.profile_folder_entry = CTkEntry(
             frame,
@@ -131,7 +135,7 @@ class RemovePage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Application Folder",
         )
-        app_folder_label.grid(row=0, column=1, padx=(10, 4), sticky="w")
+        app_folder_label.grid(row=0, column=1, padx=(10, 4), pady=(14,2), sticky="w")
 
         self.application_folder_entry = CTkEntry(
             frame,
@@ -185,7 +189,7 @@ class RemovePage(CTkFrame):
             row=4, column=0, columnspan=2, padx=(10, 4), pady=10
         )
 
-        attention_icon = self.load_image(f"{self.ICON_PATH}attention.png", (24, 24))
+        attention_icon = self.load_image(os.path.join(self.ICON_PATH, "attention.png"), (24, 24))
         self.invalid_entries_text = CTkLabel(
             self.invalid_entry_frame,
             text="",
@@ -219,7 +223,7 @@ class RemovePage(CTkFrame):
         self.remove_button = self.create_navigation_button(
             parent,
             "Remove",
-            self.ICON_PATH + "remove_icon.png",
+            os.path.join(self.ICON_PATH, "remove_icon.png"),
             lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="remove",
@@ -238,7 +242,7 @@ class RemovePage(CTkFrame):
         self.back_button = self.create_navigation_button(
             parent,
             "Back",
-            self.ICON_PATH + "back_icon.png",
+            os.path.join(self.ICON_PATH, "back_icon.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
@@ -246,8 +250,8 @@ class RemovePage(CTkFrame):
         self.create_navigation_button(
             parent,
             "Exit",
-            self.ICON_PATH + "exit_icon.png",
-            lambda: CombinedModal(self, "Exit"),
+            os.path.join(self.ICON_PATH, "exit_icon.png"),
+            lambda: CombinedModal(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
@@ -285,7 +289,7 @@ class RemovePage(CTkFrame):
 
     def create_os_info(self, parent):
         os_icon_image = self.load_image(
-            f"{self.ICON_PATH}{self.os_values['os_name'].lower()}.png", (20, 24)
+            os.path.join(self.ICON_PATH, f"{self.os_values['os_name'].lower()}.png"), (20, 24)
         )
 
         os_frame = CTkFrame(parent, corner_radius=12, fg_color="white")
@@ -322,7 +326,7 @@ class RemovePage(CTkFrame):
         else:
             self.remove_button.configure(state="disabled")
             self.invalid_entries_text.configure(
-                text=f"  {len(SpecialInputFunc().return_invalid_entries())} entries is invalid"
+                text=f"  {len(SpecialInputFunc().return_invalid_entries())} entries are invalid"
             )
             self.invalid_entry_frame.grid()
 

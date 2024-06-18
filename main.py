@@ -2,6 +2,7 @@ import os
 import ctypes
 from json import load
 from sys import exit
+import sys
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image
 from modals.combined_modal import CombinedModal
@@ -15,31 +16,43 @@ class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        with open(
-            "../RealFire-Installer/data/installer_data.json", "r", encoding="utf-8"
-        ) as file:
+        if not self.is_admin():
+            self.show_admin_error()
+            exit()
+
+        # Determine base directory using _MEIPASS or current script directory
+        self.base_dir = getattr(
+            sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
+        )  # Also I send the other pages and functions this path.
+
+        installer_data_path = os.path.join(self.base_dir, "data", "installer_data.json")
+        with open(installer_data_path, "r", encoding="utf-8") as file:
             self.text_data = load(file)
 
         self.title(self.text_data["common_values"]["installer_info"]["installer_title"])
         self.geometry("1115x666")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
-        self.iconbitmap("../RealFire-Installer/assets/icons/firefox.ico")
-        self.center_window()
 
-        if not self.is_admin():
-            self.show_admin_error()
-            exit()
+        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+        self.iconbitmap(icon_path)
+
+        self.center_window()
 
         self.installer_img = CTkImage(
             light_image=Image.open(
-                "../RealFire-Installer/assets/backgrounds/installer_img.png"
+                os.path.join(
+                    self.base_dir, "assets", "backgrounds", "installer_img.png"
+                )
             ),
             dark_image=Image.open(
-                "../RealFire-Installer/assets/backgrounds/installer_img.png"
+                os.path.join(
+                    self.base_dir, "assets", "backgrounds", "installer_img.png"
+                )
             ),
             size=(315, 666),
         )
+
         self.installer_img_label = CTkLabel(
             self,
             text=self.text_data["common_values"]["installer_info"]["installer_version"],
@@ -56,7 +69,8 @@ class MultiPageApp(CTk):
         self.frames = {}
 
     def create_frame(self, page_class):
-        frame = page_class(self.container, self)
+        frame = page_class(self.container, self, self.base_dir)
+
         frame.configure(
             fg_color="#2B2631",
             corner_radius=0,
@@ -151,7 +165,7 @@ class MultiPageApp(CTk):
             return False
 
     def exit_confirmation(self):
-        CombinedModal(self, "Exit")
+        CombinedModal(self, self.base_dir, "Exit")
 
     def center_window(self):
         self.update_idletasks()

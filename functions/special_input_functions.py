@@ -1,5 +1,6 @@
 from os import path
 
+
 class SpecialInputFunc:
     invalid_entries = []
 
@@ -13,9 +14,9 @@ class SpecialInputFunc:
                 self.invalid_entries.remove(entry_widget)
         elif (
             path.isfile(location)
-            and location.lower().endswith(".png")
+            and location.lower().endswith(tuple(file_extension))
             or location == ""
-        ) and file_extension == ".png":
+        ):
             entry_widget.configure(border_color="#10dc60")
             # Remove entry from invalid_entries if it exists
             if entry_widget in self.invalid_entries:
@@ -34,7 +35,7 @@ class SpecialInputFunc:
             return True
         else:
             return False
-        
+
     def get_variables(self, entry):
         input_value = entry.get()
         placeholder_text = entry.cget("placeholder_text")

@@ -1,5 +1,5 @@
 from json import load
-from time import sleep
+from os import path
 from tkinter import PhotoImage, Label, TclError
 from itertools import cycle
 from threading import Thread
@@ -17,32 +17,36 @@ from PIL import Image
 from modals.check_files_modal import FileInstallerModal
 from modals.combined_modal import CombinedModal
 from functions.get_os_properties import OSProperties
-from functions.detect_files import FileManager
+from functions.detect_and_download_files import FileManager
 
 
 class HomePage(CTkFrame):
-    ICON_PATH = "../RealFire-Installer/assets/icons/"
-    BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
-    DATA_PATH = "../RealFire-Installer/data/installer_data.json"
-    FILES_DATA_PATH = "../RealFire-Installer/data/installer_files_data.json"
-    FILES_DATA_URL = "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/installer_files_data.json"
     ANIMATION_SPEED = 100
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         self.controller = controller
+        self.base_dir = base_dir
+
+        self.ICON_PATH = path.join(base_dir, "assets", "icons")
+        self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds")
+        self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
+        self.FILES_DATA_PATH = path.join(base_dir, "data", "installer_files_data.json")
+        
+        self.FILES_DATA_URL = "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/installer_files_data.json?token=GHSAT0AAAAAACSZOMUOEF77DS2TIU55OU7YZTRF2WA"
+
         self.text_data = self.load_json_data(self.DATA_PATH)
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
-        self.os_values = OSProperties().get_values()
+        self.os_values = OSProperties(self.DATA_PATH).get_values()
 
         self.configure_layout()
         self.create_widgets()
 
         self.attention_icon = PhotoImage(
-            file="../RealFire-Installer/assets/icons/attention.png", height=24, width=24
+            file=path.join(self.ICON_PATH, "attention.png"), height=24, width=24
         )
         self.check_icon = PhotoImage(
-            file="../RealFire-Installer/assets/icons/check.png", height=20, width=20
+            file=path.join(self.ICON_PATH, "check.png"), height=20, width=20
         )
 
     def load_json_data(self, path):
@@ -74,9 +78,9 @@ class HomePage(CTkFrame):
 
     def create_header(self):
         header_title_bg = self.load_image(
-            f"{self.BACKGROUND_PATH}header_title_background.png", (390, 64)
+            path.join(self.BACKGROUND_PATH, "header_title_background.png"), (390, 64)
         )
-        line_top_img = self.load_image(f"{self.BACKGROUND_PATH}line_top.png", (650, 6))
+        line_top_img = self.load_image(path.join(self.BACKGROUND_PATH, "line_top.png"), (650, 6))
 
         header_label = CTkLabel(
             self.home_page_frame,
@@ -96,7 +100,7 @@ class HomePage(CTkFrame):
 
     def create_os_info(self):
         os_icon_image = self.load_image(
-            f"{self.ICON_PATH}{self.os_values['os_name'].lower()}.png", (20, 24)
+            path.join(self.ICON_PATH, f"{self.os_values['os_name'].lower()}.png"), (20, 24)
         )
 
         os_label = CTkLabel(
@@ -122,7 +126,7 @@ class HomePage(CTkFrame):
 
     def create_navigation_buttons(self):
         select_action_img = self.load_image(
-            f"{self.BACKGROUND_PATH}header_title_background.png", (270, 36)
+            path.join(self.BACKGROUND_PATH, "header_title_background.png"), (270, 36)
         )
 
         select_action_label = CTkLabel(
@@ -150,7 +154,7 @@ class HomePage(CTkFrame):
         self.create_navigation_button(
             navigation_frame,
             "Remove",
-            self.ICON_PATH + "remove_icon.png",
+            path.join(self.ICON_PATH, "remove_icon.png"),
             lambda: self.controller.show_frame("remove_page"),
             padding_x=(10, 20),
             side="right",
@@ -158,7 +162,7 @@ class HomePage(CTkFrame):
         self.install_button = self.create_navigation_button(
             navigation_frame,
             "Install",
-            self.ICON_PATH + "install_icon.png",
+            path.join(self.ICON_PATH, "install_icon.png"),
             lambda: self.controller.show_frame("install_page"),
             padding_x=(5, 5),
             side="right",
@@ -167,8 +171,8 @@ class HomePage(CTkFrame):
         self.create_navigation_button(
             navigation_frame,
             "Exit",
-            self.ICON_PATH + "exit_icon.png",
-            lambda: CombinedModal(self, "Exit"),
+            path.join(self.ICON_PATH, "exit_icon.png"),
+            lambda: CombinedModal(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
@@ -223,7 +227,7 @@ class HomePage(CTkFrame):
         self.detect_files_text.grid(row=0, column=0, padx=10, pady=10, sticky="")
 
         install_icon = self.load_image(
-            self.ICON_PATH + "get_from_internet.png", (24, 24)
+            path.join(self.ICON_PATH, "get_from_internet.png"), (24, 24)
         )
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
@@ -262,7 +266,7 @@ class HomePage(CTkFrame):
             offvalue="off",
         )
 
-        reload_icon = self.load_image(self.ICON_PATH + "reload_icon.png", (20, 20))
+        reload_icon = self.load_image(path.join(self.ICON_PATH, "reload_icon.png"), (20, 20))
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
             width=40,
@@ -282,7 +286,7 @@ class HomePage(CTkFrame):
         while True:
             try:
                 frame = PhotoImage(
-                    file="../RealFire-Installer/assets/icons/block_spin.gif",
+                    file=path.join(self.ICON_PATH, "block_spin.gif"),
                     format=f"gif -index {index}",
                 )
                 frames.append(frame)
@@ -316,7 +320,7 @@ class HomePage(CTkFrame):
     def locate_files(self):
         frames = self.load_gif()
         self.update_gif(frames)
-        file_check_result = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).check_files_exist()
+        file_check_result = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).check_files_exist(root=self.base_dir)
         self.master.after_cancel(self.animation_id)
         if not file_check_result:
             self.detect_files_text.configure(
@@ -349,7 +353,7 @@ class HomePage(CTkFrame):
             self.recheck_button.configure(state="normal")
 
     def install_files(self):
-        modal = FileInstallerModal(self)
+        modal = FileInstallerModal(self, self.base_dir)
         self.wait_window(modal)
         self.recheck_files()
 

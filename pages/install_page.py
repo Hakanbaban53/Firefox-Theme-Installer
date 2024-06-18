@@ -1,4 +1,5 @@
 from json import load
+from os import path
 
 from tkinter import colorchooser
 from customtkinter import (
@@ -20,17 +21,19 @@ from functions.get_folder_locations import get_profile_folder
 from functions.special_input_functions import SpecialInputFunc
 
 class InstallPage(CTkFrame):
-    ICON_PATH = "../RealFire-Installer/assets/icons/"
-    BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
-    DATA_PATH = "../RealFire-Installer/data/installer_data.json"
-
-    os_values = OSProperties().get_values()
-    input_values = OSProperties().get_locations()
-    profile_folder_location = get_profile_folder()
-
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         self.controller = controller
+        self.base_dir = base_dir
+        
+        self.ICON_PATH = path.join(self.base_dir, "assets", "icons/")
+        self.BACKGROUND_PATH = path.join(self.base_dir, "assets", "backgrounds/")
+        self.DATA_PATH = path.join(self.base_dir, "data", "installer_data.json")
+
+        self.os_values = OSProperties(self.DATA_PATH).get_values()
+        self.input_values = OSProperties(self.DATA_PATH).get_locations()
+        self.profile_folder_location = get_profile_folder(self.DATA_PATH)
+
         self.load_text_data()
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
         self.input_data = self.text_data.get("common_values")["inputs"]
@@ -101,7 +104,7 @@ class InstallPage(CTkFrame):
             fg_color="#2B2631",
         )
         inputs_frame.grid(
-            row=2, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+            row=2, column=0, columnspan=2, padx=40, pady=(20, 30), sticky="NSEW"
         )
 
         self.create_input_widgets(inputs_frame)
@@ -115,7 +118,7 @@ class InstallPage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Profile Folder",
         )
-        self.profile_folder_label.grid(row=0, column=0, padx=(10, 4), sticky="w")
+        self.profile_folder_label.grid(row=0, column=0, padx=(10, 4), pady=(14,2), sticky="w")
 
         self.profile_folder_entry = CTkEntry(
             master=frame,
@@ -140,7 +143,7 @@ class InstallPage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Application Folder",
         )
-        self.application_folder_label.grid(row=0, column=1, padx=(10, 4), sticky="w")
+        self.application_folder_label.grid(row=0, column=1, padx=(10, 4), pady=(14,2), sticky="w")
 
         self.application_folder_entry = CTkEntry(
             master=frame,
@@ -165,7 +168,7 @@ class InstallPage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="New Tab Wallpaper Location",
         )
-        self.newtab_wallpaper_label.grid(row=2, column=0, padx=(10, 4), sticky="w")
+        self.newtab_wallpaper_label.grid(row=2, column=0, padx=(10, 4), pady=(14,2), sticky="w")
 
         self.newtab_wallpaper_entry = CTkEntry(
             master=frame,
@@ -177,7 +180,7 @@ class InstallPage(CTkFrame):
             border_width=int(self.input_data["border_width"]),
             bg_color=self.input_data["bg_color"],
             border_color=self.input_data["border_color"],
-            placeholder_text="newtab_wallpaper_entry",
+            placeholder_text="Default Wallpaper",
         )
         self.newtab_wallpaper_entry.grid(
             row=3, column=0, padx=(10, 4), pady=10, sticky="ew"
@@ -191,9 +194,20 @@ class InstallPage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Accent Color",
         )
-        self.accent_color_label.grid(row=2, column=1, padx=(10, 4), sticky="w")
-        self.accent_color_values = ["Blue", "Red", "AccentColor", "Custom"]  # Initial values
+        self.accent_color_label.grid(row=2, column=1, padx=(10, 4), pady=(14,2), sticky="w")
+
+        self.default_color = None
+        self.accent_color_values = {
+            "RealFire Purple": "#771D76",
+            "RealFire Orange": "#F08D27",
+            "Blue": "#0000FF",
+            "Red": "#FF0000",
+            "AccentColor": "accentColor",
+            "Custom": None  # Placeholder for custom color
+        }
         self.selected_color = None  # Store custom color
+
+        initial_color = self.default_color if self.default_color else self.accent_color_values["RealFire Purple"]
 
         self.accent_color_combobox = CTkComboBox(
             master=frame,
@@ -205,16 +219,18 @@ class InstallPage(CTkFrame):
             border_width=int(self.input_data["border_width"]),
             bg_color=self.input_data["bg_color"],
             border_color=self.input_data["border_color"],
-            values=self.accent_color_values,  # Use initial values
+            button_color=initial_color,
+            button_hover_color=initial_color,
+            values=list(self.accent_color_values.keys()),
             command=self.on_accent_color_select,
         )
-                # Set default selection (if desired)
-        if "default_color" in self.__dict__:  # Check if default_color is defined
+
+        if self.default_color:
             self.accent_color_combobox.set(self.default_color)
         else:
-            self.accent_color_combobox.set(
-                self.accent_color_values[0]
-            )  # Set first value as default
+            self.accent_color_combobox.set("AccentColor")
+
+
         self.accent_color_combobox.grid(
             row=3, column=1, padx=(10, 4), pady=10, sticky="ew"
         )
@@ -223,7 +239,7 @@ class InstallPage(CTkFrame):
         self.key_bind(self.profile_folder_entry)
         self.key_bind(self.application_folder_entry)
         self.key_bind(self.application_folder_entry)
-        self.key_bind(self.newtab_wallpaper_entry, ".png")
+        self.key_bind(self.newtab_wallpaper_entry, {".png", ".jpg", ".jpeg", ".gif"})
 
 
     def create_edit_checkbox(self, frame):
@@ -315,7 +331,7 @@ class InstallPage(CTkFrame):
             parent,
             "Exit",
             self.ICON_PATH + "exit_icon.png",
-            lambda: CombinedModal(self, "Exit"),
+            lambda: CombinedModal(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
@@ -395,18 +411,24 @@ class InstallPage(CTkFrame):
             self.invalid_entry_frame.grid()
 
     def on_accent_color_select(self, choice):
-        if choice == "Custom":
+        if choice.lower() == "custom":
             self.selected_color = colorchooser.askcolor(title="Choose your color")[1]
-            self.accent_color_combobox.set(self.selected_color)
+            if self.selected_color:
+                self.accent_color_combobox.set(self.selected_color)
+                if self.selected_color=="accentColor":
+                    self.accent_color_combobox.configure(button_color="#771D76", button_hover_color="#771D76")
+                else:
+                    self.accent_color_combobox.configure(button_color=self.selected_color, button_hover_color=self.selected_color)
         else:
-            self.selected_color = choice
+            self.selected_color = self.accent_color_values.get(choice, "#0000FF")
+            if self.selected_color=="accentColor":
+                self.accent_color_combobox.configure(button_color="#771D76", button_hover_color="#771D76")
+            else:
+                self.accent_color_combobox.configure(button_color=self.selected_color, button_hover_color=self.selected_color)
 
     def get_variables_combobox(self, combobox_widget):
         selected_value = combobox_widget.get()
-        if selected_value:
-            return selected_value
-        else:
-            return "blue"
+        return selected_value if selected_value else "Blue"
 
     def checkbox_event(self):
         if self.check_var.get() == "on":

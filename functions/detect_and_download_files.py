@@ -124,13 +124,13 @@ class FileManager:
                         'url': contents
                     })
 
+        # print(self.missing_files)
         return self.missing_files
 
 # For testing purposes:
 # filemanager = FileManager(
 #     "../RealFire_Installer/data/installer_files_data.json", 
-#     "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/installer_files_data.json?token=GHSAT0AAAAAACSZOMUO7N3T4WPQSEZK5CJEZTCZEGQ"
-# )
+#     "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/installer_files_data.json"
 # missing_files = filemanager.check_files_exist()
 # filemanager.download_missing_files(missing_files)
 # print(missing_files)

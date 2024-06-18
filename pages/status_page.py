@@ -1,3 +1,4 @@
+from os import path
 from json import load
 from threading import Thread
 from customtkinter import (
@@ -5,30 +6,31 @@ from customtkinter import (
     CTkImage,
     CTkLabel,
     CTkFont,
-    CTkFrame,
-    CTkProgressBar,
     CTkTextbox,
     CTkButton,
+    CTkProgressBar,
 )
 from PIL import Image
 from modals.combined_modal import CombinedModal
+from functions.edit_file_variables import VariableUpdater
 from functions.get_os_properties import OSProperties
 from functions.install_files import FileActions
 
 
 class StatusPage(CTkFrame):
-    ICON_PATH = "../RealFire-Installer/assets/icons/"
-    BACKGROUND_PATH = "../RealFire-Installer/assets/backgrounds/"
-    DATA_PATH = "../RealFire-Installer/data/installer_data.json"
-
-    os_values = OSProperties().get_values()
-
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         self.controller = controller
-        self.file_actions = FileActions()
+        self.base_dir = base_dir
 
+        self.ICON_PATH = path.join(base_dir, "assets", "icons")
+        self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds")
+        self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
+
+        self.file_actions = FileActions(self.DATA_PATH)
         self.come_from_which_page = None
+
+        self.os_values = OSProperties(self.DATA_PATH).get_values()
         self.load_text_data()
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
 
@@ -63,9 +65,9 @@ class StatusPage(CTkFrame):
 
     def create_header(self):
         header_title_bg = self.load_image(
-            f"{self.BACKGROUND_PATH}header_title_background.png", (250, 64)
+            path.join(self.BACKGROUND_PATH, "header_title_background.png"), (250, 64)
         )
-        line_top_img = self.load_image(f"{self.BACKGROUND_PATH}line_top.png", (650, 6))
+        line_top_img = self.load_image(path.join(self.BACKGROUND_PATH, "line_top.png"), (650, 6))
 
         header_label = CTkLabel(
             self.status_page_frame,
@@ -93,7 +95,7 @@ class StatusPage(CTkFrame):
             compound="right",
             font=CTkFont(family="Inter", size=18, weight="bold"),
         )
-        self.action_label.grid(row=2, column=0, padx=60, pady=10, sticky="W")
+        self.action_label.grid(row=2, column=0, padx=60, pady=(14, 2), sticky="W")
 
     def create_progress_bar(self):
         self.progress_bar = CTkProgressBar(
@@ -113,6 +115,7 @@ class StatusPage(CTkFrame):
             fg_color="white",
             text_color="black",
             corner_radius=12,
+            state="disabled",
         )
         self.output_entry.grid(row=4, column=0, padx=60, pady=20, sticky="NSEW")
 
@@ -138,8 +141,8 @@ class StatusPage(CTkFrame):
         self.create_navigation_button(
             parent,
             "Finish",
-            self.ICON_PATH + "finish_icon.png",
-            lambda: CombinedModal(self, "Attention"),
+            path.join(self.ICON_PATH, "finish_icon.png"),
+            lambda: CombinedModal(self, self.base_dir, "Attention"),
             padding_x=(10, 20),
             side="right",
             img_side="right",
@@ -148,7 +151,7 @@ class StatusPage(CTkFrame):
         self.back_button = self.create_navigation_button(
             parent,
             "Back",
-            self.ICON_PATH + "back_icon.png",
+            path.join(self.ICON_PATH, "back_icon.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame(
@@ -159,8 +162,8 @@ class StatusPage(CTkFrame):
         self.create_navigation_button(
             parent,
             "Exit",
-            self.ICON_PATH + "exit_icon.png",
-            lambda: CombinedModal(self, "Exit"),
+            path.join(self.ICON_PATH, "exit_icon.png"),
+            lambda: CombinedModal(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
@@ -198,7 +201,7 @@ class StatusPage(CTkFrame):
 
     def create_os_info(self, parent):
         os_icon_image = self.load_image(
-            f"{self.ICON_PATH}{self.os_values['os_name'].lower()}.png", (20, 24)
+            path.join(self.ICON_PATH, f"{self.os_values['os_name'].lower()}.png"), (20, 24)
         )
 
         os_frame = CTkFrame(parent, corner_radius=12, fg_color="white")
@@ -218,59 +221,71 @@ class StatusPage(CTkFrame):
         if self.come_from_which_page == "install":
             self.action_label.configure(
                 text="Installed  ",
-                image=self.load_image(f"{self.ICON_PATH}check.png", (20, 20)),
+                image=self.load_image(path.join(self.ICON_PATH, "check.png"), (20, 20)),
                 compound="right",
             )
         elif self.come_from_which_page == "remove":
             self.action_label.configure(
                 text="Removed  ",
-                image=self.load_image(f"{self.ICON_PATH}check.png", (20, 20)),
+                image=self.load_image(path.join(self.ICON_PATH, "check.png"), (20, 20)),
                 compound="right",
             )
 
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
-        self.profile_folder = kwargs.get("profile_folder")
-        self.application_folder = kwargs.get("application_folder")
-        self.new_tab_wallpaper = kwargs.get("new_tab_wallpaper")
-        self.accent_color = kwargs.get("accent_color")
+        profile_folder = kwargs.get("profile_folder")
+        application_folder = kwargs.get("application_folder")
+        new_tab_wallpaper = kwargs.get("new_tab_wallpaper")
+        accent_color = kwargs.get("accent_color")
 
         if self.come_from_which_page == "install":
             self.action_label.configure(text="Installing...")
+
             self.file_actions.move_file(
-                "../RealFire-Installer/fx-autoconfig/config.js", self.application_folder
+                path.join(self.base_dir, "fx-autoconfig", "config.js"), application_folder
             )
             self.file_actions.move_file(
-                "../RealFire-Installer/fx-autoconfig/mozilla.cfg",
-                self.application_folder,
+                path.join(self.base_dir, "fx-autoconfig", "mozilla.cfg"), application_folder,
             )
             self.file_actions.move_file(
-                "../RealFire-Installer/fx-autoconfig/config-prefs.js",
-                f"{self.application_folder}/defaults/pref/",
+                path.join(self.base_dir, "fx-autoconfig", "config-prefs.js"),
+                path.join(application_folder, "defaults", "pref"),
             )
             self.file_actions.move_file(
-                "../RealFire-Installer/fx-autoconfig/local-settings.js",
-                f"{self.application_folder}/defaults/pref/",
+                path.join(self.base_dir, "fx-autoconfig", "local-settings.js"),
+                path.join(application_folder, "defaults", "pref"),
             )
             self.file_actions.move_folder(
-                "../RealFire-Installer/chrome", self.profile_folder
+                path.join(self.base_dir, "chrome"), profile_folder
             )
             self.file_actions.move_file(
-                "../RealFire-Installer/fx-autoconfig/user.js", self.profile_folder
+                path.join(self.base_dir, "fx-autoconfig", "user.js"), profile_folder
             )
+
+
+            if new_tab_wallpaper != "Default Wallpaper" and new_tab_wallpaper is not None:
+                self.file_actions.move_existing_file(
+                    new_tab_wallpaper,
+                    path.join(profile_folder, "chrome", "img", "new_tab_wallpaper.jpg"),
+                )
+
+            VariableUpdater(
+                path.join(".", "chrome", "includes", "realfire-colours.css")
+            ).update_variable("--accent-color", accent_color)
 
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")
-            self.file_actions.remove_file(f"{self.application_folder}/config.js")
-            self.file_actions.remove_file(f"{self.application_folder}/mozilla.cfg")
+
+            self.file_actions.remove_file(path.join(application_folder, "config.js"))
+            self.file_actions.remove_file(path.join(application_folder, "mozilla.cfg"))
             self.file_actions.remove_file(
-                f"{self.application_folder}/defaults/pref/config-prefs.js"
+                path.join(application_folder, "defaults", "pref", "config-prefs.js")
             )
             self.file_actions.remove_file(
-                f"{self.application_folder}/defaults/pref/local-settings.js"
+                path.join(application_folder, "defaults", "pref", "local-settings.js")
             )
-            self.file_actions.remove_file(f"{self.profile_folder}/user.js")
-            self.file_actions.remove_folder(f"{self.profile_folder}/chrome")
+            self.file_actions.remove_file(path.join(profile_folder, "user.js"))
+            self.file_actions.remove_folder(path.join(profile_folder, "chrome"))
 
         operation_thread = Thread(
             target=self.file_actions.execute_operations,
@@ -286,3 +301,4 @@ class StatusPage(CTkFrame):
         #         f"{self.come_from_which_page}_page"
         #     ),
         # )
+

@@ -2,8 +2,8 @@ import os
 from re import search
 from functions.get_os_properties import OSProperties
 
-def get_profile_folder():
-    input_values = OSProperties().get_locations()
+def get_profile_folder(Data_path):
+    input_values = OSProperties(Data_path).get_locations()
     
     FIREFOXFOLDER = input_values["firefox_folder"]
     PROFILENAME = ""
