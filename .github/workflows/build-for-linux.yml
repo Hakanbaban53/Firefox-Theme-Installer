@@ -29,7 +29,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile main.py --icon=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/data/installer_data.json:data" --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons:assets/icons" --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/assets/backgrounds:assets/backgrounds"
+          pyinstaller --onefile main.py --icon=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/data/installer_data.json:data" --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons:assets/icons" --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/assets/backgrounds:assets/backgrounds" --hidden-import='PIL._tkinter_finder'
 
       - name: Package into AppImage
         run: |
