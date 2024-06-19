@@ -35,22 +35,18 @@ jobs:
         run: |
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool-x86_64.AppImage
-          ./appimagetool-x86_64.AppImage --appimage-extract
-          export PATH=$PATH:$(pwd)/squashfs-root/usr/bin
         shell: bash
-        env:
-          PATH: ${{ runner.temp }}/squashfs-root/usr/bin:$PATH
 
       - name: Package into AppImage
         run: |
-          mkdir -p AppDir/usr/bin
-          cp /home/runner/work/RealFire-Installer/RealFire-Installer/dist/main AppDir/usr/bin/
-          cp /home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico AppDir/
-          printf "[Desktop Entry]\nType=Application\nName=RealFire Installer\nExec=main\nIcon=firefox\nComment=RealFire Installer\nCategories=Utility;\n" > AppDir/RealFire.desktop
-          appimagetool AppDir RealFire-Installer.AppImage
+          mkdir -p RealFire-Installer.AppDir/usr/bin
+          cp /home/runner/work/RealFire-Installer/RealFire-Installer/dist/main RealFire-Installer.AppDir/usr/bin/
+          cp /home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.png RealFire-Installer.AppDir/
+          printf "#!/bin/bash\nSELF=$(readlink -f "$0")\nHERE=${SELF%/*}\nEXEC="${HERE}/usr/bin/start_app.sh"\nexec "${EXEC}"" RealFire-Installer.AppDir/AppRun
+          printf "[Desktop Entry]\nType=Application\nName=RealFire Installer\nExec=main\nIcon=firefox\nComment=RealFire Installer\nCategories=Utility;\n" > RealFire-Installer.AppDir/RealFire.desktop
+          printf "#!/bin/bash\nAPPIMAGE_DIR=$(dirname "$(realpath "$0")")\nAPP_EXECUTABLE="${APPIMAGE_DIR}/usr/bin/main"\nif [ ! -f "$APP_EXECUTABLE" ]; then\n    echo "Error: App executable not found: $APP_EXECUTABLE"\n    exit 1\nfi\nenv DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" "$APP_EXECUTABLE" "$@"" RealFire-Installer.AppDir/usr/bin/start_app.sh
+          ARCH=x86_64 appimagetool-x86_64.AppImage RealFire-Installer.AppImage
         shell: bash
-        env:
-          PATH: ${{ runner.temp }}/squashfs-root/usr/bin:$PATH
 
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v3
