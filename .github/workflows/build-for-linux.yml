@@ -61,7 +61,7 @@ jobs:
           cat << 'EOF' > RealFire-Installer.AppDir/usr/bin/start_app.sh
           #!/bin/bash
           APPIMAGE_DIR=$(dirname "$(realpath "$0")")
-          APP_EXECUTABLE="${APPIMAGE_DIR}/usr/bin/main"
+          APP_EXECUTABLE="${APPIMAGE_DIR}/main"
           if [ ! -f "$APP_EXECUTABLE" ]; then
               echo "Error: App executable not found: $APP_EXECUTABLE"
               exit 1
