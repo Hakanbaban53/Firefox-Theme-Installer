@@ -78,25 +78,31 @@ jobs:
           ARCH=x86_64 ./appimagetool-x86_64.AppImage RealFire-Installer.AppDir RealFire-Installer.AppImage
         shell: bash
 
-      - name: Create GitHub Release
-        id: create_release
+      - name: Upload Linux build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: RealFire-Installer-Linux
+          path: RealFire-Installer.AppImage
+
+      - name: Create GitHub Release - Linux
+        id: create_release_linux
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: RealFire Installer v1.0.0
+          tag_name: v1.0.0-linux
+          release_name: RealFire Installer v1.0.0 - Linux
           body: |
-            This is the first release of RealFire Installer.
+            Release for Linux build of RealFire Installer v1.0.0.
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Upload Release Asset - Linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
           asset_path: ./RealFire-Installer.AppImage
-          asset_name: RealFire-Installer.AppImage
+          asset_name: RealFire-Installer-Linux.AppImage
           asset_content_type: application/x-iso9660-appimage
