@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-tk python3-pil python3-requests patchelf
+          sudo apt-get install -y python3-tk python3-pil python3-requests patchelf wget
           pip install customtkinter pyinstaller
 
       - name: Build with PyInstaller
