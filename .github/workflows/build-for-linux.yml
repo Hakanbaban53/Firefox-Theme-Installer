@@ -37,6 +37,9 @@ jobs:
           chmod +x appimagetool-x86_64.AppImage
           ./appimagetool-x86_64.AppImage --appimage-extract
           export PATH=$PATH:$(pwd)/squashfs-root/usr/bin
+        shell: bash
+        env:
+          PATH: ${{ runner.temp }}/squashfs-root/usr/bin:$PATH
 
       - name: Package into AppImage
         run: |
@@ -45,6 +48,9 @@ jobs:
           cp /home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico AppDir/
           printf "[Desktop Entry]\nType=Application\nName=RealFire Installer\nExec=main\nIcon=firefox\nComment=RealFire Installer\nCategories=Utility;\n" > AppDir/RealFire.desktop
           appimagetool AppDir RealFire-Installer.AppImage
+        shell: bash
+        env:
+          PATH: ${{ runner.temp }}/squashfs-root/usr/bin:$PATH
 
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v3
