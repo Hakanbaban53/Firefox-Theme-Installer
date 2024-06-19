@@ -23,16 +23,31 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          pip3 install customtkinter tk pillow requests pyinstaller
+          sudo apt-get update
+          sudo apt-get install -y python3-tk python3-pil python3-requests patchelf
+          pip install customtkinter pyinstaller
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile main.py --add-data=/home/runner/work/RealFire-Installer/RealFire-Installer/data/installer_data.json:data --add-data=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons:assets/icons --add-data=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/backgrounds:assets/backgrounds --hidden-import='PIL._tkinter_finder'
-          
+          pyinstaller --onefile main.py --icon=RealFire-Installer/assets/icons/firefox.ico --add-data "RealFire-Installer/data/installer_data.json:data" --add-data "RealFire-Installer/assets/icons:assets/icons" --add-data "RealFire-Installer/assets/backgrounds:assets/backgrounds"
+
+      - name: Download and install appimagetool
+        run: |
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          ./appimagetool-x86_64.AppImage --appimage-extract
+          alias appimagetool=$(pwd)/squashfs-root/AppRun
+
+      - name: Package into AppImage
+        run: |
+          mkdir -p AppDir/usr/bin
+          cp dist/main AppDir/usr/bin/
+          cp RealFire-Installer/assets/icons/firefox.ico AppDir/
+          printf "[Desktop Entry]\nType=Application\nName=RealFire Installer\nExec=main\nIcon=firefox\nComment=RealFire Installer\nCategories=Utility;\n" > AppDir/RealFire.desktop
+          appimagetool AppDir RealFire-Installer.AppImage
+
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v3
         with:
           name: RealFire-Installer-Linux
-          path: dist/main
-
+          path: RealFire-Installer.AppImage
