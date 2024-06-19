@@ -36,11 +36,32 @@ jobs:
           mkdir -p RealFire-Installer.AppDir/usr/bin
           cp /home/runner/work/RealFire-Installer/RealFire-Installer/dist/main RealFire-Installer.AppDir/usr/bin/
           cp /home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.png RealFire-Installer.AppDir/
-          printf "#!/bin/bash\nSELF=\$(readlink -f \"\$0\")\nHERE=\${SELF%/*}\nEXEC=\"\${HERE}/usr/bin/start_app.sh\"\nexec \"\${EXEC}\"" > RealFire-Installer.AppDir/AppRun
+          
+          echo '#!/bin/bash' > RealFire-Installer.AppDir/AppRun
+          echo 'SELF=$(readlink -f "$0")' >> RealFire-Installer.AppDir/AppRun
+          echo 'HERE=${SELF%/*}' >> RealFire-Installer.AppDir/AppRun
+          echo 'EXEC="${HERE}/usr/bin/start_app.sh"' >> RealFire-Installer.AppDir/AppRun
+          echo 'exec "${EXEC}"' >> RealFire-Installer.AppDir/AppRun
           chmod +x RealFire-Installer.AppDir/AppRun
-          printf "[Desktop Entry]\nType=Application\nName=RealFire Installer\nExec=/usr/bin/start_app.sh\nIcon=firefox\nComment=RealFire Installer\nCategories=Utility;\n" > RealFire-Installer.AppDir/RealFire.desktop
-          printf "#!/bin/bash\nAPPIMAGE_DIR=\$(dirname \"\$(realpath \"\$0\")\")\nAPP_EXECUTABLE=\"\${APPIMAGE_DIR}/usr/bin/main\"\nif [ ! -f \"\$APP_EXECUTABLE\" ]; then\n    echo \"Error: App executable not found: \$APP_EXECUTABLE\"\n    exit 1\nfi\npkexec env DISPLAY=\$DISPLAY XAUTHORITY=\$XAUTHORITY \"\$APP_EXECUTABLE\" \"\$@\"" > RealFire-Installer.AppDir/usr/bin/start_app.sh
+          
+          echo '[Desktop Entry]' > RealFire-Installer.AppDir/RealFire.desktop
+          echo 'Type=Application' >> RealFire-Installer.AppDir/RealFire.desktop
+          echo 'Name=RealFire Installer' >> RealFire-Installer.AppDir/RealFire.desktop
+          echo 'Exec=/usr/bin/start_app.sh' >> RealFire-Installer.AppDir/RealFire.desktop
+          echo 'Icon=firefox' >> RealFire-Installer.AppDir/RealFire.desktop
+          echo 'Comment=RealFire Installer' >> RealFire-Installer.AppDir/RealFire.desktop
+          echo 'Categories=Utility;' >> RealFire-Installer.AppDir/RealFire.desktop
+          
+          echo '#!/bin/bash' > RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo 'APPIMAGE_DIR=$(dirname "$(realpath "$0")")' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo 'APP_EXECUTABLE="${APPIMAGE_DIR}/usr/bin/main"' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo 'if [ ! -f "$APP_EXECUTABLE" ]; then' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo '    echo "Error: App executable not found: $APP_EXECUTABLE"' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo '    exit 1' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo 'fi' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
+          echo 'pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY "$APP_EXECUTABLE" "$@"' >> RealFire-Installer.AppDir/usr/bin/start_app.sh
           chmod +x RealFire-Installer.AppDir/usr/bin/start_app.sh
+          
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x ./appimagetool-x86_64.AppImage
           ARCH=x86_64 ./appimagetool-x86_64.AppImage RealFire-Installer.AppDir RealFire-Installer.AppImage
