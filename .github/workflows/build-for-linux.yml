@@ -36,7 +36,7 @@ jobs:
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool-x86_64.AppImage
           ./appimagetool-x86_64.AppImage --appimage-extract
-          alias appimagetool=$(pwd)/squashfs-root/AppRun
+          export PATH=$PATH:$(pwd)/squashfs-root/usr/bin
 
       - name: Package into AppImage
         run: |
