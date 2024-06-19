@@ -29,7 +29,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile main.py --icon=a=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico --add-data "a=/home/runner/work/RealFire-Installer/RealFire-Installer/data/installer_data.json:data" --add-data "a=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons:assets/icons" --add-data "a=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/backgrounds:assets/backgrounds"
+          pyinstaller --onefile main.py --icon=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/data/installer_data.json:data" --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons:assets/icons" --add-data "/home/runner/work/RealFire-Installer/RealFire-Installer/assets/backgrounds:assets/backgrounds"
 
       - name: Download and install appimagetool
         run: |
@@ -41,8 +41,8 @@ jobs:
       - name: Package into AppImage
         run: |
           mkdir -p AppDir/usr/bin
-          cp a=/home/runner/work/RealFire-Installer/RealFire-Installer/dist/main AppDir/usr/bin/
-          cp a=/home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico AppDir/
+          cp /home/runner/work/RealFire-Installer/RealFire-Installer/dist/main AppDir/usr/bin/
+          cp /home/runner/work/RealFire-Installer/RealFire-Installer/assets/icons/firefox.ico AppDir/
           printf "[Desktop Entry]\nType=Application\nName=RealFire Installer\nExec=main\nIcon=firefox\nComment=RealFire Installer\nCategories=Utility;\n" > AppDir/RealFire.desktop
           appimagetool AppDir RealFire-Installer.AppImage
 
