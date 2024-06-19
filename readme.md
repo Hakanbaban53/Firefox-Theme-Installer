@@ -69,7 +69,7 @@ $ pip3 install customtkinter tk pillow requests pyinstaller
 $ pyinstaller --onefile .\main.py --icon=../RealFire-Installer/assets/icons/firefox.ico --add-data "../RealFire-Installer/data/installer_data.json:data" --add-data "../RealFire-Installer/assets/icons;assets/icons" --add-data "..\RealFire-Installer\assets\backgrounds;assets\backgrounds"
 
 # Build the app in Linux
-$ pyinstaller --onefile .\main.py --add-data="../RealFire-Installer/data/installer_data.json:data" --add-data="../RealFire-Installer/assets/icons:assets/icons" --add-data="..\RealFire-Installer\assets\backgrounds:assets\backgrounds" --hidden-import='PIL._tkinter_finder'
+$ pyinstaller --onefile ./main.py --add-data="../RealFire-Installer/data/installer_data.json:data" --add-data="../RealFire-Installer/assets/icons:assets/icons" --add-data="../RealFire-Installer/assets/backgrounds:assets/backgrounds" --hidden-import='PIL._tkinter_finder'
 ```
 
 > **Note 1 🔩**
