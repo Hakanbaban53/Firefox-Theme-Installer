@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-tk python3-pil python3-requests patchelf libfuse2
-          pip install customtkinter pyinstaller
+          sudo apt-get install -y python3-tk python3-requests patchelf libfuse2
+          pip install customtkinter pyinstaller pillow
 
       - name: Build with PyInstaller
         run: |
