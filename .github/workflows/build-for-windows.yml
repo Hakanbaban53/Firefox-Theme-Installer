@@ -47,7 +47,31 @@ jobs:
         shell: powershell
 
       - name: Upload Windows build artifact
-        uses: actions/upload-artifact@v3
+        id: upload-windows-artifact
+        uses: actions/upload-artifact@v2
         with:
           name: RealFire-Installer-Windows
           path: dist\main.exe
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
+        with:
+          tag_name: v1.0.0
+          release_name: RealFire Installer v1.0.0
+          body: |
+            This is the first release of RealFire Installer for Windows.
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/main.exe
+          asset_name: RealFire-Installer-Windows.exe
+          asset_content_type: application/octet-stream
