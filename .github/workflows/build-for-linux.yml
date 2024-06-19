@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-tk python3-requests patchelf libfuse2
-          pip install customtkinter pyinstaller pillow
+          sudo apt-get install -y python3-tk patchelf libfuse2
+          pip install customtkinter pyinstaller pillow requests
 
       - name: Build with PyInstaller
         run: |
@@ -57,6 +57,8 @@ jobs:
           Comment=RealFire Installer
           Categories=Utility;
           EOF
+
+          chmod +x RealFire-Installer.AppDir/RealFire.desktop
           
           cat << 'EOF' > RealFire-Installer.AppDir/usr/bin/start_app.sh
           #!/bin/bash
@@ -66,7 +68,7 @@ jobs:
               echo "Error: App executable not found: $APP_EXECUTABLE"
               exit 1
           fi
-          env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY "$APP_EXECUTABLE" "$@"
+          env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" "$APP_EXECUTABLE" "$@"
           EOF
           
           chmod +x RealFire-Installer.AppDir/usr/bin/start_app.sh
