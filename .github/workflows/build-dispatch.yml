@@ -34,11 +34,11 @@ jobs:
           sudo apt update
           sudo apt install gh -y || (curl -sSL https://github.com/cli/cli/releases/latest/download/gh_$(uname -s)_amd64.tar.gz | tar -xz && sudo cp gh_$(uname -s)_amd64/bin/gh /usr/local/bin/)
 
-      - name: Clear GH_TOKEN environment variable
-        run: unset GH_TOKEN
+      - name: Clear GITHUB_TOKEN environment variable
+        run: unset GITHUB_TOKEN
 
       - name: Authenticate with GitHub CLI
-        run: gh auth login --with-token
+        run: gh auth login --with-token ${{ secrets.RFGITHUB_TOKEN }}
 
       - name: Dispatch Linux build
         if: github.event.inputs.build-for-linux == 'true' || github.event.inputs.build-for-all == 'true'
