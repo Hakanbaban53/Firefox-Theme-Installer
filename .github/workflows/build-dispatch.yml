@@ -21,51 +21,33 @@ on:
         default: 'false'
 
 jobs:
-  dispatch-build:
+  dispatch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check inputs
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Install GitHub CLI
         run: |
-          echo "build-for-windows: ${{ github.event.inputs.build-for-windows }}"
-          echo "build-for-linux: ${{ github.event.inputs.build-for-linux }}"
-          echo "build-for-macos: ${{ github.event.inputs.build-for-macos }}"
-          echo "build-for-all: ${{ github.event.inputs.build-for-all }}"
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh -y
 
-      - name: Trigger Windows build
-        if: github.event.inputs.build-for-windows == 'true' || github.event.inputs.build-for-all == 'true'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            console.log("Triggering Windows build...")
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'build-for-windows.yml',
-              ref: context.ref,
-            })
+      - name: Authenticate with GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
+        run: gh auth login --with-token
 
-      - name: Trigger Linux build
+      - name: Dispatch Linux build
         if: github.event.inputs.build-for-linux == 'true' || github.event.inputs.build-for-all == 'true'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            console.log("Triggering Linux build...")
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'build-for-linux.yml',
-              ref: context.ref,
-            })
+        run: gh workflow run build-for-linux.yml --ref ${{ github.ref }}
 
-      - name: Trigger macOS build
+      - name: Dispatch Windows build
+        if: github.event.inputs.build-for-windows == 'true' || github.event.inputs.build-for-all == 'true'
+        run: gh workflow run build-for-windows.yml --ref ${{ github.ref }}
+
+      - name: Dispatch macOS build
         if: github.event.inputs.build-for-macos == 'true' || github.event.inputs.build-for-all == 'true'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            console.log("Triggering macOS build...")
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'build-for-macos.yml',
-              ref: context.ref,
-            })
+        run: gh workflow run build-for-macos.yml --ref ${{ github.ref }}
