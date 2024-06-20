@@ -36,7 +36,7 @@ jobs:
 
       - name: Authenticate with GitHub CLI
         run: |
-          echo "${{ secrets.RFGITHUB_TOKEN }}" | gh auth login --with-token
+          echo "${{ secrets.RFGITHUB_CLI_TOKEN }}" | gh auth login --with-token
 
       - name: Dispatch Linux build
         if: github.event.inputs.build-for-linux == 'true' || github.event.inputs.build-for-all == 'true'
