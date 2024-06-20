@@ -83,7 +83,7 @@ jobs:
         id: create_release_linux
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v1.0.0-linux
           release_name: RealFire Installer v1.0.0 - Linux
@@ -95,7 +95,7 @@ jobs:
       - name: Upload Release Asset - Linux
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
           asset_path: ./RealFire-Installer.AppImage
