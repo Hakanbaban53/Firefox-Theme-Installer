@@ -1,0 +1,61 @@
+name: Dispatch Build Jobs
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-windows:
+        description: 'Build for Windows'
+        required: false
+        default: 'false'
+      build-linux:
+        description: 'Build for Linux'
+        required: false
+        default: 'false'
+      build-macos:
+        description: 'Build for macOS'
+        required: false
+        default: 'false'
+      build-all:
+        description: 'Build for all platforms'
+        required: false
+        default: 'false'
+
+jobs:
+  dispatch-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Windows build
+        if: github.event.inputs.build-windows == 'true' || github.event.inputs.build-all == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build-windows.yml',
+              ref: context.ref,
+            })
+
+      - name: Trigger Linux build
+        if: github.event.inputs.build-linux == 'true' || github.event.inputs.build-all == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build-linux.yml',
+              ref: context.ref,
+            })
+
+      - name: Trigger macOS build
+        if: github.event.inputs.build-macos == 'true' || github.event.inputs.build-all == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build-macos.yml',
+              ref: context.ref,
+            })

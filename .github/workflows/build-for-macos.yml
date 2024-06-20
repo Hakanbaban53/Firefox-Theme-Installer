@@ -1,0 +1,55 @@
+name: Build RealFire Installer for macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install customtkinter tk pillow requests pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onefile main.py --icon=assets/icons/firefox.ico --add-data "data/installer_data.json:data" --add-data "assets/icons:assets/icons" --add-data "assets/backgrounds:assets/backgrounds"
+
+      - name: Upload macOS build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: RealFire-Installer-macOS
+          path: dist/main
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
+        with:
+          tag_name: v1.0.0
+          release_name: RealFire Installer v1.0.0
+          body: |
+            This is the macOS release of RealFire Installer v1.0.0.
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEWTOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/main
+          asset_name: RealFire-Installer-macOS
+          asset_content_type: application/octet-stream
