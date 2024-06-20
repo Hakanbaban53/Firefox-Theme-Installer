@@ -38,7 +38,9 @@ jobs:
         run: unset GH_TOKEN
 
       - name: Authenticate with GitHub CLI
-        run: gh auth login --with-token ${{ secrets.RFGITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
+        run: gh auth login --with-token
 
       - name: Dispatch Linux build
         if: github.event.inputs.build-for-linux == 'true' || github.event.inputs.build-for-all == 'true'
