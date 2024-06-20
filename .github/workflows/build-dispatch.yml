@@ -32,7 +32,7 @@ jobs:
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'build-windows.yml',
+              workflow_id: 'build-for-windows.yml',
               ref: context.ref,
             })
 
@@ -44,7 +44,7 @@ jobs:
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'build-linux.yml',
+              workflow_id: 'build-for-linux.yml',
               ref: context.ref,
             })
 
@@ -56,6 +56,6 @@ jobs:
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'build-macos.yml',
+              workflow_id: 'build-for-macos.yml',
               ref: context.ref,
             })
