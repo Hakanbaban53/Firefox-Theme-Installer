@@ -1,4 +1,4 @@
-name: Build RealFire Installer for macOS
+name: Build macOS
 
 on:
   workflow_dispatch:

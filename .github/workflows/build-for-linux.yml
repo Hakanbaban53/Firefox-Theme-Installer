@@ -1,4 +1,4 @@
-name: Build RealFire Installer
+name: Build Linux
 
 on:
   workflow_dispatch:
