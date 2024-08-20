@@ -13,11 +13,11 @@ class FileManager:
         self.json_file_url = json_file_url
         self.missing_files = {}
 
-    def load_json_data(self, json_file_path=None):
+    def load_json_data(self, json_file_path=None, check_file_age=False):
         if json_file_path is None:
             json_file_path = self.json_file_path
 
-        if os.path.exists(json_file_path):
+        if os.path.exists(json_file_path) and check_file_age:
             file_age = datetime.now() - datetime.fromtimestamp(os.path.getmtime(json_file_path))
             if file_age > timedelta(days=3):
                 # print(f"File {json_file_path} is older than one week. Deleting and downloading a new one.")

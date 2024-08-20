@@ -1,7 +1,7 @@
 from json import load
 from os import path
-from tkinter import PhotoImage, Label, TclError
-from itertools import cycle
+from pathlib import Path
+from tkinter import PhotoImage, Label
 from threading import Thread
 
 from customtkinter import (
@@ -14,41 +14,54 @@ from customtkinter import (
 )
 from PIL import Image
 
+from functions.get_the_theme_files import ThemeDownloader
+from functions.get_theme_data import ThemeManager
 from modals.check_files_modal import FileInstallerModal
-from modals.combined_modal import CombinedModal
+from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.detect_and_download_files import FileManager
-
+from modals.theme_modal import ThemeModal
 
 class HomePage(CTkFrame):
     ANIMATION_SPEED = 100
 
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
+
         self.controller = controller
         self.base_dir = base_dir
 
+        # Define paths
         self.ICON_PATH = path.join(base_dir, "assets", "icons")
         self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds")
+        self.THEMES_DATA_PATH = path.join(base_dir, "data", "themes.json")
         self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
-        self.FILES_DATA_PATH = path.join(base_dir, "data", "installer_files_data.json")
-        
-        self.FILES_DATA_URL = "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/installer_files_data.json?token=GHSAT0AAAAAACSZOMUOEF77DS2TIU55OU7YZTRF2WA"
+        self.THEME_PATH = Path(path.expanduser("~")) / ".cache" / "RealFire" / "Themes"
 
+        # Load data
         self.text_data = self.load_json_data(self.DATA_PATH)
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
+        self.theme_manager = ThemeManager(self.THEMES_DATA_PATH)
         self.os_values = OSProperties(self.DATA_PATH).get_values()
 
-        self.configure_layout()
-        self.create_widgets()
+        # Initialize variables
+        self.data_json_path = None
+        self.modal_theme = None
 
+        # Load icons and images
         self.attention_icon = PhotoImage(
             file=path.join(self.ICON_PATH, "attention.png"), height=24, width=24
         )
         self.check_icon = PhotoImage(
             file=path.join(self.ICON_PATH, "check.png"), height=20, width=20
         )
-
+        self.install_files_icon = self.load_image(
+            path.join(self.ICON_PATH, "get_from_internet.png"), (24, 24)
+        )
+        # Configure layout and create widgets
+        self.configure_layout()
+        self.create_widgets()
+        
     def load_json_data(self, path):
         with open(path, "r") as file:
             return load(file)
@@ -72,6 +85,7 @@ class HomePage(CTkFrame):
     def create_widgets(self):
         self.create_header()
         self.create_os_info()
+        self.theme_select()
         self.create_navigation_buttons()
         self.create_file_detection()
         self.create_recheck_skip_section()
@@ -80,7 +94,9 @@ class HomePage(CTkFrame):
         header_title_bg = self.load_image(
             path.join(self.BACKGROUND_PATH, "header_title_background.png"), (390, 64)
         )
-        line_top_img = self.load_image(path.join(self.BACKGROUND_PATH, "line_top.png"), (650, 6))
+        line_top_img = self.load_image(
+            path.join(self.BACKGROUND_PATH, "line_top.png"), (650, 6)
+        )
 
         header_label = CTkLabel(
             self.home_page_frame,
@@ -90,17 +106,18 @@ class HomePage(CTkFrame):
             font=("Inter", 22, "bold"),
         )
         header_label.grid(
-            row=0, column=0, columnspan=2, padx=203, pady=(75, 0), sticky="NSEW"
+            row=0, column=0, columnspan=2, padx=203, pady=(35, 0), sticky="NSEW"
         )
 
         line_top_label = CTkLabel(self.home_page_frame, text="", image=line_top_img)
         line_top_label.grid(
-            row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+            row=1, column=0, columnspan=2, padx=10, pady=10, sticky="NSEW"
         )
 
     def create_os_info(self):
         os_icon_image = self.load_image(
-            path.join(self.ICON_PATH, f"{self.os_values['os_name'].lower()}.png"), (20, 24)
+            path.join(self.ICON_PATH, f"{self.os_values['os_name'].lower()}.png"),
+            (20, 24),
         )
 
         os_label = CTkLabel(
@@ -109,7 +126,7 @@ class HomePage(CTkFrame):
             text_color="White",
             font=("Inter", 20, "bold"),
         )
-        os_label.grid(row=2, column=0, padx=(175, 0), sticky="ew")
+        os_label.grid(row=2, column=0, padx=(175, 0), pady=20, sticky="ew")
 
         os_frame = CTkFrame(self.home_page_frame, corner_radius=12, fg_color="white")
         os_frame.grid(row=2, column=1, padx=(0, 185), sticky="ew")
@@ -124,6 +141,39 @@ class HomePage(CTkFrame):
         )
         os_info_label.pack(padx=10, pady=10, side="left")
 
+    def theme_select(self):
+        theme_frame = CTkFrame(
+            self.home_page_frame,
+            corner_radius=12,
+            fg_color="white",
+            border_color="#771D76",
+            border_width=4,
+        )
+        theme_frame.grid(row=3, column=0, columnspan=2, pady=(10, 35), sticky="")
+
+        self.theme_label = CTkLabel(
+            theme_frame,
+            text="Select Theme: None",
+            text_color="Black",
+            font=("Inter", 18),
+        )
+        self.theme_label.pack(padx=10, pady=10, side="left")
+
+        theme_select = CTkButton(
+            theme_frame,
+            text="Change Theme",
+            width=float(self.button_data["width"]),
+            height=float(self.button_data["height"]),
+            corner_radius=float(self.button_data["corner_radius"]),
+            bg_color=self.button_data["bg_color"],
+            fg_color=self.button_data["fg_color"],
+            hover_color=self.button_data["hover_color"],
+            text_color=self.button_data["text_color"],
+            command=self.select_theme,
+            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
+        )
+        theme_select.pack(padx=10, pady=10, side="right")
+
     def create_navigation_buttons(self):
         select_action_img = self.load_image(
             path.join(self.BACKGROUND_PATH, "header_title_background.png"), (270, 36)
@@ -136,9 +186,7 @@ class HomePage(CTkFrame):
             text_color="White",
             font=("Inter", 20, "bold"),
         )
-        select_action_label.grid(
-            row=3, column=0, columnspan=2, padx=60, pady=(70, 30), sticky="ew"
-        )
+        select_action_label.grid(row=4, column=0, columnspan=2, padx=60, pady=(0,15), sticky="ew")
 
         navigation_frame = CTkFrame(
             self.home_page_frame,
@@ -149,7 +197,7 @@ class HomePage(CTkFrame):
             fg_color="white",
             border_color="#F89F24",
         )
-        navigation_frame.grid(row=4, column=0, columnspan=2, sticky="")
+        navigation_frame.grid(row=5, column=0, columnspan=2, pady=(0,15), sticky="")
 
         self.create_navigation_button(
             navigation_frame,
@@ -172,7 +220,7 @@ class HomePage(CTkFrame):
             navigation_frame,
             "Exit",
             path.join(self.ICON_PATH, "exit_icon.png"),
-            lambda: CombinedModal(self, self.base_dir, "Exit"),
+            lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
@@ -212,13 +260,11 @@ class HomePage(CTkFrame):
         self.detect_files_frame = CTkFrame(
             self.home_page_frame, corner_radius=12, fg_color="white"
         )
-        self.detect_files_frame.grid(
-            row=5, column=0, padx=0, pady=(20, 10), columnspan=2, sticky=""
-        )
+        self.detect_files_frame.grid(row=6, column=0, padx=0, columnspan=2, sticky="")
 
         self.detect_files_text = Label(
             self.detect_files_frame,
-            text="Checking The Files   ",
+            text="Please Select theme ",
             fg="#000000",
             bg="#FFFFFF",
             font=("Arial", 16, "bold"),
@@ -226,12 +272,9 @@ class HomePage(CTkFrame):
         )
         self.detect_files_text.grid(row=0, column=0, padx=10, pady=10, sticky="")
 
-        install_icon = self.load_image(
-            path.join(self.ICON_PATH, "get_from_internet.png"), (24, 24)
-        )
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
-            text="Install Missing Files",
+            text="Show Files",
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
             corner_radius=float(self.button_data["corner_radius"]),
@@ -240,18 +283,15 @@ class HomePage(CTkFrame):
             hover_color=self.button_data["hover_color"],
             text_color=self.button_data["text_color"],
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
-            command=self.install_files,
-            image=install_icon,
+            command=self.get_theme,
+            image=self.install_files_icon,
             state="disabled",
         )
-
-        thread = Thread(target=self.fetch_files)
-        thread.start()
 
     def create_recheck_skip_section(self):
         self.recheck_skip_frame = CTkFrame(self.home_page_frame, fg_color="#2B2631")
         self.recheck_skip_frame.grid(
-            row=6, column=0, padx=0, pady=0, columnspan=2, sticky=""
+            row=7, column=0, padx=0, pady=0, columnspan=2, sticky=""
         )
 
         self.check_var = StringVar(value="off")
@@ -260,13 +300,14 @@ class HomePage(CTkFrame):
             text="I know what I do",
             text_color="#FFFFFF",
             font=("Arial", 16, "bold"),
-            command=self.checkbox_event,
             variable=self.check_var,
             onvalue="on",
             offvalue="off",
         )
 
-        reload_icon = self.load_image(path.join(self.ICON_PATH, "reload_icon.png"), (20, 20))
+        reload_icon = self.load_image(
+            path.join(self.ICON_PATH, "reload_icon.png"), (20, 20)
+        )
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
             width=40,
@@ -276,81 +317,84 @@ class HomePage(CTkFrame):
             command=self.refetch_files,
             image=reload_icon,
         )
-        self.recheck_button.grid(
-            row=1, column=0, padx=0, pady=0, columnspan=2, sticky=""
+
+    def select_theme(self):
+        self.modal_theme = ThemeModal(self, self.theme_manager, self.base_dir)
+        self.wait_window(self.modal_theme)
+
+        if hasattr(self.modal_theme, 'theme_selected') and self.modal_theme.theme_selected:
+            self.theme_label.configure(text=f"Select Theme: {self.modal_theme.theme_selected.title}")
+            self.install_files_button.configure(text="Install Files", state="normal")
+            self.install_files_button.grid()
+        else:
+            self.modal_theme = None
+            self.theme_label.configure(text="Select Theme: None")
+            self.detect_files_text.configure(
+                text="Please Select theme ", fg="#000000"
+            )
+            self.install_button.configure(state="disabled")
+            self.install_files_button.grid_remove()
+
+    def get_theme(self):
+        self.detect_files_text.configure(
+            text="Installing Files ", fg="#000000"
         )
+        self.install_files_button.grid_remove()
+        handler = ThemeDownloader(self.modal_theme.theme_selected, self.THEME_PATH)
+        test = handler.process_theme()
+        
+        if isinstance(test, dict) and test.get('type') == "data":
+            self.detect_files_text.configure(
+                text="Theme has its own data JSON", fg="#00FF00", image=self.check_icon
+            )
+            self.data_json_path = test.get('path')
+            thread = Thread(target=self.fetch_files())
+            thread.start()
 
-    def load_gif(self):
-        frames = []
-        index = 0
-        while True:
-            try:
-                frame = PhotoImage(
-                    file=path.join(self.ICON_PATH, "block_spin.gif"),
-                    format=f"gif -index {index}",
-                )
-                frames.append(frame)
-                index += 2
-            except TclError:
-                break
-        return cycle(frames)
 
-    def update_gif(self, frames):
-        frame = next(frames)
-        self.detect_files_text.config(image=frame)
-        self.animation_id = self.after(self.ANIMATION_SPEED, self.update_gif, frames)
+        elif isinstance(test, dict) and test.get('type') == 'userChrome.css':
+            self.detect_files_text.configure(
+                text="Theme has userChrome.css file", fg="#00FF00", image=self.check_icon
+            )
+            self.install_button.configure(state="normal")
+        else:
+            self.detect_files_text.configure(
+                text="No theme data or chrome/userChrome.css found.", fg="#FF0000", image=self.attention_icon
+            )
+            self.install_button.configure(state="disabled")
 
     def fetch_files(self):
-        frames = self.load_gif()
-        self.update_gif(frames)
-        fetch_files_data = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).load_json_data()
-        self.master.after_cancel(self.animation_id)
+        fetch_files_data = FileManager(self.data_json_path).load_json_data()
         if fetch_files_data == {}:
-            self.detect_files_text.configure(
-                text="Failed to Fetch Files Data  ", fg="#f04141", image=self.attention_icon
+            self.install_files_button.configure(
+                text="Failed to Fetch Files Data  ", text_color="#f04141", image=self.attention_icon
             )
             self.install_files_button.configure(state="disabled")
             self.recheck_button.configure(state="normal")
-            self.user_know_what_do.grid(row=5, column=0, padx=10, pady=0, sticky="")
-            self.recheck_button.grid(row=5, column=1, padx=10, pady=0, sticky="")
+            self.user_know_what_do.grid(row=1, column=0, padx=10, pady=0, sticky="")
+            self.recheck_button.grid(row=1, column=0, padx=0, pady=5, columnspan=2, sticky="")
         else:
-            Thread(target=self.locate_files).start()
+            Thread(target=self.locate_files ).start()
 
 
     def locate_files(self):
-        frames = self.load_gif()
-        self.update_gif(frames)
-        file_check_result = FileManager(self.FILES_DATA_PATH, self.FILES_DATA_URL).check_files_exist(root=self.base_dir)
-        self.master.after_cancel(self.animation_id)
+        file_check_result = FileManager(self.data_json_path).check_files_exist(root=self.base_dir)
         if not file_check_result:
-            self.detect_files_text.configure(
-                text="All Files Installed  ", fg="#10dc60", image=self.check_icon
+            self.install_files_button.configure(
+                text="All Files Installed  ", text_color="#10dc60", image=self.check_icon
             )
+            self.install_files_button.configure(state="disabled")
             self.install_button.configure(state="normal")
             self.recheck_button.grid(row=6, column=0, padx=0, pady=0, sticky="")
             self.user_know_what_do.grid_remove()
         else:
-            self.detect_files_text.configure(
-                text="Some Files Are Missing  ", fg="#f04141", image=self.attention_icon
+            self.install_files_button.configure(
+                text="Some Files Are Missing  ", text_color="#f04141", image=self.attention_icon, command=self.install_files
             )
             self.install_files_button.configure(state="normal")
-            self.install_files_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
-            self.user_know_what_do.grid(row=6, column=0, padx=10, pady=0, sticky="")
-            self.recheck_button.grid(row=6, column=1, padx=10, pady=0, sticky="")
-
-    def checkbox_event(self):
-        if self.user_know_what_do.get() == "on":
-            self.install_button.configure(state="normal")
-            self.install_files_button.configure(state="disabled")
-            self.detect_files_text.configure(
-                text="Skipped by User  ", fg="#f04141", image=self.attention_icon
-            )
-            self.recheck_button.configure(state="disabled")
-        else:
-            self.install_button.configure(state="disabled")
-            self.install_files_button.configure(state="normal")
-            self.refetch_files()
-            self.recheck_button.configure(state="normal")
+            self.install_files_button.grid(row=2, column=0, padx=10, pady=10, sticky="")
+            self.user_know_what_do.grid(row=7, column=0, padx=10, pady=0, sticky="")
+            self.recheck_button.grid(row=7, column=1, padx=10, pady=0, sticky="")
 
     def install_files(self):
         modal = FileInstallerModal(self, self.base_dir)
@@ -358,17 +402,15 @@ class HomePage(CTkFrame):
         self.recheck_files()
 
     def refetch_files(self):
-        self.detect_files_text.configure(text="Fetching The Files  ", fg="#000000")
+        self.install_files_button.configure(text="Fetching The Files  ", text_color="#000000", state="disabled")
         self.install_button.configure(state="disabled")
-        self.install_files_button.grid_remove()
         self.user_know_what_do.grid_remove()
         thread = Thread(target=self.fetch_files)
         thread.start()
 
     def recheck_files(self):
-        self.detect_files_text.configure(text="Checking The Files  ", fg="#000000")
+        self.install_files_button.configure(text="Checking The Files  ", text_color="#000000", state="disabled")
         self.install_button.configure(state="disabled")
-        self.install_files_button.grid_remove()
         self.user_know_what_do.grid_remove()
         thread = Thread(target=self.locate_files)
         thread.start()

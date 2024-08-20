@@ -5,7 +5,7 @@ from sys import exit
 import sys
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image, ImageTk
-from modals.combined_modal import CombinedModal
+from modals.info_modals import InfoModals
 from pages.home_page import HomePage
 from pages.install_page import InstallPage
 from pages.remove_page import RemovePage
@@ -20,9 +20,9 @@ class MultiPageApp(CTk):
             sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
         )  # Also I send the other pages and functions this path.
 
-        if not self.is_admin():
-            self.show_admin_error(self)
-            exit()
+        # if not self.is_admin():
+        #     self.show_admin_error(self)
+        #     exit()
 
         installer_data_path = os.path.join(self.base_dir, "data", "installer_data.json")
         with open(installer_data_path, "r", encoding="utf-8") as file:
@@ -168,7 +168,7 @@ class MultiPageApp(CTk):
             return False
 
     def exit_confirmation(self):
-        CombinedModal(self, self.base_dir, "Exit")
+        InfoModals(self, self.base_dir, "Exit")
 
     def center_window(self):
         self.update_idletasks()

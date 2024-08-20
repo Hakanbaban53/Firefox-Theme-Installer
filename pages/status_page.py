@@ -11,7 +11,7 @@ from customtkinter import (
     CTkProgressBar,
 )
 from PIL import Image
-from modals.combined_modal import CombinedModal
+from modals.info_modals import InfoModals
 from functions.edit_file_variables import VariableUpdater
 from functions.get_os_properties import OSProperties
 from functions.install_files import FileActions
@@ -142,7 +142,7 @@ class StatusPage(CTkFrame):
             parent,
             "Finish",
             path.join(self.ICON_PATH, "finish_icon.png"),
-            lambda: CombinedModal(self, self.base_dir, "Attention"),
+            lambda: InfoModals(self, self.base_dir, "Attention"),
             padding_x=(10, 20),
             side="right",
             img_side="right",
@@ -163,7 +163,7 @@ class StatusPage(CTkFrame):
             parent,
             "Exit",
             path.join(self.ICON_PATH, "exit_icon.png"),
-            lambda: CombinedModal(self, self.base_dir, "Exit"),
+            lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )

@@ -5,7 +5,7 @@ from customtkinter import CTkButton
 from json import load
 from os import path
 
-class CombinedModal(tk.Toplevel):
+class InfoModals(tk.Toplevel):
     def __init__(self, parent, base_dir, modal):
         super().__init__(parent)
         

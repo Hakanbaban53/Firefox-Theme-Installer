@@ -1,0 +1,194 @@
+import os
+import tkinter as tk
+from tkinter import ttk
+from PIL import Image, ImageTk
+from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry
+
+from modals.theme_detail_modal import ThemeDetailModal
+
+class ThemeModal(tk.Toplevel):
+    def __init__(self, parent, theme_manager, base_dir):
+        super().__init__(parent)
+        self.configure(bg="#2B2631")
+        self.transient(parent)
+        self.resizable(False, False)
+        self.wait_visibility()
+        self.grab_set()
+
+        self.theme_manager = theme_manager
+        self.base_dir = base_dir
+        self.cache_dir = os.path.join(self.base_dir, "image_cache")
+        os.makedirs(self.cache_dir, exist_ok=True)
+
+        self.sort_order = "asc"
+        self.sort_column = "Title"
+        self.current_page = 1
+        self.items_per_page = 15
+        self.total_pages = 1
+
+        self.configure_layout()
+        self.set_window_icon()
+        self.create_widgets()
+        self.populate_tags()
+        self.update_treeview()
+
+    def configure_layout(self):
+        self.theme_modal_frame = CTkFrame(self, fg_color="#2B2631")
+        self.theme_modal_frame.grid(row=0, column=1, sticky="SW")
+        self.theme_modal_frame.columnconfigure(0, weight=1)
+
+    def set_window_icon(self):
+        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+        try:
+            if os.name == "nt":
+                self.iconbitmap(icon_path)
+            else:
+                icon = Image.open(icon_path)
+                self.iconphoto(True, ImageTk.PhotoImage(icon))
+        except Exception as e:
+            print(f"Error setting window icon: {e}")
+
+    def create_widgets(self):
+        self.create_search_bar()
+        self.create_treeview()
+        self.create_navigation_buttons()
+        self.create_tag_filter()
+
+    def create_search_bar(self):
+        self.search_entry = CTkEntry(self.theme_modal_frame, placeholder_text="Search themes...")
+        self.search_entry.grid(row=0, column=0, padx=10, pady=10, sticky="EW")
+        self.search_entry.bind("<KeyRelease>", self.update_search)
+
+    def create_treeview(self):
+        self.tree = ttk.Treeview(
+            self.theme_modal_frame,
+            columns=("Title", "Description"),
+            show="headings",
+            height=self.items_per_page,
+        )
+        self.tree.heading("Title", text="Title", command=lambda: self.sort_column_click("Title"))
+        self.tree.heading("Description", text="Description", command=lambda: self.sort_column_click("Description"))
+        self.tree.column("Description", width=400)
+        self.tree.grid(row=1, column=0, padx=10, pady=10, sticky="NSEW")
+        self.tree.tag_configure("oddrow", background="#f2f2f2")
+        self.tree.tag_configure("evenrow", background="#ffffff")
+
+        self.tree.bind("<Double-1>", self.open_theme_detail)
+        self.tree.bind("<<TreeviewSelect>>", self.on_select)
+
+    def create_navigation_buttons(self):
+        self.select_button = CTkButton(self.theme_modal_frame, text="Select Theme", command=self.select_theme, state=tk.DISABLED, width=75)
+        self.select_button.grid(row=2, column=0, padx=10, pady=10, sticky="")
+
+        pagination_frame = CTkFrame(self.theme_modal_frame)
+        pagination_frame.grid(pady=10)
+        self.prev_button = CTkButton(pagination_frame, text="Previous", command=self.prev_page, width=75)
+        self.prev_button.pack(side=tk.LEFT, padx=5)
+        self.page_label = CTkLabel(pagination_frame, text=f"Page {self.current_page} of {self.total_pages}")
+        self.page_label.pack(side=tk.LEFT, padx=5)
+        self.next_button = CTkButton(pagination_frame, text="Next", command=self.next_page, width=75)
+        self.next_button.pack(side=tk.LEFT, padx=5)
+
+    def create_tag_filter(self):
+        tags_frame = CTkFrame(self.theme_modal_frame)
+        tags_frame.grid(row=4, column=0, padx=1, pady=10, sticky="")
+
+        self.tag_combobox = ttk.Combobox(tags_frame)
+        self.tag_combobox.grid(row=0, column=0, padx=10, pady=10, sticky="EW")
+        self.tag_combobox.bind("<KeyRelease>", self.filter_combobox)
+        self.tag_combobox.bind("<<ComboboxSelected>>", self.update_search)
+
+        self.tag_info_label = CTkLabel(tags_frame, text="Select a tag to filter")
+        self.tag_info_label.grid(row=0, column=1, padx=10, pady=10, sticky="W")
+
+    def populate_tags(self):
+        tags = {tag for theme in self.theme_manager.get_all_themes() for tag in theme.tags}
+        sorted_tags = sorted(tags)
+        self.all_tags = sorted_tags
+        self.tag_combobox["values"] = sorted_tags
+        self.tag_combobox.set("")  # Default to empty
+
+    def update_search(self, event=None):
+        self.current_page = 1
+        self.update_treeview()
+
+    def filter_combobox(self, event=None):
+        input_text = self.tag_combobox.get().lower()
+        filtered_tags = [tag for tag in self.all_tags if input_text in tag.lower()]
+        self.tag_combobox["values"] = filtered_tags
+
+    def update_treeview(self):
+        search_query = self.search_entry.get().lower()
+        selected_tag = self.tag_combobox.get()
+
+        filtered_themes = self.get_filtered_themes(search_query, selected_tag)
+        self.total_pages = self.calculate_total_pages(filtered_themes)
+
+        self.tree.delete(*self.tree.get_children())  # Clear Treeview
+        self.add_themes_to_treeview(filtered_themes)
+
+        self.update_pagination_controls()
+
+    def get_filtered_themes(self, search_query, selected_tag):
+        return [
+            theme
+            for theme in self.theme_manager.get_all_themes()
+            if search_query in theme.title.lower() and (not selected_tag or selected_tag in theme.tags)
+        ]
+
+    def calculate_total_pages(self, filtered_themes):
+        return (len(filtered_themes) + self.items_per_page - 1) // self.items_per_page
+
+    def add_themes_to_treeview(self, filtered_themes):
+        sorted_themes = sorted(
+            filtered_themes,
+            key=lambda t: getattr(t, self.sort_column.lower()),
+            reverse=self.sort_order == "desc",
+        )
+        start_index = (self.current_page - 1) * self.items_per_page
+        end_index = min(start_index + self.items_per_page, len(sorted_themes))
+
+        for index, theme in enumerate(sorted_themes[start_index:end_index], start=start_index):
+            row_tag = "oddrow" if index % 2 == 0 else "evenrow"
+            self.tree.insert("", tk.END, values=(theme.title, theme.description), tags=(row_tag,))
+
+    def update_pagination_controls(self):
+        self.page_label.configure(text=f"Page {self.current_page} of {self.total_pages}")
+        self.prev_button.configure(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
+        self.next_button.configure(state=tk.NORMAL if self.current_page < self.total_pages else tk.DISABLED)
+
+    def sort_column_click(self, column):
+        self.sort_order = "desc" if self.sort_column == column and self.sort_order == "asc" else "asc"
+        self.sort_column = column
+        self.update_treeview()
+
+    def prev_page(self):
+        if self.current_page > 1:
+            self.current_page -= 1
+            self.update_treeview()
+
+    def next_page(self):
+        if self.current_page < self.total_pages:
+            self.current_page += 1
+            self.update_treeview()
+
+    def on_select(self, event):
+        self.select_button.configure(state=tk.NORMAL if self.tree.selection() else tk.DISABLED)
+
+    def select_theme(self):
+        selected_item = self.tree.selection()
+        if selected_item:
+            theme_title = self.tree.item(selected_item[0], "values")[0]
+            self.theme_selected = self.theme_manager.get_theme_by_title(theme_title)
+        self.destroy()
+
+    def open_theme_detail(self, event):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            return
+
+        theme_title = self.tree.item(selected_item[0], "values")[0]
+        theme = self.theme_manager.get_theme_by_title(theme_title)
+        print(f"Opening theme detail for: {theme}")
+        modal = ThemeDetailModal(self, theme, self.cache_dir)
+        modal.wait_window()

@@ -12,7 +12,7 @@ from customtkinter import (
     StringVar,
 )
 from PIL import Image
-from modals.combined_modal import CombinedModal
+from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.get_folder_locations import get_profile_folder
 from functions.special_input_functions import SpecialInputFunc
@@ -251,7 +251,7 @@ class RemovePage(CTkFrame):
             parent,
             "Exit",
             os.path.join(self.ICON_PATH, "exit_icon.png"),
-            lambda: CombinedModal(self, self.base_dir, "Exit"),
+            lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )

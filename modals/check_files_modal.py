@@ -6,12 +6,13 @@ from tkinter import ttk
 from threading import Thread
 from customtkinter import CTkButton
 from functions.detect_and_download_files import FileManager
-from modals.combined_modal import CombinedModal
+from modals.info_modals import InfoModals
 
 
 class FileInstallerModal(tk.Toplevel):
     def __init__(self, parent, base_dir):
         super().__init__(parent)
+        
         self.transient(parent)
         self.configure(bg="#2B2631")
         self.resizable(False, False)
@@ -135,11 +136,11 @@ class FileInstallerModal(tk.Toplevel):
             self.check_all_files_installed()
         )
         if all_files_installed == 0:
-            modal = CombinedModal(self, self.base_dir, "check_files_installed")
+            modal = InfoModals(self, self.base_dir, "check_files_installed")
             self.wait_window(modal)
             self.destroy()
         else:
-            CombinedModal(self, self.base_dir, "check_files_not_installed")
+            InfoModals(self, self.base_dir, "check_files_not_installed")
 
     def center_window(self):
         """Center the modal window on the screen."""
