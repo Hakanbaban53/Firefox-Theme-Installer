@@ -15,7 +15,6 @@ from PIL import Image
 
 from components.create_navigation_button import NavigationButton
 from functions.get_the_theme_files import ThemeDownloader
-from functions.get_theme_data import ThemeManager
 from modals.check_files_modal import FileInstallerModal
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
@@ -32,16 +31,16 @@ class HomePage(CTkFrame):
         self.controller = controller
         self.base_dir = base_dir
 
+
         # Define paths
         self.ASSETS_PATH = path.join(base_dir, "assets")
-        self.THEMES_DATA_PATH = path.join(base_dir, "data", "themes.json")
         self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
         self.THEME_PATH = Path(path.expanduser("~")) / ".cache" / "RealFire" / "Themes"
+
 
         # Load data
         self.text_data = self.load_json_data(self.DATA_PATH)
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
-        self.theme_manager = ThemeManager(self.THEMES_DATA_PATH)
         self.os_values = OSProperties(self.DATA_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
 
@@ -293,9 +292,8 @@ class HomePage(CTkFrame):
         )
 
     def select_theme(self):
-        self.modal_theme = ThemeModal(self, self.theme_manager, self.base_dir)
+        self.modal_theme = ThemeModal(self, self.base_dir)
         self.wait_window(self.modal_theme)
-        self.clean_install.grid(row=7, column=0, padx=10, pady=10, sticky="")
         self.recheck_button.grid_remove()
 
 
@@ -311,8 +309,10 @@ class HomePage(CTkFrame):
                 text=f"Select Theme: {self.modal_theme.theme_selected.title}"
             )
             self.install_files_button.configure(text="Install Theme", state="normal", command=self.get_theme, text_color="#000000")
+            self.clean_install.grid(row=7, column=0, padx=10, pady=10, sticky="")
             self.install_files_button.grid(pady=10)
             self.install_button.configure(state="disabled")
+            
         else:
             self.modal_theme = None
             self.theme_label.configure(text="Select Theme: None")
