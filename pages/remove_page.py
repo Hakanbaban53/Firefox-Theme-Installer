@@ -12,6 +12,7 @@ from customtkinter import (
     StringVar,
 )
 from PIL import Image
+from components.create_navigation_button import NavigationButton
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.get_folder_locations import get_profile_folder
@@ -27,14 +28,16 @@ class RemovePage(CTkFrame):
         self.ICON_PATH = os.path.join(base_dir, "assets", "icons")
         self.BACKGROUND_PATH = os.path.join(base_dir, "assets", "backgrounds")
         self.DATA_PATH = os.path.join(base_dir, "data", "installer_data.json")
-
-        self.os_values = OSProperties(self.DATA_PATH).get_values()
-        self.input_values = OSProperties(self.DATA_PATH).get_locations()
         self.profile_folder_location = get_profile_folder(self.DATA_PATH)
 
         self.load_text_data()
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
         self.input_data = self.text_data.get("common_values")["inputs"]
+
+        self.os_values = OSProperties(self.DATA_PATH).get_values()
+        self.input_values = OSProperties(self.DATA_PATH).get_locations()
+        self.navigation_button = NavigationButton(self.button_data)
+
 
         self.configure_layout()
         self.create_widgets()
@@ -220,7 +223,7 @@ class RemovePage(CTkFrame):
         self.create_os_info(bottom_frame)
 
     def create_navigation_buttons(self, parent):
-        self.remove_button = self.create_navigation_button(
+        self.remove_button = self.navigation_button.create_navigation_button(
             parent,
             "Remove",
             os.path.join(self.ICON_PATH, "remove_icon.png"),
@@ -239,7 +242,7 @@ class RemovePage(CTkFrame):
             img_side="right",
         )
 
-        self.back_button = self.create_navigation_button(
+        self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "Back",
             os.path.join(self.ICON_PATH, "back_icon.png"),
@@ -247,7 +250,7 @@ class RemovePage(CTkFrame):
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
         )
-        self.create_navigation_button(
+        self.navigation_button.create_navigation_button(
             parent,
             "Exit",
             os.path.join(self.ICON_PATH, "exit_icon.png"),
@@ -255,37 +258,6 @@ class RemovePage(CTkFrame):
             padding_x=(20, 10),
             side="left",
         )
-
-    def create_navigation_button(
-        self,
-        parent,
-        text,
-        image_path,
-        command,
-        padding_x,
-        side,
-        img_side="left",
-        **kwargs,
-    ):
-        button_image = self.load_image(image_path, (20, 20))
-        button = CTkButton(
-            parent,
-            width=float(self.button_data["width"]),
-            height=float(self.button_data["height"]),
-            corner_radius=float(self.button_data["corner_radius"]),
-            bg_color=self.button_data["bg_color"],
-            fg_color=self.button_data["fg_color"],
-            hover_color=self.button_data["hover_color"],
-            text_color=self.button_data["text_color"],
-            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
-            image=button_image,
-            text=text,
-            compound=img_side,
-            command=command,
-            **kwargs,
-        )
-        button.pack(padx=padding_x, pady=10, side=side)
-        return button
 
     def create_os_info(self, parent):
         os_icon_image = self.load_image(
