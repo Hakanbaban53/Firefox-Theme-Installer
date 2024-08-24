@@ -1,7 +1,8 @@
 from json import load
 from os import path
 
-from tkinter import colorchooser
+import threading
+from tkinter import BooleanVar, colorchooser
 from customtkinter import (
     CTkFrame,
     CTkImage,
@@ -10,27 +11,29 @@ from customtkinter import (
     CTkEntry,
     CTkCheckBox,
     StringVar,
-    CTkComboBox,
 )
 from PIL import Image
 
 from components.create_navigation_button import NavigationButton
+from functions.preview_theme import PreviewTheme
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.get_folder_locations import get_profile_folder
 from functions.special_input_functions import SpecialInputFunc
+
 
 class InstallPage(CTkFrame):
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         self.controller = controller
         self.base_dir = base_dir
-        
+
         self.ICON_PATH = path.join(self.base_dir, "assets", "icons/")
         self.BACKGROUND_PATH = path.join(self.base_dir, "assets", "backgrounds/")
         self.DATA_PATH = path.join(self.base_dir, "data", "installer_data.json")
 
         self.profile_folder_location = get_profile_folder(self.DATA_PATH)
+        self.theme_dir = None
 
         self.load_text_data()
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
@@ -70,6 +73,7 @@ class InstallPage(CTkFrame):
         self.create_header()
         self.create_inputs()
         self.create_invalid_entry_frame()
+        self.create_preview_theme()
         self.create_bottom_widgets()
         self.update_button_and_frame()
         self.checkbox_event()
@@ -89,12 +93,12 @@ class InstallPage(CTkFrame):
             bg_color="#2B2631",
         )
         header_label.grid(
-            row=0, column=0, columnspan=2, padx=248, pady=(75, 0), sticky="NSEW"
+            row=0, column=0, columnspan=2, padx=203, pady=(35, 0), sticky="NSEW"
         )
 
         line_top_label = CTkLabel(self.install_page_frame, text="", image=line_top_img)
         line_top_label.grid(
-            row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+            row=1, column=0, columnspan=2, padx=10, pady=10, sticky="NSEW"
         )
 
     def create_inputs(self):
@@ -106,7 +110,7 @@ class InstallPage(CTkFrame):
             fg_color="#2B2631",
         )
         inputs_frame.grid(
-            row=2, column=0, columnspan=2, padx=40, pady=(20, 30), sticky="NSEW"
+            row=2, column=0, columnspan=2, padx=40, pady=(10, 20), sticky="NSEW"
         )
 
         self.create_input_widgets(inputs_frame)
@@ -120,7 +124,9 @@ class InstallPage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Profile Folder",
         )
-        self.profile_folder_label.grid(row=0, column=0, padx=(10, 4), pady=(14,2), sticky="w")
+        self.profile_folder_label.grid(
+            row=0, column=0, padx=(10, 4), pady=(14, 2), sticky="w"
+        )
 
         self.profile_folder_entry = CTkEntry(
             master=frame,
@@ -145,7 +151,9 @@ class InstallPage(CTkFrame):
             font=CTkFont(family="Inter", size=18, weight="bold"),
             text="Application Folder",
         )
-        self.application_folder_label.grid(row=0, column=1, padx=(10, 4), pady=(14,2), sticky="w")
+        self.application_folder_label.grid(
+            row=0, column=1, padx=(10, 4), pady=(14, 2), sticky="w"
+        )
 
         self.application_folder_entry = CTkEntry(
             master=frame,
@@ -163,86 +171,38 @@ class InstallPage(CTkFrame):
             row=1, column=1, padx=(10, 4), pady=10, sticky="ew"
         )
 
-        # New tab wallpaper
-        self.newtab_wallpaper_label = CTkLabel(
-            master=frame,
-            text_color="white",
-            font=CTkFont(family="Inter", size=18, weight="bold"),
-            text="New Tab Wallpaper Location",
-        )
-        self.newtab_wallpaper_label.grid(row=2, column=0, padx=(10, 4), pady=(14,2), sticky="w")
-
-        self.newtab_wallpaper_entry = CTkEntry(
-            master=frame,
-            width=int(self.input_data["width"]),
-            height=int(self.input_data["height"]),
-            fg_color=self.input_data["fg_color"],
-            text_color=self.input_data["text_color"],
-            corner_radius=int(self.input_data["corner_radius"]),
-            border_width=int(self.input_data["border_width"]),
-            bg_color=self.input_data["bg_color"],
-            border_color=self.input_data["border_color"],
-            placeholder_text="Default Wallpaper",
-        )
-        self.newtab_wallpaper_entry.grid(
-            row=3, column=0, padx=(10, 4), pady=10, sticky="ew"
-        )
-
-
-        # Accent Color
-        self.accent_color_label = CTkLabel(
-            master=frame,
-            text_color="white",
-            font=CTkFont(family="Inter", size=18, weight="bold"),
-            text="Accent Color",
-        )
-        self.accent_color_label.grid(row=2, column=1, padx=(10, 4), pady=(14,2), sticky="w")
-
-        self.default_color = None
-        self.accent_color_values = {
-            "RealFire Purple": "#771D76",
-            "RealFire Orange": "#F08D27",
-            "Blue": "#0000FF",
-            "Red": "#FF0000",
-            "AccentColor": "accentColor",
-            "Custom": None  # Placeholder for custom color
-        }
-        self.selected_color = None  # Store custom color
-
-        initial_color = self.default_color if self.default_color else self.accent_color_values["RealFire Purple"]
-
-        self.accent_color_combobox = CTkComboBox(
-            master=frame,
-            width=int(self.input_data["width"]),
-            height=int(self.input_data["height"]),
-            fg_color=self.input_data["fg_color"],
-            text_color=self.input_data["text_color"],
-            corner_radius=int(self.input_data["corner_radius"]),
-            border_width=int(self.input_data["border_width"]),
-            bg_color=self.input_data["bg_color"],
-            border_color=self.input_data["border_color"],
-            button_color=initial_color,
-            button_hover_color=initial_color,
-            values=list(self.accent_color_values.keys()),
-            command=self.on_accent_color_select,
-        )
-
-        if self.default_color:
-            self.accent_color_combobox.set(self.default_color)
-        else:
-            self.accent_color_combobox.set("AccentColor")
-
-
-        self.accent_color_combobox.grid(
-            row=3, column=1, padx=(10, 4), pady=10, sticky="ew"
-        )
-
-
         self.key_bind(self.profile_folder_entry)
         self.key_bind(self.application_folder_entry)
-        self.key_bind(self.application_folder_entry)
-        self.key_bind(self.newtab_wallpaper_entry, {".png", ".jpg", ".jpeg", ".gif"})
 
+        self.CSL = BooleanVar(value=False)
+        CSL_checkbox = CTkCheckBox(
+            master=frame,
+            text="Enable Custom Script Loader",
+            command=self.checkbox_event,
+            fg_color="#F08D27",
+            hover_color="#F08D27",
+            bg_color="#2B2631",
+            text_color="white",
+            variable=self.CSL,
+            onvalue=True,
+            offvalue=False,
+        )
+        CSL_checkbox.grid(row=2, column=0, padx=(10, 4), pady=10, sticky="ew")
+
+        self.telemetry = BooleanVar(value=False)
+        telemetry_checkbox = CTkCheckBox(
+            master=frame,
+            text="Disable Firefox Telemetry",
+            command=self.checkbox_event,
+            fg_color="#F08D27",
+            hover_color="#F08D27",
+            bg_color="#2B2631",
+            text_color="white",
+            variable=self.telemetry,
+            onvalue=True,
+            offvalue=False,
+        )
+        telemetry_checkbox.grid(row=2, column=1, padx=(10, 4), pady=10, sticky="ew")
 
     def create_edit_checkbox(self, frame):
         self.check_var = StringVar(value="off")
@@ -258,7 +218,7 @@ class InstallPage(CTkFrame):
             onvalue="on",
             offvalue="off",
         )
-        edit_checkbox.grid(row=5, column=1, padx=(10, 4), pady=10, sticky="ew")
+        edit_checkbox.grid(row=3, column=1, padx=(10, 4), pady=10, sticky="ew")
 
     def create_invalid_entry_frame(self):
         self.invalid_entry_frame = CTkFrame(
@@ -283,6 +243,43 @@ class InstallPage(CTkFrame):
             compound="left",
         )
         self.invalid_entries_text.pack(padx=10, pady=10)
+
+    def create_preview_theme(self):
+        preview_frame = CTkFrame(
+            self.install_page_frame,
+            width=440,
+            height=60,
+            corner_radius=12,
+            fg_color="white",
+        )
+        preview_frame.grid(
+            row=5, column=0, columnspan=2, padx=40, pady=(20, 30), sticky=""
+        )
+
+        preview_label = CTkLabel(
+            preview_frame,
+            text="Preview Theme in Firefox",
+            text_color="black",
+            font=("Arial", 18, "bold"),
+        )
+        preview_label.pack(padx=(10, 4), pady=10, side="left")
+
+        self.navigation_button.create_navigation_button(
+            preview_frame,
+            text="Preview Theme",
+            image_path=self.ICON_PATH + "preview_icon.png",
+            side="right",
+            padding_x=10,
+            command=self.start_theme_preview_thread,  # Updated to use threading
+        )
+
+    def start_theme_preview_thread(self):
+        # Start the preview in a new thread
+        preview_thread = threading.Thread(target=self.preview_theme)
+        preview_thread.start()
+
+    def preview_theme(self):
+        self.preview.run_firefox()
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
@@ -311,10 +308,12 @@ class InstallPage(CTkFrame):
             command=lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="install",
-                profile_folder=SpecialInputFunc().get_variables(self.profile_folder_entry),
-                application_folder=SpecialInputFunc().get_variables(self.application_folder_entry),
-                new_tab_wallpaper=SpecialInputFunc().get_variables(self.newtab_wallpaper_entry),
-                accent_color=self.get_variables_combobox(self.accent_color_combobox),
+                profile_folder=SpecialInputFunc().get_variables(
+                    self.profile_folder_entry
+                ),
+                application_folder=SpecialInputFunc().get_variables(
+                    self.application_folder_entry
+                ),
             ),
             padding_x=(10, 20),
             side="right",
@@ -381,22 +380,6 @@ class InstallPage(CTkFrame):
             )
             self.invalid_entry_frame.grid()
 
-    def on_accent_color_select(self, choice):
-        if choice.lower() == "custom":
-            self.selected_color = colorchooser.askcolor(title="Choose your color")[1]
-            if self.selected_color:
-                self.accent_color_combobox.set(self.selected_color)
-                if self.selected_color=="accentColor":
-                    self.accent_color_combobox.configure(button_color="#771D76", button_hover_color="#771D76")
-                else:
-                    self.accent_color_combobox.configure(button_color=self.selected_color, button_hover_color=self.selected_color)
-        else:
-            self.selected_color = self.accent_color_values.get(choice, "#0000FF")
-            if self.selected_color=="accentColor":
-                self.accent_color_combobox.configure(button_color="#771D76", button_hover_color="#771D76")
-            else:
-                self.accent_color_combobox.configure(button_color=self.selected_color, button_hover_color=self.selected_color)
-
     def get_variables_combobox(self, combobox_widget):
         selected_value = combobox_widget.get()
         return selected_value if selected_value else "Blue"
@@ -405,13 +388,15 @@ class InstallPage(CTkFrame):
         if self.check_var.get() == "on":
             self.application_folder_entry.configure(state="normal")
             self.profile_folder_entry.configure(state="normal")
-            self.newtab_wallpaper_entry.configure(state="normal")
-            self.accent_color_combobox.configure(state="normal")
         else:
             self.application_folder_entry.configure(state="disabled")
             self.profile_folder_entry.configure(state="disabled")
-            self.newtab_wallpaper_entry.configure(state="disabled")
-            self.accent_color_combobox.configure(state="disabled")
 
     def update_parameters(self, **kwargs):
-        pass
+        print(kwargs)
+        self.theme_dir = kwargs.get("theme_dir")
+        self.preview = PreviewTheme(
+            self.theme_dir,
+            "/tmp/theme_preview",
+            self.os_values["os_name"],
+        )

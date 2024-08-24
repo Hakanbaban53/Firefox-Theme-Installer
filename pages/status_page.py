@@ -31,9 +31,9 @@ class StatusPage(CTkFrame):
         self.button_data = self.text_data.get("common_values")["navigation_buttons"]
         self.come_from_which_page = None
 
-        self.file_actions = FileActions(self.DATA_PATH)
         self.os_values = OSProperties(self.DATA_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
+        self.file_actions = FileActions(self.os_values["os_name"])
 
 
         self.configure_layout()

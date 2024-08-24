@@ -47,6 +47,7 @@ class HomePage(CTkFrame):
         # Initialize variables
         self.data_json_path = None
         self.modal_theme = None
+        self.theme_data = None
 
         # Configure layout and create widgets
         self.configure_layout()
@@ -221,7 +222,9 @@ class HomePage(CTkFrame):
             navigation_frame,
             "Install",
             path.join(self.ASSETS_PATH, "icons/install_icon.png"),
-            lambda: self.controller.show_frame("install_page"),
+            lambda: self.controller.show_frame("install_page",
+            theme_dir = self.theme_data.get("path"),
+                                               ),
             padding_x=(5, 5),
             side="right",
             state="disabled",
@@ -340,16 +343,16 @@ class HomePage(CTkFrame):
 
     def run_theme_process(self):
         """Run the theme processing logic."""
-        theme_data = ThemeDownloader(
+        self.theme_data = ThemeDownloader(
             self.modal_theme.theme_selected, self.THEME_PATH, self.check_var.get()
         ).process_theme()
-        print(theme_data)
+        print(self.theme_data)
 
-        if isinstance(theme_data, dict) and theme_data.get("type") == "data":
+        if isinstance(self.theme_data, dict) and self.theme_data.get("type") == "data":
             self.detect_files_text.configure(
                 text="Theme has its own data JSON", fg="#00FF00", image=self.check_icon
             )
-            self.data_json_path = theme_data.get("path")
+            self.data_json_path = self.theme_data.get("path")
 
             # Start the file fetching process in a separate thread
             thread = Thread(target=self.fetch_files)
@@ -357,7 +360,7 @@ class HomePage(CTkFrame):
             self.clean_install.grid_remove()
 
         elif (
-            isinstance(theme_data, dict) and theme_data.get("type") == "userChrome.css"
+            isinstance(self.theme_data, dict) and self.theme_data.get("type") == "userChrome.css"
         ):
             self.detect_files_text.configure(
                 text="Theme has userChrome.css file", fg="#00FF00", image=self.check_icon
