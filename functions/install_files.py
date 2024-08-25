@@ -84,35 +84,40 @@ class FileActions:
         
         self.commands.append(command)
 
-    def execute_operations(self, progress_bar, output_entry):
+    def execute_operations(self, progress_bar, output_entry=None):
         total_operations = len(self.commands)
         if total_operations == 0:
             return
 
-        output_entry.configure(state='normal')
-        
+        if output_entry:
+            output_entry.configure(state='normal')
+
         for i, command in enumerate(self.commands):
             try:
                 result = run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
                 output = result.stdout.decode('utf-8').strip()
                 error = result.stderr.decode('utf-8').strip()
 
-                output_entry.insert("end", f"Completed: {command}\n")
+                if output_entry:
+                    output_entry.insert("end", f"Completed: {command}\n")
                 
-                if output:
+                if output and output_entry:
                     output_entry.insert("end", f"Output: {output}\n")
-                if error:
+                if error and output_entry:
                     output_entry.insert("end", f"Error: {error}\n")
 
             except CalledProcessError as e:
-                output_entry.insert("end", f"Failed: {command} with error {e.stderr.decode('utf-8').strip()}\n")
+                if output_entry:
+                    output_entry.insert("end", f"Failed: {command} with error {e.stderr.decode('utf-8').strip()}\n")
             except Exception as e:
-                output_entry.insert("end", f"Failed: {command} with error {e}\n")
+                if output_entry:
+                    output_entry.insert("end", f"Failed: {command} with error {e}\n")
 
             progress = (i + 1) / total_operations
-            progress_bar.set(progress)
-            output_entry.see("end")
-            progress_bar.master.update_idletasks()
+            if progress_bar:
+                progress_bar.set(progress)
+                progress_bar.master.update_idletasks()
 
-        output_entry.configure(state='disabled')
+        if output_entry:
+            output_entry.configure(state='disabled')
         self.commands.clear()

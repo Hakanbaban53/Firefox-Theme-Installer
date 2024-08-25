@@ -1,0 +1,8 @@
+{
+  "custom_script_loader": {
+    "mozilla.cfg": "https://raw.githubusercontent.com/Hakanbaban53/RealFire/main/programs/mozilla.cfg",
+    "config.js": "https://raw.githubusercontent.com/MrOtherGuy/fx-autoconfig/master/program/config.js",
+    "config-prefs.js": "https://raw.githubusercontent.com/MrOtherGuy/fx-autoconfig/master/program/defaults/pref/config-prefs.js",
+    "local-settings.js": "https://raw.githubusercontent.com/Hakanbaban53/RealFire/main/programs/local-settings.js"
+  }
+}
