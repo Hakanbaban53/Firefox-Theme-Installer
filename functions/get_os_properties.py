@@ -1,4 +1,5 @@
 from json import load
+import os
 from platform import system
 
 class OSProperties:
@@ -36,6 +37,3 @@ class OSProperties:
     def get_locations(self):
         os_data = self.get_values()
         return os_data.get("default_locations", {})
-
-
-

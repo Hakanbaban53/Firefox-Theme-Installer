@@ -1,46 +1,8 @@
 {
   "common_values": {
     "installer_info": {
-      "installer_title": "RealFire Installer",
-      "installer_version": " RealFire Version: Beta β 0.1 "
-    },
-    
-    "inputs": {
-      "border_color": "#771D76",
-      "text_color": "#000000",
-      "bg_color": "#2B2631",
-      "fg_color": "#FFFFFF",
-      "corner_radius": "8",
-      "border_width": "3",
-      "height": "38",
-      "width": "342"
-    },
-
-    "dropboxes": {}
-  },
-  
-  "windows": {
-    "os_name":"Windows",
-    "os_color":"#357EC7",
-    "default_locations":{
-      "application_folder":"C:\\Program Files\\Mozilla Firefox",
-      "firefox_folder":"%APPDATA%\\Mozilla\\Firefox"
-    }
-  },
-  "linux": {
-    "os_name":"Linux",
-    "os_color":"#F06F27",
-    "default_locations":{
-      "application_folder":"/usr/lib64/firefox",
-      "firefox_folder":"/home/$USER/.mozilla/firefox"
-    }
-  },
-  "macos": {
-    "os_name":"macOS",
-    "os_color":"#000000",
-    "default_locations":{
-      "application_folder":"/Applications/Firefox.app/Contents/MacOS/Firefox",
-      "firefox_folder":"/Library/Application\\ Support/Firefox"
+      "installer_title": "Firefox Theme Installer",
+      "installer_version": " Theme Installer Version: V1.0.0"
     }
   }
 }

@@ -6,13 +6,7 @@ from tkinter import BooleanVar, PhotoImage, Label, TclError
 from threading import Thread
 from PIL import Image
 
-from customtkinter import (
-    CTkFrame,
-    CTkLabel,
-    CTkButton,
-    CTkCheckBox,
-    CTkImage
-)
+from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox, CTkImage
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
@@ -33,20 +27,32 @@ class HomePage(CTkFrame):
         self.controller = controller
         self.base_dir = base_dir
 
-        # Define paths
-        self.ASSETS_PATH = path.join(base_dir, "assets")
-        self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
-        self.navigation_button_data_path = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
-        self.THEME_PATH = Path(path.expanduser("~")) / ".cache" / "RealFire" / "Themes"
-        self.custom_script_loader_path = path.join(
-            base_dir, "data", "fx-autoconfig.json"
+        self.config_data = self.load_json_data(
+            path.join(base_dir, "data", "pages", "home_page_data.json")
+        ) 
+
+        self.ASSETS_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["ASSETS_PATH"]
+        )
+        self.NAVIGATION_BUTTON_DATA_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+        )
+        self.OS_PROPERTIES_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["OS_PROPERTIES_PATH"]
+        )
+        self.THEME_PATH = Path(
+            path.expanduser(self.config_data["data_paths"]["THEME_PATH"])
+        )
+        self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
         )
 
-        # Load data
-        self.text_data = self.load_json_data(self.DATA_PATH)
-        self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
+        # Load additional data
+        self.navigation_button_data = self.load_json_data(
+            self.NAVIGATION_BUTTON_DATA_PATH
+        )
         self.button_data = self.navigation_button_data["navigation_buttons"]
-        self.os_values = OSProperties(self.DATA_PATH).get_values()
+        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
         self.header = CreateHeader()
 
@@ -78,59 +84,78 @@ class HomePage(CTkFrame):
         self.create_recheck_skip_section()
 
     def create_images(self):
-        # Load icons and images
+        # Load icons and images based on JSON paths
+        icons = self.config_data["icons"]
         self.attention_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/attention.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/attention.png")),
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["attention_icon"])
+            ),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["attention_icon"])),
             size=(24, 24),
         )
         self.check_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/check.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/check.png")),
+            light_image=Image.open(path.join(self.ASSETS_PATH, icons["check_icon"])),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["check_icon"])),
             size=(24, 24),
         )
         self.install_files_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/install_icon.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/install_icon.png")),
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["install_files_icon"])
+            ),
+            dark_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["install_files_icon"])
+            ),
             size=(24, 24),
         )
         self.theme_not_selected_icon = PhotoImage(
-            file=path.join(self.ASSETS_PATH, "icons/theme-not-selected.png"),
+            file=path.join(self.ASSETS_PATH, icons["theme_not_selected_icon"]),
             height=32,
             width=24,
         )
         self.theme_selected_icon = PhotoImage(
-            file=path.join(self.ASSETS_PATH, "icons/theme-selected.png"),
+            file=path.join(self.ASSETS_PATH, icons["theme_selected_icon"]),
             height=32,
             width=24,
         )
         self.header_title_bg = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["header_title_bg"])
+            ),
+            dark_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["header_title_bg"])
+            ),
             size=(390, 64),
         )
         self.line_top_img = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/line_top.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/line_top.png")),
+            light_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
             size=(650, 6),
         )
         self.os_icon_image = CTkImage(
-            light_image=Image.open(path.join(
-                self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-            )),
-            dark_image=Image.open(path.join(
-                self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-            )),
+            light_image=Image.open(
+                path.join(
+                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
+                )
+            ),
+            dark_image=Image.open(
+                path.join(
+                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
+                )
+            ),
             size=(20, 24),
         )
         self.select_action_img = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["header_title_bg"])
+            ),
+            dark_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["header_title_bg"])
+            ),
             size=(270, 36),
         )
         self.reload_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/reload_icon.png")),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/reload_icon.png")),
+            light_image=Image.open(path.join(self.ASSETS_PATH, icons["reload_icon"])),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["reload_icon"])),
             size=(24, 24),
         )
 
@@ -140,49 +165,84 @@ class HomePage(CTkFrame):
         )
 
     def create_os_info(self):
+        os_info = self.config_data["create_os_info"]
 
         os_label = CTkLabel(
             self.home_page_frame,
-            text="Detected Operating System: ",
-            text_color="White",
-            font=("Inter", 20, "bold"),
+            text=os_info["os_label"]["text"],
+            text_color=os_info["os_label"]["text_color"],
+            font=eval(os_info["os_label"]["font"]),  # Convert the string to a tuple
         )
-        os_label.grid(row=2, column=0, padx=(175, 0), pady=20, sticky="ew")
-
-        os_frame = CTkFrame(self.home_page_frame, corner_radius=12, fg_color="white")
-        os_frame.grid(row=2, column=1, padx=(0, 185), sticky="ew")
+        os_label.grid(
+            row=os_info["os_label"]["grid_data"]["row"],
+            column=os_info["os_label"]["grid_data"]["column"],
+            padx=os_info["os_label"]["grid_data"]["padx"],
+            pady=os_info["os_label"]["grid_data"]["pady"],
+            sticky=os_info["os_label"]["grid_data"]["sticky"],
+        )
+        os_frame = CTkFrame(
+            self.home_page_frame,
+            fg_color=os_info["os_frame"]["fg_color"],
+            corner_radius=int(os_info["os_frame"]["corner_radius"]),
+            border_color=os_info["os_frame"]["border_color"],
+            border_width=int(os_info["os_frame"]["border_width"]),
+        )
+        os_frame.grid(
+            row=os_info["os_frame"]["grid_data"]["row"],
+            column=os_info["os_frame"]["grid_data"]["column"],
+            padx=os_info["os_frame"]["grid_data"]["padx"],
+            pady=os_info["os_frame"]["grid_data"]["pady"],
+            sticky=os_info["os_frame"]["grid_data"]["sticky"],
+        )
 
         os_info_label = CTkLabel(
             os_frame,
             text=f"{self.os_values['os_name']} ",
             text_color=self.os_values["os_color"],
-            font=("Arial", 20, "bold"),
+            font=eval(os_info["os_info_label"]["font"]),
             image=self.os_icon_image,
-            compound="right",
+            compound=os_info["os_info_label"]["compound"],
         )
-        os_info_label.pack(padx=10, pady=10, side="left")
+        os_info_label.pack(
+            padx=os_info["os_info_label"]["pack_data"]["padx"],
+            pady=os_info["os_info_label"]["pack_data"]["pady"],
+            side=os_info["os_info_label"]["pack_data"]["side"],
+        )
 
     def theme_select(self):
+        theme_select = self.config_data["theme_select"]
+
         theme_frame = CTkFrame(
             self.home_page_frame,
-            corner_radius=12,
-            fg_color="white",
-            border_color="#771D76",
-            border_width=4,
+            fg_color=theme_select["theme_frame"]["fg_color"],
+            corner_radius=int(theme_select["theme_frame"]["corner_radius"]),
+            border_color=theme_select["theme_frame"]["border_color"],
+            border_width=int(theme_select["theme_frame"]["border_width"]),
         )
-        theme_frame.grid(row=3, column=0, columnspan=2, pady=(10, 35), sticky="")
+        theme_frame.grid(
+            row=theme_select["theme_frame"]["grid_data"]["row"],
+            column=theme_select["theme_frame"]["grid_data"]["column"],
+            columnspan=theme_select["theme_frame"]["grid_data"]["columnspan"],
+            padx=theme_select["theme_frame"]["grid_data"]["padx"],
+            pady=theme_select["theme_frame"]["grid_data"]["pady"],
+            sticky=theme_select["theme_frame"]["grid_data"]["sticky"],
+        )
 
         self.theme_label = CTkLabel(
             theme_frame,
-            text="Select Theme: None",
-            text_color="Black",
-            font=("Inter", 18),
+            text=theme_select["theme_label"]["text"],
+            font=eval(theme_select["theme_label"]["font"]),
+            text_color=theme_select["theme_label"]["fg_color"],
         )
-        self.theme_label.pack(padx=10, pady=10, side="left")
+        self.theme_label.pack(
+            padx=theme_select["theme_label"]["pack_data"]["padx"],
+            pady=theme_select["theme_label"]["pack_data"]["pady"],
+            side=theme_select["theme_label"]["pack_data"]["side"],
+        )
 
-        theme_select = CTkButton(
+        theme_select_button = CTkButton(
             theme_frame,
-            text="Change Theme",
+            text=theme_select["theme_select_button"]["text"],
             width=float(self.button_data["width"]),
             height=float(self.button_data["height"]),
             corner_radius=float(self.button_data["corner_radius"]),
@@ -193,31 +253,52 @@ class HomePage(CTkFrame):
             command=self.select_theme,
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
         )
-        theme_select.pack(padx=10, pady=10, side="right")
+        theme_select_button.pack(
+            padx=theme_select["theme_select_button"]["pack_data"]["padx"],
+            pady=theme_select["theme_select_button"]["pack_data"]["pady"],
+            side=theme_select["theme_select_button"]["pack_data"]["side"],
+        )
 
     def create_navigation_buttons(self):
 
+        navigation_buttons = self.config_data["create_navigation_buttons"]
+
         select_action_label = CTkLabel(
             self.home_page_frame,
-            text="Please Select the Action",
+            text=navigation_buttons["select_action_label"]["text"],
             image=self.select_action_img,
-            text_color="White",
-            font=("Inter", 20, "bold"),
+            text_color=navigation_buttons["select_action_label"]["text_color"],
+            font=eval(navigation_buttons["select_action_label"]["font"]),
         )
         select_action_label.grid(
-            row=4, column=0, columnspan=2, padx=60, pady=(0, 15), sticky="ew"
+            row=navigation_buttons["select_action_label"]["grid_data"]["row"],
+            column=navigation_buttons["select_action_label"]["grid_data"]["column"],
+            columnspan=navigation_buttons["select_action_label"]["grid_data"][
+                "columnspan"
+            ],
+            padx=navigation_buttons["select_action_label"]["grid_data"]["padx"],
+            pady=navigation_buttons["select_action_label"]["grid_data"]["pady"],
+            sticky=navigation_buttons["select_action_label"]["grid_data"]["sticky"],
         )
-
         navigation_frame = CTkFrame(
             self.home_page_frame,
-            width=460,
-            height=54,
-            corner_radius=12,
-            border_width=4,
-            fg_color="white",
-            border_color="#F89F24",
+            fg_color=navigation_buttons["navigation_frame"]["fg_color"],
+            corner_radius=int(navigation_buttons["navigation_frame"]["corner_radius"]),
+            border_color=navigation_buttons["navigation_frame"]["border_color"],
+            border_width=int(navigation_buttons["navigation_frame"]["border_width"]),
+            width=navigation_buttons["navigation_frame"]["width"],
+            height=navigation_buttons["navigation_frame"]["height"],
         )
-        navigation_frame.grid(row=5, column=0, columnspan=2, pady=(0, 15), sticky="")
+        navigation_frame.grid(
+            row=navigation_buttons["navigation_frame"]["grid_data"]["row"],
+            column=navigation_buttons["navigation_frame"]["grid_data"]["column"],
+            columnspan=navigation_buttons["navigation_frame"]["grid_data"][
+                "columnspan"
+            ],
+            padx=navigation_buttons["navigation_frame"]["grid_data"]["padx"],
+            pady=navigation_buttons["navigation_frame"]["grid_data"]["pady"],
+            sticky=navigation_buttons["navigation_frame"]["grid_data"]["sticky"],
+        )
 
         self.navigation_button.create_navigation_button(
             navigation_frame,
@@ -253,58 +334,87 @@ class HomePage(CTkFrame):
         )
 
     def create_file_detection(self):
-        self.detect_files_frame = CTkFrame(
-            self.home_page_frame, corner_radius=12, fg_color="white"
-        )
-        self.detect_files_frame.grid(row=6, column=0, padx=0, columnspan=2, sticky="")
 
+        file_detection = self.config_data["create_file_detection"]
+
+        self.detect_files_frame = CTkFrame(
+            self.home_page_frame,
+            fg_color=file_detection["detect_files_frame"]["fg_color"],
+            corner_radius=int(file_detection["detect_files_frame"]["corner_radius"]),
+            border_color=file_detection["detect_files_frame"]["border_color"],
+            border_width=int(file_detection["detect_files_frame"]["border_width"]),
+        )
+        self.detect_files_frame.grid(
+            row=file_detection["detect_files_frame"]["grid_data"]["row"],
+            column=file_detection["detect_files_frame"]["grid_data"]["column"],
+            columnspan=file_detection["detect_files_frame"]["grid_data"]["columnspan"],
+            padx=file_detection["detect_files_frame"]["grid_data"]["padx"],
+            pady=file_detection["detect_files_frame"]["grid_data"]["pady"],
+            sticky=file_detection["detect_files_frame"]["grid_data"]["sticky"],
+        )
         self.detect_files_text = Label(
             self.detect_files_frame,
-            text="Please Select theme ",
-            fg="#000000",
-            bg="#FFFFFF",
-            font=("Arial", 16, "bold"),
-            compound="right",
+            text=file_detection["detect_files_text"]["text"],
+            font=eval(file_detection["detect_files_text"]["font"]),
+            fg=file_detection["detect_files_text"]["fg"],
+            bg=file_detection["detect_files_text"]["bg"],
+            compound=file_detection["detect_files_text"]["compound"],
             image=self.theme_not_selected_icon,
         )
-        self.detect_files_text.grid(row=0, column=0, padx=10, pady=10, sticky="")
-
+        self.detect_files_text.grid(
+            row=file_detection["detect_files_text"]["grid_data"]["row"],
+            column=file_detection["detect_files_text"]["grid_data"]["column"],
+            padx=file_detection["detect_files_text"]["grid_data"]["padx"],
+            pady=file_detection["detect_files_text"]["grid_data"]["pady"],
+            sticky=file_detection["detect_files_text"]["grid_data"]["sticky"],
+        )
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
-            text="Show Files",
-            width=float(self.button_data["width"]),
-            height=float(self.button_data["height"]),
-            corner_radius=float(self.button_data["corner_radius"]),
-            bg_color=self.button_data["bg_color"],
-            fg_color=self.button_data["fg_color"],
-            hover_color=self.button_data["hover_color"],
-            text_color=self.button_data["text_color"],
-            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
+            text=file_detection["install_files_button"]["text"],
+            width=float(file_detection["install_files_button"]["width"]),
+            height=float(file_detection["install_files_button"]["height"]),
+            corner_radius=float(
+                file_detection["install_files_button"]["corner_radius"]
+            ),
+            fg_color=file_detection["install_files_button"]["fg_color"],
+            hover_color=file_detection["install_files_button"]["hover_color"],
+            text_color=file_detection["install_files_button"]["text_color"],
+            font=eval(file_detection["install_files_button"]["font"]),
         )
 
     def create_recheck_skip_section(self):
-        self.recheck_skip_frame = CTkFrame(self.home_page_frame, fg_color="#2B2631")
+        create_section = self.config_data["create_recheck_skip_section"]
+
+        self.recheck_skip_frame = CTkFrame(
+            self.home_page_frame,
+            fg_color=create_section["recheck_skip_frame"]["fg_color"],
+        )
         self.recheck_skip_frame.grid(
-            row=7, column=0, padx=0, pady=0, columnspan=2, sticky=""
+            row=create_section["recheck_skip_frame"]["grid_data"]["row"],
+            column=create_section["recheck_skip_frame"]["grid_data"]["column"],
+            columnspan=create_section["recheck_skip_frame"]["grid_data"]["columnspan"],
+            padx=create_section["recheck_skip_frame"]["grid_data"]["padx"],
+            pady=create_section["recheck_skip_frame"]["grid_data"]["pady"],
+            sticky=create_section["recheck_skip_frame"]["grid_data"]["sticky"],
         )
 
         self.check_var = BooleanVar(value=False)
         self.clean_install = CTkCheckBox(
             self.recheck_skip_frame,
-            text="Clean Install",
-            text_color="#FFFFFF",
-            font=("Arial", 16, "bold"),
+            text=create_section["clean_install_checkbox"]["text"],
+            text_color=create_section["clean_install_checkbox"]["text_color"],
+            onvalue=bool(create_section["clean_install_checkbox"]["onvalue"]),
+            offvalue=bool(create_section["clean_install_checkbox"]["offvalue"]),
             variable=self.check_var,
-            onvalue=True,
-            offvalue=False,
+            font=eval(create_section["clean_install_checkbox"]["font"]),
         )
 
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
-            width=40,
-            height=40,
-            text="",
-            fg_color="#FFFFFF",
+            width=float(create_section["recheck_button"]["width"]),
+            height=float(create_section["recheck_button"]["height"]),
+            text=create_section["recheck_button"]["text"],
+            fg_color=create_section["recheck_button"]["fg_color"],
             image=self.reload_icon,
         )
 
@@ -509,16 +619,18 @@ class HomePage(CTkFrame):
         # Disable the button and change the text
         self.detect_files_text.config(text="Installing Necessary Files", fg="#000000")
         custom_script_loader = FileManager(
-            self.custom_script_loader_path
+            self.CUSTOM_SCRIPT_LOADER_PATH
         ).load_json_data()
 
         if custom_script_loader:
-            missing_files = FileManager(self.data_json_path).check_files_exist(
-                custom_script_loader
-            )
+            missing_files = FileManager(
+                self.CUSTOM_SCRIPT_LOADER_PATH
+            ).check_files_exist(custom_script_loader)
             if missing_files:
                 thread = Thread(
-                    target=FileManager(self.data_json_path).download_missing_files,
+                    target=FileManager(
+                        self.CUSTOM_SCRIPT_LOADER_PATH
+                    ).download_missing_files,
                     args=(missing_files,),
                 )
                 thread.start()

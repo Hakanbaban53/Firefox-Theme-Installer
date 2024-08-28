@@ -1,0 +1,203 @@
+{
+    "data_paths": {
+      "ASSETS_PATH": "assets",
+      "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
+      "OS_PROPERTIES_PATH": "data/OS data/os_properties.json",
+      "THEME_PATH": "~/.cache/RealFire/Themes",
+      "CUSTOM_SCRIPT_LOADER_PATH": "data/files data/fx-autoconfig.json"
+    },
+    
+    "icons": {
+      "attention_icon": "icons/attention.png",
+      "check_icon": "icons/check.png",
+      "install_files_icon": "icons/install_icon.png",
+      "theme_not_selected_icon": "icons/theme-not-selected.png",
+      "theme_selected_icon": "icons/theme-selected.png",
+      "header_title_bg": "backgrounds/header_title_background.png",
+      "line_top_img": "backgrounds/line_top.png",
+      "reload_icon": "icons/reload_icon.png",
+      "remove_icon": "icons/remove_icon.png",
+      "exit_icon": "icons/exit_icon.png",
+      "block_spin_gif": "icons/block_spin.gif",
+      "os_icons": {
+        "windows": "icons/windows.png",
+        "linux": "icons/linux.png",
+        "mac": "icons/mac.png"
+      }
+    },
+  
+    "create_os_info": {
+      "os_label": {
+        "text": "Detected Operating System: ",
+        "text_color": "white",
+        "font": "(\"Inter\", 20, \"bold\")",
+        "grid_data": {
+          "row": 2,
+          "column": 0,
+          "sticky": "ew",
+          "padx": [175, 0],
+          "pady": 20
+        }
+      },
+      "os_frame": {
+        "fg_color": "white",
+        "corner_radius": "12",
+        "border_width": 0,
+        "border_color": "None",
+        "grid_data": {
+          "row": 2,
+          "column": 1,
+          "sticky": "ew",
+          "padx": [0, 185],
+          "pady": 0
+        }
+      },
+      "os_info_label": {
+        "font": "(\"Arial\", 20, \"bold\")",
+        "compound": "right",
+        "pack_data": {
+          "side": "left",
+          "padx": 10,
+          "pady": 10
+        }
+      }
+    },
+  
+    "theme_select": {
+      "theme_frame": {
+        "fg_color": "white",
+        "corner_radius": "12",
+        "border_width": 4,
+        "border_color": "#771D76",
+        "grid_data": {
+          "row": 3,
+          "column": 0,
+          "columnspan": 2,
+          "sticky": "",
+          "padx": 0,
+          "pady": [10, 35]
+        }
+      },
+      "theme_label": {
+        "text": "Select Theme: None",
+        "font": "(\"Inter\", 18)",
+        "fg_color": "Black",
+        "pack_data": {
+          "side": "left",
+          "padx": 10,
+          "pady": 10
+        }
+      },
+      "theme_select_button": {
+        "text": "Select Theme",
+        "pack_data": {
+          "side": "right",
+          "padx": 10,
+          "pady": 10
+        }
+      }
+    },
+  
+    "create_navigation_buttons": {
+      "select_action_label": {
+        "text": "Please Select the Action",
+        "text_color": "white",
+        "font": "(\"Inter\", 20, \"bold\")",
+        "grid_data": {
+          "row": 4,
+          "column": 0,
+          "columnspan": 2,
+          "sticky": "ew",
+          "padx": 60,
+          "pady": [0, 15]
+        }
+      },
+      "navigation_frame": {
+        "width": 460,
+        "height": 54,
+        "corner_radius": 12,
+        "border_width": 4,
+        "fg_color": "white",
+        "border_color": "#F89F24",
+        "grid_data": {
+          "row": 5,
+          "column": 0,
+          "columnspan": 2,
+          "sticky": "",
+          "padx": 0,
+          "pady": [0, 15]
+        }
+      }
+    },
+  
+    "create_file_detection": {
+      "detect_files_frame": {
+        "corner_radius": 12,
+        "fg_color": "white",
+        "border_width": 0,
+        "border_color": "None",
+        "grid_data": {
+          "row": 6,
+          "column": 0,
+          "columnspan": 2,
+          "sticky": "",
+          "padx": 0,
+          "pady": 0
+        }
+      },
+      "detect_files_text": {
+        "parent": "detect_files_frame",
+        "text": "Please Select theme ",
+        "fg": "#000000",
+        "bg": "#FFFFFF",
+        "font": "(\"Arial\", 16, \"bold\")",
+        "compound": "right",
+        "grid_data": {
+          "row": 0,
+          "column": 0,
+          "padx": 10,
+          "pady": 10,
+          "sticky": ""
+        }
+      },
+      "install_files_button": {
+        "text": "Show Files",
+        "width": 120,
+        "height": 40,
+        "corner_radius": 14,
+        "fg_color": "#E0E0E0",
+        "hover_color": "#D0D0D0",
+        "text_color": "#000000",
+        "font": "(\"Arial\", 18, \"bold\")"
+      }
+    },
+  
+    "create_recheck_skip_section": {
+      "recheck_skip_frame": {
+        "fg_color": "#2B2631",
+        "grid_data": {
+          "row": 7,
+          "column": 0,
+          "columnspan": 2,
+          "sticky": "",
+          "padx": 0,
+          "pady": 0
+        }
+      },
+      "clean_install_checkbox": {
+        "text": "Clean Install",
+        "text_color": "#FFFFFF",
+        "font": "(\"Arial\", 16, \"bold\")",
+        "onvalue": true,
+        "offvalue": false
+      },
+      "recheck_button": {
+        "width": 40,
+        "height": 40,
+        "text": "",
+        "fg_color": "#FFFFFF",
+        "image": "reload_icon"
+      }
+    }
+  }
+  

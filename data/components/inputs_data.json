@@ -1,0 +1,12 @@
+{
+    "inputs": {
+        "border_color": "#771D76",
+        "text_color": "#000000",
+        "bg_color": "#2B2631",
+        "fg_color": "#FFFFFF",
+        "corner_radius": "8",
+        "border_width": "3",
+        "height": "38",
+        "width": "342"
+      }
+}

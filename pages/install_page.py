@@ -18,7 +18,7 @@ from components.create_navigation_button import NavigationButton
 from functions.preview_theme import PreviewTheme
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
-from functions.get_folder_locations import get_profile_folder
+from functions.get_folder_locations import GetFolderLocations
 from functions.special_input_functions import SpecialInputFunc
 
 
@@ -27,24 +27,27 @@ class InstallPage(CTkFrame):
         super().__init__(parent)
         self.controller = controller
         self.base_dir = base_dir
-
-        self.ICON_PATH = path.join(self.base_dir, "assets", "icons/")
-        self.BACKGROUND_PATH = path.join(self.base_dir, "assets", "backgrounds/")
-        self.DATA_PATH = path.join(self.base_dir, "data", "installer_data.json")
-        self.navigation_button_data_path = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
-
-
-        self.profile_folder_location = get_profile_folder(self.DATA_PATH)
         self.theme_dir = None
 
-        self.text_data = self.load_json_data(self.DATA_PATH)
-        self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
-        self.button_data = self.navigation_button_data["navigation_buttons"]
-        self.input_data = self.text_data.get("common_values")["inputs"]
+        self.ICON_PATH = path.join(base_dir, "assets", "icons/")
+        self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds/")
+        self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
+        self.NAVIGATION_BUTTON_DATA_PATH = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
+        self.OS_PROPERTIES_PATH = path.join(base_dir, "data", "OS data", "os_properties.json")
+        self.INPUTS_DATA_PATH = path.join(base_dir, "data", "components", "inputs_data.json")
 
-        self.os_values = OSProperties(self.DATA_PATH).get_values()
-        self.input_values = OSProperties(self.DATA_PATH).get_locations()
+
+        self.text_data = self.load_json_data(self.DATA_PATH)
+        self.navigation_button_data=self.load_json_data(self.NAVIGATION_BUTTON_DATA_PATH)
+        self.inputs_data = self.load_json_data(self.INPUTS_DATA_PATH)
+
+        self.button_data = self.navigation_button_data["navigation_buttons"]
+        self.input_data = self.inputs_data["inputs"]
+
+        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
+        self.input_values = OSProperties(self.OS_PROPERTIES_PATH).get_locations()
         self.navigation_button = NavigationButton(self.button_data)
+        self.profile_folder_location = GetFolderLocations(self.os_values).get_profile_folder()
 
         self.configure_layout()
         self.create_widgets()

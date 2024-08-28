@@ -14,10 +14,7 @@ class ThemeDownloader:
         self.theme_folder_path = os.path.join(extract_path, f"{self.theme_data.title}-main")
         self.download_url = self.theme_data.link + "/archive/refs/heads/main.zip"
         self.clean_install = clean_install
-        self.user_js_url = "https://github.com/Hakanbaban53/RealFire/raw/main/programs/user.js"
-        self.user_js_target_dir = None
         self.base_dir = base_dir
-        print(self.clean_install)
 
         os.makedirs(extract_path, exist_ok=True)
         # logging.basicConfig(level=logging.INFO)
