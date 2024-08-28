@@ -1,18 +1,10 @@
-from customtkinter import CTkButton, CTkImage
 from PIL import Image
+from customtkinter import CTkButton, CTkImage
 
 
 class NavigationButton:
     def __init__(self, button_data):
         self.button_data = button_data
-        pass
-
-    def load_image(self, file_name, size):
-        return CTkImage(
-            light_image=Image.open(file_name),
-            dark_image=Image.open(file_name),
-            size=size,
-        )
 
     def create_navigation_button(
         self,
@@ -25,7 +17,7 @@ class NavigationButton:
         img_side="left",
         **kwargs,
     ):
-        button_image = self.load_image(image_path, (20, 20))
+        button_image = CTkImage(light_image=Image.open(image_path), dark_image=Image.open(image_path), size=(20, 20))
         button = CTkButton(
             parent,
             width=float(self.button_data["width"]),

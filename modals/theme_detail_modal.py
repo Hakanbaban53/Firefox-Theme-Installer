@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkTextbox, CTkImage, CTkScrollableFrame
@@ -11,30 +12,45 @@ import requests
 
 
 class ThemeDetailModal(tk.Toplevel):
-    def __init__(self, parent, theme, cache_dir):
+    def __init__(self, parent, theme, cache_dir, base_dir):
         super().__init__(parent)
+        self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.theme = theme
         print(f"Opening theme detail for: {theme}")
 
-        self.cache_expiration = 86400  # Cache expiration in seconds (1 day)
-        self.title(f"Theme Details: {self.theme.title}")
+        self.data = self.load_ui_data()  # Load UI data from JSON
+        self.cache_expiration = self.data["ThemeDetailModal"]["cache_expiration"]
 
+        self.title(f"{self.data['ThemeDetailModal']['title_prefix']}{self.theme.title}")
         self.configure_modal_window(parent)
         self.create_detail_window(self.theme)
     
+    def load_ui_data(self):
+        """Load UI configuration data from JSON file."""
+        ui_data_path = os.path.join(self.base_dir, "data", "modals","theme_detail_modal_data.json")  # Path to JSON file
+        try:
+            with open(ui_data_path, "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise FileNotFoundError("The UI configuration file was not found.")
+        except json.JSONDecodeError:
+            raise ValueError("Error parsing the UI configuration JSON file.")
+        except Exception as e:
+            raise Exception(f"An error occurred while loading the UI data file: {e}")
+
     def configure_modal_window(self, parent):
         """Configures the modal window's basic properties."""
         self.transient(parent)
-        self.configure(bg="#2B2631")
+        self.configure(bg=self.data["ThemeDetailModal"]["background_color"])
         self.resizable(False, False)
-        self.geometry("700x700")
+        self.geometry(self.data["ThemeDetailModal"]["window_geometry"])
         self.wait_visibility()
         self.grab_set()
 
     def create_detail_window(self, theme):
         """Creates and configures the theme detail window."""
-        detail_modal_frame = CTkScrollableFrame(self, fg_color="#2B2631")
+        detail_modal_frame = CTkScrollableFrame(self, fg_color=self.data["ThemeDetailModal"]["background_color"])
         detail_modal_frame.pack(fill=tk.BOTH, expand=True)
         detail_modal_frame.columnconfigure(0, weight=1)
         
@@ -47,7 +63,11 @@ class ThemeDetailModal(tk.Toplevel):
         text_frame = CTkFrame(parent)
         text_frame.grid(row=0, column=0, sticky="NSEW")
 
-        text_widget = CTkTextbox(text_frame, font=("Arial", 16), wrap=tk.WORD)
+        text_widget = CTkTextbox(
+            text_frame,
+            font=tuple(self.data["ThemeDetailModal"]["text_frame"]["font"]),
+            wrap=getattr(tk, self.data["ThemeDetailModal"]["text_frame"]["wrap"])
+        )
         text_widget.insert(tk.END, description)
         text_widget.configure(state=tk.DISABLED)
         text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -57,7 +77,7 @@ class ThemeDetailModal(tk.Toplevel):
         image_frame = CTkFrame(parent)
         image_frame.grid(row=1, column=0, sticky="NSEW")
 
-        loading_label = CTkLabel(image_frame, text="Loading image...")
+        loading_label = CTkLabel(image_frame, text=self.data["ThemeDetailModal"]["loading_image_text"])
         loading_label.pack()
 
         image_label = CTkLabel(image_frame, text="")
@@ -118,9 +138,9 @@ class ThemeDetailModal(tk.Toplevel):
         """Displays the image in the UI."""
         try:
             image = CTkImage(
-                light_image=Image.open(BytesIO(image_data)),
-                dark_image=Image.open(BytesIO(image_data)),
-                size=(650, 500),
+            light_image=Image.open(BytesIO(image_data)),
+            dark_image=Image.open(BytesIO(image_data)),
+            size=tuple(self.data["ThemeDetailModal"]["image_size"]),
             )
             image_label.configure(image=image)
             image_label.image = image
@@ -128,25 +148,40 @@ class ThemeDetailModal(tk.Toplevel):
         except (IOError, Exception) as e:
             self.display_image_error(loading_label, error_message=str(e))
 
-    def display_image_error(self, loading_label, error_message="Failed to load image."):
+    def display_image_error(self, loading_label, error_message=None):
         """Displays an error message if image loading fails."""
+        error_message = error_message or self.data["ThemeDetailModal"]["failed_image_text"]
         error_label = CTkLabel(loading_label.master, text=error_message)
         error_label.pack(pady=10)
         loading_label.pack_forget()
 
     def add_buttons(self, parent, theme):
         """Adds the Open Theme Page and Provide Feedback buttons."""
-        buttons_frame = CTkFrame(parent, fg_color="#2B2631")
+        buttons_frame = CTkFrame(parent, fg_color=self.data["ThemeDetailModal"]["background_color"])
         buttons_frame.grid(row=2, column=0, pady=10)
 
-        link_button = CTkButton(buttons_frame, text="Open Theme Page", command=lambda: webbrowser.open(theme.link))
+        link_button = CTkButton(
+            buttons_frame,
+            text=self.data["ThemeDetailModal"]["buttons"]["open_theme_page"],
+            command=lambda: webbrowser.open(theme.link)
+        )
         link_button.grid(row=0, column=0, padx=10)
 
-        feedback_button = CTkButton(buttons_frame, text="Provide Feedback", command=self.open_feedback_form)
+        feedback_button = CTkButton(
+            buttons_frame,
+            text=self.data["ThemeDetailModal"]["buttons"]["provide_feedback"],
+            command=self.open_feedback_form
+        )
         feedback_button.grid(row=0, column=1, padx=10)
 
     def open_feedback_form(self):
         """Opens a dialog to collect user feedback."""
-        feedback = simpledialog.askstring("Feedback", "Please provide your feedback or report an issue:")
+        feedback = simpledialog.askstring(
+            self.data["ThemeDetailModal"]["buttons"]["feedback_prompt"],
+            self.data["ThemeDetailModal"]["buttons"]["feedback_prompt"]
+        )
         if feedback:
-            messagebox.showinfo("Feedback Received", "Thank you for your feedback!")
+            messagebox.showinfo(
+                self.data["ThemeDetailModal"]["buttons"]["feedback_received_title"],
+                self.data["ThemeDetailModal"]["buttons"]["feedback_received"]
+            )

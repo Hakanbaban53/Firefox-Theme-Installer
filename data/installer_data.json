@@ -4,28 +4,6 @@
       "installer_title": "RealFire Installer",
       "installer_version": " RealFire Version: Beta β 0.1 "
     },
-    "modals":{
-    "exit_modal": {
-      "modal_title": "Exit Confirmation",
-      "modal_label": "Are you sure you want to exit?"
-    },
-    "attention_modal": {
-      "modal_title": "Attention!",
-      "modal_label": "RealFire Succesfully installed.\n Please restart firefox twice!"
-    },
-    "admin_req_modal": {
-      "modal_title": "Launch Error!",
-      "modal_label": "Admin rights are now required to launch the App."
-    },
-    "check_files_installed_modal": {
-      "modal_title": "All Files Installed",
-      "modal_label": "You can continue now."
-    },
-    "check_files_not_installed_modal": {
-      "modal_title": "All Files Not Installed!",
-      "modal_label": "Some Files Are Missing."
-    }
-  },
     
     "inputs": {
       "border_color": "#771D76",
@@ -37,17 +15,7 @@
       "height": "38",
       "width": "342"
     },
-    "navigation_buttons":{
-      "fg_color":"#D9D9D9",
-      "hover_color":"#EEEEEE",
-      "bg_color":"#FFFFFF",
-      "corner_radius":"12",
-      "width":"122",
-      "height":"38",
-      "text_color":"#000000",
-      "font_family":"Inter",
-      "font_size":"20"
-    },
+
     "dropboxes": {}
   },
   

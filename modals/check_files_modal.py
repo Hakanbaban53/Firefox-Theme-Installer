@@ -1,9 +1,9 @@
-from os import path
+import json
 import os
 import tkinter as tk
-from PIL import Image, ImageTk
 from tkinter import ttk
 from threading import Thread
+from PIL import Image, ImageTk
 from customtkinter import CTkButton
 from functions.detect_and_download_files import FileManager
 from modals.info_modals import InfoModals
@@ -12,7 +12,6 @@ from modals.info_modals import InfoModals
 class FileInstallerModal(tk.Toplevel):
     def __init__(self, parent, base_dir):
         super().__init__(parent)
-        
         self.transient(parent)
         self.configure(bg="#2B2631")
         self.resizable(False, False)
@@ -20,8 +19,9 @@ class FileInstallerModal(tk.Toplevel):
         self.grab_set()
 
         self.base_dir = base_dir
-        self.load_data()
- 
+        self.data = self.load_ui_data()  # Load UI data from JSON
+        self.load_data()  # Load installer data from JSON
+
         icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
         if os.name == "nt":
             self.iconbitmap(icon_path)
@@ -29,9 +29,8 @@ class FileInstallerModal(tk.Toplevel):
             icon = Image.open(icon_path)
             self.iconphoto(True, ImageTk.PhotoImage(icon))
 
-
         self.file_manager = FileManager(self.data_file_path)
-        self.title("Install Missing Files")
+        self.title(self.data["FileInstallerModal"]["title"])
         self.center_window()
         self.create_widgets()
 
@@ -39,7 +38,7 @@ class FileInstallerModal(tk.Toplevel):
         """Load data from JSON file."""
         try:
             # Load installer data using base_dir
-            self.data_file_path = path.join(
+            self.data_file_path = os.path.join(
                 self.base_dir, "data", "installer_files_data.json"
             )
         except FileNotFoundError:
@@ -47,14 +46,29 @@ class FileInstallerModal(tk.Toplevel):
         except Exception as e:
             raise Exception(f"An error occurred while loading the data file: {e}")
 
+    def load_ui_data(self):
+        """Load UI configuration data from JSON file."""
+        ui_data_path = os.path.join(self.base_dir, "data", "modals", "check_files_modal_data.json")  # Path to UI JSON
+        try:
+            with open(ui_data_path, "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise FileNotFoundError("The UI configuration file was not found.")
+        except json.JSONDecodeError:
+            raise ValueError("Error parsing the UI configuration JSON file.")
+        except Exception as e:
+            raise Exception(f"An error occurred while loading the UI data file: {e}")
+
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""
+        modal_config = self.data["FileInstallerModal"]
+
         self.files_modal_frame = tk.Frame(self, bg="#2B2631")
         self.files_modal_frame.pack(padx=20, pady=10)
 
         self.missing_files_label = tk.Label(
             master=self.files_modal_frame,
-            text="Some Files Are Missing. Do you want to Install?",
+            text=modal_config["missing_files_label"],
             fg="#FFFFFF",
             bg="#2B2631",
             font=("Arial", 16, "bold"),
@@ -65,14 +79,12 @@ class FileInstallerModal(tk.Toplevel):
         self.treeview = ttk.Treeview(master=self.files_modal_frame)
         self.treeview.grid(row=1, column=0, padx=20, pady=0)
 
-        # Define columns
-        self.treeview["columns"] = ("File(s) Name",)
-        self.treeview.column("#0", width=150)
-        self.treeview.column("File(s) Name", anchor="w", width=300)
-
-        # Define headings
-        self.treeview.heading("#0", text="Folder(s) Name", anchor="w")
-        self.treeview.heading("File(s) Name", text="File(s) Name", anchor="w")
+        # Define columns dynamically from JSON
+        for i, col in enumerate(modal_config["tree_view_columns"]):
+            self.treeview["columns"] = (f"#{i}",)
+            self.treeview.column(f"#{i}", width=col["width"])
+            # Define headings
+            self.treeview.heading(f"#{i}", text=col["header"], anchor="w")
 
         # Add dictionary items to treeview
         for folder, files in self.check_all_files_installed().items():
@@ -85,7 +97,7 @@ class FileInstallerModal(tk.Toplevel):
 
         self.check_button = CTkButton(
             master=self.buttons_frame,
-            text="Check",
+            text=modal_config["buttons"]["check_button"],
             text_color="white",
             command=self.on_check_button_click,
             fg_color="#771D76",
@@ -94,7 +106,7 @@ class FileInstallerModal(tk.Toplevel):
 
         self.install_files_button = CTkButton(
             master=self.buttons_frame,
-            text="Install",
+            text=modal_config["buttons"]["install_button"],
             text_color="white",
             command=self.on_install_button_click,
             fg_color="#F08D27",
@@ -103,14 +115,12 @@ class FileInstallerModal(tk.Toplevel):
 
     def check_all_files_installed(self):
         """Check if all files are installed and return the missing files."""
-        self.file_check_result = self.file_manager.check_files_exist(root=self.base_dir) # If we dont pass base_dir, it will take the default value of root as "." and check for the files in the current directory.
+        self.file_check_result = self.file_manager.check_files_exist(root=self.base_dir)
         return self.file_check_result
 
     def on_install_button_click(self):
         """Handle the install button click event."""
         self.install_files_button.configure(text="Installing", state="disabled")
-
-        # Start the download process in a separate thread
         thread = Thread(target=self.start_download_process)
         thread.start()
         self.after(100, self.check_thread, thread)
@@ -132,9 +142,7 @@ class FileInstallerModal(tk.Toplevel):
 
     def on_check_button_click(self):
         """Handle the check button click event."""
-        all_files_installed = len(
-            self.check_all_files_installed()
-        )
+        all_files_installed = len(self.check_all_files_installed())
         if all_files_installed == 0:
             modal = InfoModals(self, self.base_dir, "check_files_installed")
             self.wait_window(modal)
@@ -144,7 +152,7 @@ class FileInstallerModal(tk.Toplevel):
 
     def center_window(self):
         """Center the modal window on the screen."""
-        self.update_idletasks()  # Ensure that window dimensions are updated
+        self.update_idletasks()
         window_width = self.winfo_width()
         window_height = self.winfo_height()
         screen_width = self.winfo_screenwidth()

@@ -4,16 +4,17 @@ from os import path
 from pathlib import Path
 from tkinter import BooleanVar, PhotoImage, Label, TclError
 from threading import Thread
+from PIL import Image
 
 from customtkinter import (
     CTkFrame,
-    CTkImage,
     CTkLabel,
     CTkButton,
     CTkCheckBox,
+    CTkImage
 )
-from PIL import Image
 
+from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
 from functions.get_the_theme_files import ThemeDownloader
 from modals.check_files_modal import FileInstallerModal
@@ -35,15 +36,19 @@ class HomePage(CTkFrame):
         # Define paths
         self.ASSETS_PATH = path.join(base_dir, "assets")
         self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
+        self.navigation_button_data_path = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
         self.THEME_PATH = Path(path.expanduser("~")) / ".cache" / "RealFire" / "Themes"
-        self.custom_script_loader_path = path.join(base_dir, "data", "custom_script_loader.json")
-        self.custom_script_loader_folder_path = Path(path.expanduser("~")) / ".cache" / "RealFire" / "CustomScriptLoader"
+        self.custom_script_loader_path = path.join(
+            base_dir, "data", "fx-autoconfig.json"
+        )
 
         # Load data
         self.text_data = self.load_json_data(self.DATA_PATH)
-        self.button_data = self.text_data.get("common_values")["navigation_buttons"]
+        self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
+        self.button_data = self.navigation_button_data["navigation_buttons"]
         self.os_values = OSProperties(self.DATA_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
+        self.header = CreateHeader()
 
         # Initialize variables
         self.data_json_path = None
@@ -57,13 +62,6 @@ class HomePage(CTkFrame):
     def load_json_data(self, path):
         with open(path, "r") as file:
             return load(file)
-
-    def load_image(self, file_name, size):
-        return CTkImage(
-            light_image=Image.open(file_name),
-            dark_image=Image.open(file_name),
-            size=size,
-        )
 
     def configure_layout(self):
         self.home_page_frame = CTkFrame(self, fg_color="#2B2631")
@@ -81,14 +79,20 @@ class HomePage(CTkFrame):
 
     def create_images(self):
         # Load icons and images
-        self.attention_icon = self.load_image(
-            path.join(self.ASSETS_PATH, "icons/attention.png"), (24, 24)
+        self.attention_icon = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/attention.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/attention.png")),
+            size=(24, 24),
         )
-        self.check_icon = self.load_image(
-            path.join(self.ASSETS_PATH, "icons/check.png"), (20, 20)
+        self.check_icon = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/check.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/check.png")),
+            size=(24, 24),
         )
-        self.install_files_icon = self.load_image(
-            path.join(self.ASSETS_PATH, "icons/get_from_internet.png"), (24, 24)
+        self.install_files_icon = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/install_icon.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/install_icon.png")),
+            size=(24, 24),
         )
         self.theme_not_selected_icon = PhotoImage(
             file=path.join(self.ASSETS_PATH, "icons/theme-not-selected.png"),
@@ -100,45 +104,39 @@ class HomePage(CTkFrame):
             height=32,
             width=24,
         )
-        self.header_title_bg = self.load_image(
-            path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png"),
-            (390, 64),
+        self.header_title_bg = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
+            size=(390, 64),
         )
-        self.line_top_img = self.load_image(
-            path.join(self.ASSETS_PATH, "backgrounds/line_top.png"), (650, 6)
+        self.line_top_img = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/line_top.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/line_top.png")),
+            size=(650, 6),
         )
-        self.os_icon_image = self.load_image(
-            path.join(
+        self.os_icon_image = CTkImage(
+            light_image=Image.open(path.join(
                 self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-            ),
-            (20, 24),
+            )),
+            dark_image=Image.open(path.join(
+                self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
+            )),
+            size=(20, 24),
         )
-        self.select_action_img = self.load_image(
-            path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png"),
-            (270, 36),
+        self.select_action_img = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "backgrounds/header_title_background.png")),
+            size=(270, 36),
         )
-        self.reload_icon = self.load_image(
-            path.join(self.ASSETS_PATH, "icons/reload_icon.png"), (20, 20)
+        self.reload_icon = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, "icons/reload_icon.png")),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, "icons/reload_icon.png")),
+            size=(24, 24),
         )
 
     def create_header(self):
-
-        header_label = CTkLabel(
-            self.home_page_frame,
-            text="Welcome to the RealFire Installer",
-            image=self.header_title_bg,
-            text_color="White",
-            font=("Inter", 22, "bold"),
-        )
-        header_label.grid(
-            row=0, column=0, columnspan=2, padx=203, pady=(35, 0), sticky="NSEW"
-        )
-
-        line_top_label = CTkLabel(
-            self.home_page_frame, text="", image=self.line_top_img
-        )
-        line_top_label.grid(
-            row=1, column=0, columnspan=2, padx=10, pady=10, sticky="NSEW"
+        self.header.create_header(
+            self.home_page_frame, self.header_title_bg, self.line_top_img
         )
 
     def create_os_info(self):
@@ -235,7 +233,11 @@ class HomePage(CTkFrame):
             path.join(self.ASSETS_PATH, "icons/install_icon.png"),
             lambda: self.controller.show_frame(
                 "install_page",
-                theme_dir=self.theme_data.get("path") if self.theme_data.get("type") == "userChrome.css" else path.join(self.base_dir, "chrome"),
+                theme_dir=(
+                    self.theme_data.get("path")
+                    if self.theme_data.get("type") == "userChrome.css"
+                    else path.join(self.base_dir, "chrome")
+                ),
             ),
             padding_x=(5, 5),
             side="right",
@@ -472,7 +474,7 @@ class HomePage(CTkFrame):
             text_color="#f04141",
             image=self.attention_icon,
             command=self.install_files,
-            state="normal"
+            state="normal",
         )
         self.install_files_button.grid(row=2, column=0, padx=10, pady=10, sticky="")
         self.recheck_button.grid(row=7, column=1, padx=0, pady=10, sticky="")
@@ -494,29 +496,31 @@ class HomePage(CTkFrame):
     def get_theme(self):
         """Handle the theme installation process."""
         self.start_loading_animation()  # Start the loading GIF
-        print("get")
         self.get_neccessary_files()
         self.install_files_button.configure(
             text="Installing Files", text_color="#000000", state="disabled"
         )
-        self.detect_files_text.config(
-            text="Installing Theme Files", fg="#000000"
-        )
+        self.detect_files_text.config(text="Installing Theme Files", fg="#000000")
         thread = Thread(target=self.run_theme_process)
         thread.start()
         self.check_thread(thread)
 
     def get_neccessary_files(self):
         # Disable the button and change the text
-        self.detect_files_text.config(
-            text="Installing Necessary Files", fg="#000000"
-        )
-        custom_script_loader = FileManager(self.custom_script_loader_path).load_json_data()
+        self.detect_files_text.config(text="Installing Necessary Files", fg="#000000")
+        custom_script_loader = FileManager(
+            self.custom_script_loader_path
+        ).load_json_data()
 
         if custom_script_loader:
-            missing_files = FileManager(self.data_json_path).check_files_exist(custom_script_loader)
+            missing_files = FileManager(self.data_json_path).check_files_exist(
+                custom_script_loader
+            )
             if missing_files:
-                thread = Thread(target=FileManager(self.data_json_path).download_missing_files, args=(missing_files,))
+                thread = Thread(
+                    target=FileManager(self.data_json_path).download_missing_files,
+                    args=(missing_files,),
+                )
                 thread.start()
                 self.check_thread(thread)
             else:
@@ -525,7 +529,6 @@ class HomePage(CTkFrame):
         else:
             # print("Failed to load custom script loader data.")
             self.stop_loading_animation()
-
 
     def check_thread(self, thread):
         """Check if the thread is finished and update the UI accordingly."""

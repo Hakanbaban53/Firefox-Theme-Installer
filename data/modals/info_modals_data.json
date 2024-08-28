@@ -1,0 +1,24 @@
+{
+  "modals": {
+    "exit_modal": {
+      "modal_title": "Exit Confirmation",
+      "modal_label": "Are you sure you want to exit?"
+    },
+    "attention_modal": {
+      "modal_title": "Attention!",
+      "modal_label": "RealFire Succesfully installed.\n Please restart firefox twice!"
+    },
+    "admin_req_modal": {
+      "modal_title": "Launch Error!",
+      "modal_label": "Admin rights are now required to launch the App."
+    },
+    "check_files_installed_modal": {
+      "modal_title": "All Files Installed",
+      "modal_label": "You can continue now."
+    },
+    "check_files_not_installed_modal": {
+      "modal_title": "All Files Not Installed!",
+      "modal_label": "Some Files Are Missing."
+    }
+  }
+}

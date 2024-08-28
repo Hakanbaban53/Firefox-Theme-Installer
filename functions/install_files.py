@@ -6,13 +6,23 @@ class FileActions:
         self.os_name = os_name
         self.commands = []
 
+    def elevate_windows_command(self, batched_commands):
+        # Batch all commands into a single string
+        batched_command_str = " & ".join(batched_commands)
+        return f'powershell -Command "Start-Process cmd -ArgumentList \'/c {batched_command_str}\' -Verb RunAs"'
+
+    def elevate_linux_command(self, batched_commands):
+        # Batch all commands into a single string for Linux/macOS
+        batched_command_str = " && ".join(batched_commands)
+        return f'pkexec bash -c "{batched_command_str}"'
+
     def copy_file(self, source, destination):
         if not os.path.exists(source):
             print(f"Source file does not exist: {source}")
             return
+        print(f"Copying {source} to {destination}")
 
-        command = ''
-        if self.os_name.lower() in ["linux", "darwin"]:  # Linux and macOS
+        if self.os_name.lower() in ["linux", "darwin"]:
             command = f'cp "{source}" "{destination}"'
         elif self.os_name.lower() == "windows":
             command = f'copy "{source.replace("/", "\\")}" "{destination.replace("/", "\\")}"'
@@ -24,8 +34,7 @@ class FileActions:
             print(f"Source file does not exist: {source}")
             return
 
-        command = ''
-        if self.os_name.lower() in ["linux", "darwin"]:  # Linux and macOS
+        if self.os_name.lower() in ["linux", "darwin"]:
             command = f'mv "{source}" "{destination}"'
         elif self.os_name.lower() == "windows":
             command = f'move "{source.replace("/", "\\")}" "{destination.replace("/", "\\")}"'
@@ -37,8 +46,7 @@ class FileActions:
             print(f"Source folder does not exist: {source}")
             return
 
-        command = ''
-        if self.os_name.lower() in ["linux", "darwin"]:  # Linux and macOS
+        if self.os_name.lower() in ["linux", "darwin"]:
             command = f'cp -rf "{source}" "{destination}"'
         elif self.os_name.lower() == "windows":
             command = f'xcopy /e /i "{source.replace("/", "\\")}" "{destination.replace("/", "\\")}"'
@@ -50,8 +58,7 @@ class FileActions:
             print(f"Source folder does not exist: {source}")
             return
 
-        command = ''
-        if self.os_name.lower() in ["linux", "darwin"]:  # Linux and macOS
+        if self.os_name.lower() in ["linux", "darwin"]:
             command = f'mv "{source}" "{destination}"'
         elif self.os_name.lower() == "windows":
             command = f'move "{source.replace("/", "\\")}" "{destination.replace("/", "\\")}"'
@@ -62,9 +69,9 @@ class FileActions:
         if not os.path.exists(file_path):
             print(f"File does not exist: {file_path}")
             return
-
-        command = ''
-        if self.os_name.lower() in ["linux", "darwin"]:  # Linux and macOS
+        print(f"Removing {file_path}")
+        
+        if self.os_name.lower() in ["linux", "darwin"]:
             command = f'rm "{file_path}"'
         elif self.os_name.lower() == "windows":
             command = f'del "{file_path.replace("/", "\\")}"'
@@ -76,8 +83,7 @@ class FileActions:
             print(f"Folder does not exist: {folder_path}")
             return
 
-        command = ''
-        if self.os_name.lower() in ["linux", "darwin"]:  # Linux and macOS
+        if self.os_name.lower() in ["linux", "darwin"]:
             command = f'rm -rf "{folder_path}"'
         elif self.os_name.lower() == "windows":
             command = f'rd /s /q "{folder_path.replace("/", "\\")}"'
@@ -92,7 +98,16 @@ class FileActions:
         if output_entry:
             output_entry.configure(state='normal')
 
-        for i, command in enumerate(self.commands):
+        if self.os_name.lower() == "windows":
+            batched_command = self.elevate_windows_command(self.commands)
+            commands_to_execute = [batched_command]
+        elif self.os_name.lower() in ["linux", "darwin"]:
+            batched_command = self.elevate_linux_command(self.commands)
+            commands_to_execute = [batched_command]
+        else:
+            commands_to_execute = self.commands
+
+        for i, command in enumerate(commands_to_execute):
             try:
                 result = run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
                 output = result.stdout.decode('utf-8').strip()

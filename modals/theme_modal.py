@@ -1,5 +1,5 @@
+import json
 import os
-import time
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
@@ -13,23 +13,25 @@ from modals.theme_detail_modal import ThemeDetailModal
 class ThemeModal(tk.Toplevel):
     def __init__(self, parent, base_dir):
         super().__init__(parent)
-        self.configure(bg="#2B2631")
+        self.load_ui_data(base_dir)
+        self.configure(bg=self.data["ThemeModal"]["window"]["background_color"])
         self.transient(parent)
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
 
-        self.THEMES_DATA_URL = "https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/themes.json"
-        self.THEMES_DATA_PATH = os.path.join(base_dir, "data", "themes.json")
-        self.theme_manager = ThemeManager(self.THEMES_DATA_PATH, self.THEMES_DATA_URL)
         self.base_dir = base_dir
+        self.theme_manager = ThemeManager(
+            os.path.join(self.base_dir, self.data["ThemeModal"]["themes"]["data_path"]),
+            self.data["ThemeModal"]["themes"]["data_url"]
+        )
         self.cache_dir = os.path.join(self.base_dir, "image_cache")
         os.makedirs(self.cache_dir, exist_ok=True)
 
         self.sort_order = "asc"
         self.sort_column = "Title"
         self.current_page = 1
-        self.items_per_page = 15
+        self.items_per_page = self.data["ThemeModal"]["themes"]["items_per_page"]
         self.total_pages = 1
 
         self.configure_layout()
@@ -38,13 +40,17 @@ class ThemeModal(tk.Toplevel):
         self.populate_tags()
         self.load_themes()
 
+    def load_ui_data(self, base_dir):
+        with open(os.path.join(base_dir, "data", "modals", "theme_modal_data.json"), "r") as file:
+            self.data = json.load(file)
+
     def configure_layout(self):
-        self.theme_modal_frame = CTkFrame(self, fg_color="#2B2631")
+        self.theme_modal_frame = CTkFrame(self, fg_color=self.data["ThemeModal"]["window"]["background_color"])
         self.theme_modal_frame.grid(row=0, column=1, sticky="SW")
         self.theme_modal_frame.columnconfigure(0, weight=1)
 
     def set_window_icon(self):
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
+        icon_path = os.path.join(self.base_dir, self.data["ThemeModal"]["window"]["icon_path"])
         try:
             if os.name == "nt":
                 self.iconbitmap(icon_path)
@@ -62,7 +68,8 @@ class ThemeModal(tk.Toplevel):
 
     def create_search_bar(self):
         self.search_entry = CTkEntry(
-            self.theme_modal_frame, placeholder_text="Search themes..."
+            self.theme_modal_frame,
+            placeholder_text=self.data["ThemeModal"]["search_bar"]["placeholder_text"]
         )
         self.search_entry.grid(row=0, column=0, padx=10, pady=10, sticky="EW")
         self.search_entry.bind("<KeyRelease>", self.update_search)
@@ -70,7 +77,7 @@ class ThemeModal(tk.Toplevel):
     def create_treeview(self):
         self.tree = ttk.Treeview(
             self.theme_modal_frame,
-            columns=("Title", "Description"),
+            columns=self.data["ThemeModal"]["treeview"]["columns"],
             show="headings",
             height=self.items_per_page,
         )
@@ -82,10 +89,10 @@ class ThemeModal(tk.Toplevel):
             text="Description",
             command=lambda: self.sort_column_click("Description"),
         )
-        self.tree.column("Description", width=400)
+        self.tree.column("Description", width=self.data["ThemeModal"]["treeview"]["description_column_width"])
         self.tree.grid(row=1, column=0, padx=10, pady=10, sticky="NSEW")
-        self.tree.tag_configure("oddrow", background="#f2f2f2")
-        self.tree.tag_configure("evenrow", background="#ffffff")
+        self.tree.tag_configure("oddrow", background=self.data["ThemeModal"]["treeview"]["oddrow_background"])
+        self.tree.tag_configure("evenrow", background=self.data["ThemeModal"]["treeview"]["evenrow_background"])
 
         self.tree.bind("<Double-1>", self.open_theme_detail)
         self.tree.bind("<<TreeviewSelect>>", self.on_select)
@@ -93,10 +100,10 @@ class ThemeModal(tk.Toplevel):
     def create_navigation_buttons(self):
         self.select_button = CTkButton(
             self.theme_modal_frame,
-            text="Select Theme",
+            text=self.data["ThemeModal"]["buttons"]["select_button"]["text"],
             command=self.select_theme,
             state=tk.DISABLED,
-            width=75,
+            width=self.data["ThemeModal"]["buttons"]["select_button"]["width"],
         )
         self.select_button.grid(row=2, column=0, padx=10, pady=10, sticky="")
 
@@ -104,26 +111,26 @@ class ThemeModal(tk.Toplevel):
         pagination_frame.grid(pady=10)
         self.prev_button = CTkButton(
             pagination_frame,
-            text="Previous",
+            text=self.data["ThemeModal"]["buttons"]["pagination"]["prev_button"]["text"],
             command=self.prev_page,
-            width=75,
-            fg_color="#db7f1f",
-            hover_color="#ed963b",
-            text_color="#ffffff",
+            width=self.data["ThemeModal"]["buttons"]["pagination"]["prev_button"]["width"],
+            fg_color=self.data["ThemeModal"]["buttons"]["pagination"]["prev_button"]["fg_color"],
+            hover_color=self.data["ThemeModal"]["buttons"]["pagination"]["prev_button"]["hover_color"],
+            text_color=self.data["ThemeModal"]["buttons"]["pagination"]["prev_button"]["text_color"],
         )
         self.prev_button.pack(side=tk.LEFT, padx=5)
         self.page_label = CTkLabel(
-            pagination_frame, text=f"Page {self.current_page} of {self.total_pages}"
+            pagination_frame, text=self.data["ThemeModal"]["pagination"]["label_template"].format(current=self.current_page, total=self.total_pages)
         )
         self.page_label.pack(side=tk.LEFT, padx=5)
         self.next_button = CTkButton(
             pagination_frame,
-            text="Next",
+            text=self.data["ThemeModal"]["buttons"]["pagination"]["next_button"]["text"],
             command=self.next_page,
-            width=75,
-            fg_color="#db7f1f",
-            hover_color="#ed963b",
-            text_color="#ffffff",
+            width=self.data["ThemeModal"]["buttons"]["pagination"]["next_button"]["width"],
+            fg_color=self.data["ThemeModal"]["buttons"]["pagination"]["next_button"]["fg_color"],
+            hover_color=self.data["ThemeModal"]["buttons"]["pagination"]["next_button"]["hover_color"],
+            text_color=self.data["ThemeModal"]["buttons"]["pagination"]["next_button"]["text_color"],
         )
         self.next_button.pack(side=tk.LEFT, padx=5)
 
@@ -136,7 +143,7 @@ class ThemeModal(tk.Toplevel):
         self.tag_combobox.bind("<KeyRelease>", self.filter_combobox)
         self.tag_combobox.bind("<<ComboboxSelected>>", self.update_search)
 
-        self.tag_info_label = CTkLabel(tags_frame, text="Select a tag to filter")
+        self.tag_info_label = CTkLabel(tags_frame, text=self.data["ThemeModal"]["tags"]["info_label"])
         self.tag_info_label.grid(row=0, column=1, padx=10, pady=10, sticky="W")
 
     def populate_tags(self):
@@ -161,7 +168,8 @@ class ThemeModal(tk.Toplevel):
         try:
             self.select_button.configure(text="Retrying")
             self.theme_manager = ThemeManager(
-                self.THEMES_DATA_PATH, self.THEMES_DATA_URL
+                os.path.join(self.base_dir, self.data["ThemeModal"]["themes"]["data_path"]),
+                self.data["ThemeModal"]["themes"]["data_url"]
             )
             self.update_treeview()  # Update the treeview after retrying
             if self.theme_manager.get_all_themes():
@@ -307,7 +315,7 @@ class ThemeModal(tk.Toplevel):
             )
     
             if theme_data:
-                ThemeDetailModal(self, theme_data, self.cache_dir)
+                ThemeDetailModal(self, theme_data, self.cache_dir, base_dir=self.base_dir)
 
     def next_page(self):
         if self.current_page < self.total_pages:

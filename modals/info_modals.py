@@ -35,11 +35,11 @@ class InfoModals(tk.Toplevel):
         """Load data from JSON file."""
         try:
             data_file_path = path.join(
-                self.base_dir, "data", "installer_data.json"
+                self.base_dir, "data", "modals","info_modals_data.json"
             )
             with open(data_file_path, "r", encoding="utf-8") as file:
                 self.installer_data = load(file)
-            self.text_data = self.installer_data.get("common_values", {}).get(
+            self.text_data = self.installer_data.get(
                 "modals", {}
             )
         except FileNotFoundError:

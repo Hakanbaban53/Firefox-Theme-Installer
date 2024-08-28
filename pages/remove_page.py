@@ -28,10 +28,12 @@ class RemovePage(CTkFrame):
         self.ICON_PATH = os.path.join(base_dir, "assets", "icons")
         self.BACKGROUND_PATH = os.path.join(base_dir, "assets", "backgrounds")
         self.DATA_PATH = os.path.join(base_dir, "data", "installer_data.json")
+        self.navigation_button_data_path = os.path.join(self.base_dir,"data", "components", "navigation_button_data.json")
         self.profile_folder_location = get_profile_folder(self.DATA_PATH)
 
-        self.load_text_data()
-        self.button_data = self.text_data.get("common_values")["navigation_buttons"]
+        self.text_data = self.load_json_data(self.DATA_PATH)
+        self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
+        self.button_data = self.navigation_button_data["navigation_buttons"]
         self.input_data = self.text_data.get("common_values")["inputs"]
 
         self.os_values = OSProperties(self.DATA_PATH).get_values()
@@ -42,9 +44,10 @@ class RemovePage(CTkFrame):
         self.configure_layout()
         self.create_widgets()
 
-    def load_text_data(self):
-        with open(self.DATA_PATH, "r", encoding="utf-8") as file:
-            self.text_data = load(file)
+    def load_json_data(self, path):
+        with open(path, "r") as file:
+            return load(file)
+
 
     def load_image(self, file_name, size):
         return CTkImage(

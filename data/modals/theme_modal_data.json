@@ -1,0 +1,62 @@
+{
+    "ThemeModal": {
+      "window": {
+        "background_color": "#2B2631",
+        "icon_path": "assets/icons/firefox.ico"
+      },
+      "themes": {
+        "data_url": "https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/themes.json",
+        "data_path": "data/themes.json",
+        "items_per_page": 15
+      },
+      "search_bar": {
+        "placeholder_text": "Search themes..."
+      },
+      "treeview": {
+        "columns": ["Title", "Description"],
+        "description_column_width": 400,
+        "oddrow_background": "#f2f2f2",
+        "evenrow_background": "#ffffff"
+      },
+      "buttons": {
+        "select_button": {
+          "text": "Select Theme",
+          "width": 75,
+          "disabled_color": "#D8000C"
+        },
+        "retry_button": {
+          "text": "Retry",
+          "text_color": "#ffffff",
+          "hover_color": "#fc3d47",
+          "fg_color": "#D8000C"
+        },
+        "pagination": {
+          "prev_button": {
+            "text": "Previous",
+            "width": 75,
+            "fg_color": "#db7f1f",
+            "hover_color": "#ed963b",
+            "text_color": "#ffffff"
+          },
+          "next_button": {
+            "text": "Next",
+            "width": 75,
+            "fg_color": "#db7f1f",
+            "hover_color": "#ed963b",
+            "text_color": "#ffffff"
+          }
+        }
+      },
+      "tags": {
+        "info_label": "Select a tag to filter"
+      },
+      "pagination": {
+        "label_template": "Page {current} of {total}"
+      },
+      "error_messages": {
+        "no_themes": "No themes available. Please check your theme source or internet connection.",
+        "retry_failed": "Retry failed: {error}"
+      }
+    }
+  }
+  

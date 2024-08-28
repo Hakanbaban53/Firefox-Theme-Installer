@@ -26,9 +26,12 @@ class StatusPage(CTkFrame):
         self.ICON_PATH = path.join(base_dir, "assets", "icons")
         self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds")
         self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
+        self.navigation_button_data_path = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
 
-        self.load_text_data()
-        self.button_data = self.text_data.get("common_values")["navigation_buttons"]
+
+        self.text_data = self.load_json_data(self.DATA_PATH)
+        self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
+        self.button_data = self.navigation_button_data["navigation_buttons"]
         self.come_from_which_page = None
 
         self.os_values = OSProperties(self.DATA_PATH).get_values()
@@ -39,9 +42,9 @@ class StatusPage(CTkFrame):
         self.configure_layout()
         self.create_widgets()
 
-    def load_text_data(self):
-        with open(self.DATA_PATH, "r", encoding="utf-8") as file:
-            self.text_data = load(file)
+    def load_json_data(self, path):
+        with open(path, "r") as file:
+            return load(file)
 
     def load_image(self, file_name, size):
         return CTkImage(
@@ -206,8 +209,6 @@ class StatusPage(CTkFrame):
         self.come_from_which_page = kwargs.get("come_from_which_page")
         profile_folder = kwargs.get("profile_folder")
         application_folder = kwargs.get("application_folder")
-        new_tab_wallpaper = kwargs.get("new_tab_wallpaper")
-        accent_color = kwargs.get("accent_color")
 
         if self.come_from_which_page == "install":
             self.action_label.configure(text="Installing...")
@@ -232,17 +233,6 @@ class StatusPage(CTkFrame):
             self.file_actions.move_file(
                 path.join(self.base_dir, "fx-autoconfig", "user.js"), profile_folder
             )
-
-
-            if new_tab_wallpaper != "Default Wallpaper" and new_tab_wallpaper is not None:
-                self.file_actions.move_existing_file(
-                    new_tab_wallpaper,
-                    path.join(profile_folder, "chrome", "img", "new_tab_wallpaper.jpg"),
-                )
-
-            VariableUpdater(
-                path.join(self.base_dir, "chrome", "includes", "realfire-colours.css")
-            ).update_variable("--accent-color", accent_color)
 
         elif self.come_from_which_page == "remove":
             self.action_label.configure(text="Removing...")

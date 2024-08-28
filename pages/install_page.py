@@ -31,12 +31,15 @@ class InstallPage(CTkFrame):
         self.ICON_PATH = path.join(self.base_dir, "assets", "icons/")
         self.BACKGROUND_PATH = path.join(self.base_dir, "assets", "backgrounds/")
         self.DATA_PATH = path.join(self.base_dir, "data", "installer_data.json")
+        self.navigation_button_data_path = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
+
 
         self.profile_folder_location = get_profile_folder(self.DATA_PATH)
         self.theme_dir = None
 
-        self.load_text_data()
-        self.button_data = self.text_data.get("common_values")["navigation_buttons"]
+        self.text_data = self.load_json_data(self.DATA_PATH)
+        self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
+        self.button_data = self.navigation_button_data["navigation_buttons"]
         self.input_data = self.text_data.get("common_values")["inputs"]
 
         self.os_values = OSProperties(self.DATA_PATH).get_values()
@@ -46,9 +49,9 @@ class InstallPage(CTkFrame):
         self.configure_layout()
         self.create_widgets()
 
-    def load_text_data(self):
-        with open(self.DATA_PATH, "r", encoding="utf-8") as file:
-            self.text_data = load(file)
+    def load_json_data(self, path):
+        with open(path, "r") as file:
+            return load(file)
 
     def load_image(self, file_name, size):
         return CTkImage(
@@ -279,6 +282,20 @@ class InstallPage(CTkFrame):
         preview_thread.start()
 
     def preview_theme(self):
+        profile_folder = (SpecialInputFunc().get_variables(self.profile_folder_entry))
+        application_folder = (
+            SpecialInputFunc().get_variables(self.application_folder_entry)
+        )
+
+        self.preview = PreviewTheme(
+            self.base_dir,
+            self.theme_dir,
+            "/tmp/theme_preview",
+            self.os_values["os_name"],
+            self.CSL.get(),
+            profile_folder,
+            application_folder,
+        )
         self.preview.run_firefox()
 
     def create_bottom_widgets(self):
@@ -393,10 +410,4 @@ class InstallPage(CTkFrame):
             self.profile_folder_entry.configure(state="disabled")
 
     def update_parameters(self, **kwargs):
-        print(kwargs)
         self.theme_dir = kwargs.get("theme_dir")
-        self.preview = PreviewTheme(
-            self.theme_dir,
-            "/tmp/theme_preview",
-            self.os_values["os_name"],
-        )
