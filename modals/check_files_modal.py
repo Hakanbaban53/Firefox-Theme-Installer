@@ -10,7 +10,7 @@ from modals.info_modals import InfoModals
 
 
 class FileInstallerModal(tk.Toplevel):
-    def __init__(self, parent, base_dir):
+    def __init__(self, parent, base_dir, theme_dir):
         super().__init__(parent)
         self.transient(parent)
         self.configure(bg="#2B2631")
@@ -19,8 +19,8 @@ class FileInstallerModal(tk.Toplevel):
         self.grab_set()
 
         self.base_dir = base_dir
+        self.theme_dir = theme_dir
         self.data = self.load_ui_data()  # Load UI data from JSON
-        self.load_data()  # Load installer data from JSON
 
         icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
         if os.name == "nt":
@@ -29,22 +29,10 @@ class FileInstallerModal(tk.Toplevel):
             icon = Image.open(icon_path)
             self.iconphoto(True, ImageTk.PhotoImage(icon))
 
-        self.file_manager = FileManager(self.data_file_path)
+        self.file_manager = FileManager(self.theme_dir)
         self.title(self.data["FileInstallerModal"]["title"])
         self.center_window()
         self.create_widgets()
-
-    def load_data(self):
-        """Load data from JSON file."""
-        try:
-            # Load installer data using base_dir
-            self.data_file_path = os.path.join(
-                self.base_dir, "data", "installer_files_data.json"
-            )
-        except FileNotFoundError:
-            raise FileNotFoundError("The installer data file was not found.")
-        except Exception as e:
-            raise Exception(f"An error occurred while loading the data file: {e}")
 
     def load_ui_data(self):
         """Load UI configuration data from JSON file."""

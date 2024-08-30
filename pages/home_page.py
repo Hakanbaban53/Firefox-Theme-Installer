@@ -19,7 +19,6 @@ from modals.theme_modal import ThemeModal
 
 
 class HomePage(CTkFrame):
-    ANIMATION_SPEED = 100
 
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
@@ -31,6 +30,10 @@ class HomePage(CTkFrame):
             path.join(base_dir, "data", "pages", "home_page_data.json")
         ) 
 
+        # Set the animation speed
+        self.ANIMATION_SPEED = self.config_data["additional_settings"]["animation_speed"]
+
+        # Set the paths
         self.ASSETS_PATH = path.join(
             base_dir, self.config_data["data_paths"]["ASSETS_PATH"]
         )
@@ -419,23 +422,24 @@ class HomePage(CTkFrame):
         )
 
     def start_loading_animation(self):
-        self.frames = self.load_gif()  # Load the GIF frames
-        self.update_gif(self.frames)  # Start the GIF animation
+        """Start the loading GIF animation."""
+        self.frames = self.load_gif()
+        self.update_gif(self.frames)
 
     def stop_loading_animation(self):
+        """Stop the loading GIF animation."""
         if hasattr(self, "animation_id"):
-            self.after_cancel(self.animation_id)  # Stop the GIF animation
-            self.detect_files_text.config(
-                image=""
-            )  # Clear the image to stop displaying the GIF
+            self.after_cancel(self.animation_id)
+            self.detect_files_text.config(image="")
 
     def load_gif(self):
+        """Load frames from the GIF file."""
         frames = []
         index = 0
         while True:
             try:
                 frame = PhotoImage(
-                    file=path.join(self.ASSETS_PATH, "icons/block_spin.gif"),
+                    file=path.join(self.ASSETS_PATH, self.config_data["icons"]["block_spin_gif"]),
                     format=f"gif -index {index}",
                 )
                 frames.append(frame)
@@ -445,48 +449,51 @@ class HomePage(CTkFrame):
         return cycle(frames)
 
     def update_gif(self, frames):
+        """Update the GIF animation frame by frame."""
         frame = next(frames)
         self.detect_files_text.config(image=frame)
         self.animation_id = self.after(self.ANIMATION_SPEED, self.update_gif, frames)
 
+    # Theme selection and processing
     def select_theme(self):
+        """Open the theme selection modal and configure UI elements based on selection."""
         self.modal_theme = ThemeModal(self, self.base_dir)
         self.wait_window(self.modal_theme)
         self.recheck_button.grid_remove()
 
-        if (
-            hasattr(self.modal_theme, "theme_selected")
-            and self.modal_theme.theme_selected
-        ):
-            self.detect_files_text.configure(
-                text="Theme Selected ", image=self.theme_selected_icon, fg="#000000"
-            )
-            self.theme_label.configure(
-                text=f"Select Theme: {self.modal_theme.theme_selected.title}"
-            )
-            self.install_files_button.configure(
-                text="Install Theme",
-                state="normal",
-                command=self.get_theme,
-                text_color="#000000",
-                image=None,
-            )
-            self.clean_install.grid(row=7, column=0, padx=10, pady=10, sticky="")
-            self.install_files_button.grid(pady=10)
-            self.install_button.configure(state="disabled")
-        else:
-            self.clear_selection()
+        if getattr(self.modal_theme, "theme_selected", False):
+            self.update_ui_for_selected_theme()
 
-    def clear_selection(self):
-        self.modal_theme = None
-        self.theme_label.configure(text="Select Theme: None")
+
+    def update_ui_for_selected_theme(self):
+        """Update UI when a theme is selected."""
+        updated_ui_data = self.config_data["update_ui_for_selected_theme"]
+
         self.detect_files_text.configure(
-            text="Please Select a Theme",
-            fg="#000000",
-            image=self.theme_not_selected_icon,
+        image=self.theme_selected_icon,
+        text=updated_ui_data["detect_files_text"]["text"],
+        fg=updated_ui_data["detect_files_text"]["fg"],
         )
-        self.install_button.configure(state="disabled")
-        self.install_files_button.grid_remove()
+
+        self.theme_label.configure(
+            text=f"{updated_ui_data["theme_label"]["text"]} {self.modal_theme.theme_selected.title}"
+        )
+        self.install_files_button.configure(
+            command=self.get_theme,
+            text=updated_ui_data["install_files_button"]["text"],
+            text_color=updated_ui_data["install_files_button"]["text_color"],
+            image=None,
+            state=updated_ui_data["install_files_button"]["state"],
+        )
+        self.clean_install.grid(
+            row=updated_ui_data["clean_install"]["grid_data"]["row"],
+            column=updated_ui_data["clean_install"]["grid_data"]["column"],
+            padx=updated_ui_data["clean_install"]["grid_data"]["padx"],
+            pady=updated_ui_data["clean_install"]["grid_data"]["pady"],
+            sticky=updated_ui_data["clean_install"]["grid_data"]["sticky"], 
+        )
+        self.install_files_button.grid(pady=updated_ui_data["install_files_button"]["grid_data"]["pady"])
+        self.install_button.configure(updated_ui_data["install_button"]["state"])
 
     def run_theme_process(self):
         """Run the theme processing logic."""
@@ -499,65 +506,83 @@ class HomePage(CTkFrame):
 
         if isinstance(self.theme_data, dict):
             theme_type = self.theme_data.get("type")
-            if theme_type == "data":
-                self.handle_data_json_theme()
-            elif theme_type == "userChrome.css":
-                self.handle_userChrome_theme()
-            else:
-                self.no_theme_data_found()
+            self.handle_theme_type(theme_type)
+        else:
+            self.no_theme_data_found()
+
+    def handle_theme_type(self, theme_type):
+        """Handle different types of themes based on the theme data."""
+        if theme_type == "data":
+            self.handle_data_json_theme()
+        elif theme_type == "userChrome.css":
+            self.handle_userChrome_theme()
         else:
             self.no_theme_data_found()
 
     def handle_data_json_theme(self):
+        """Handle themes that have their own data JSON file."""
+        handle_data_json_theme = self.config_data["handle_data_json_theme"]
         self.detect_files_text.configure(
-            text="Theme has its own data JSON", fg="#00FF00"
+            text=handle_data_json_theme["detect_files_text"]["text"],
+            fg=handle_data_json_theme["detect_files_text"]["fg"],
         )
         self.data_json_path = self.theme_data.get("path")
-        thread = Thread(target=self.fetch_files)
-        thread.start()
+        self.start_thread(self.fetch_files)
         self.clean_install.grid_remove()
 
     def handle_userChrome_theme(self):
+        """Handle themes that include a userChrome.css file."""
+        handle_userChrome_theme = self.config_data["handle_userChrome_theme"]
         self.detect_files_text.configure(
-            text="Theme has userChrome.css file", fg="#00FF00"
+            text=handle_userChrome_theme["detect_files_text"]["text"],
+            fg=handle_userChrome_theme["detect_files_text"]["fg"],
         )
-        self.install_button.configure(state="normal")
-        self.recheck_button.configure(state="normal", command=self.get_theme)
+        self.install_button.configure(
+            state=handle_userChrome_theme["install_button"]["state"]
+        )
+        self.recheck_button.configure(
+            state=handle_userChrome_theme["recheck_button"]["state"],
+            command=self.get_theme)
         self.install_files_button.configure(
-            text="Installed",
-            fg_color="#D9D9D9",
-            state="disabled",
             image=self.check_icon,
-            text_color="#000000",
-        )
+            text=handle_userChrome_theme["install_files_button"]["text"],
+            text_color=handle_userChrome_theme["install_files_button"]["text_color"],
+            state=handle_userChrome_theme["install_files_button"]["state"],
+            fg_color=handle_userChrome_theme["install_files_button"]["fg_color"],
+            width=handle_userChrome_theme["install_files_button"]["width"],
+        )       
         self.check_var = BooleanVar(value=False)
-        self.recheck_button.grid(row=1, column=0, padx=10, pady=0, sticky="")
+        self.recheck_button.grid(
+            row=handle_userChrome_theme["recheck_button"]["grid_data"]["row"],
+            column=handle_userChrome_theme["recheck_button"]["grid_data"]["column"],
+            padx=handle_userChrome_theme["recheck_button"]["grid_data"]["padx"],
+            pady=handle_userChrome_theme["recheck_button"]["grid_data"]["pady"],
+            sticky=handle_userChrome_theme["recheck_button"]["grid_data"]["sticky"],
+        )
         self.clean_install.grid_remove()
 
     def no_theme_data_found(self):
+        """Handle cases where no valid theme data is found."""
+        no_theme_data_found = self.config_data["no_theme_data_found"]
         self.detect_files_text.configure(
-            text="No theme data or chrome/userChrome.css found",
-            fg="#FF0000",
+            text=no_theme_data_found["detect_files_text"]["text"],
+            fg=no_theme_data_found["detect_files_text"]["fg"],
         )
         self.install_files_button.configure(
-            text="Installed",
-            fg_color="#D9D9D9",
-            state="disabled",
             image=self.check_icon,
-            text_color="#000000",
+            text=no_theme_data_found["install_files_button"]["text"],
+            text_color=no_theme_data_found["install_files_button"]["text_color"],
+            state=no_theme_data_found["install_files_button"]["state"],
+            fg_color=no_theme_data_found["install_files_button"]["fg_color"],
+            width=no_theme_data_found["install_files_button"]["width"],
+        )  
+        self.install_button.configure(
+            state=no_theme_data_found["install_button"]["state"]
         )
-        self.install_button.configure(state="disabled")
 
-    def handle_fetch_files_failure(self):
-        self.install_files_button.configure(
-            text="Failed to Fetch Files Data",
-            text_color="#f04141",
-            image=self.attention_icon,
-        )
-        self.clean_install.grid(row=7, column=0, padx=10, pady=10, sticky="")
-        self.install_files_button.configure(state="disabled")
-
+    # File handling and animations
     def locate_files(self):
+        """Check if all necessary theme files are present."""
         file_check_result = FileManager(self.data_json_path).check_files_exist(
             root=self.base_dir
         )
@@ -568,113 +593,169 @@ class HomePage(CTkFrame):
             self.handle_all_files_installed()
 
     def handle_all_files_installed(self):
+        """Update UI when all theme files are installed."""
+        handle_all_files_installed = self.config_data["handle_all_files_installed"]
         self.install_files_button.configure(
-            text="All Files Installed",
-            text_color="#10dc60",
+            width=handle_all_files_installed["install_files_button"]["width"],
+            text=handle_all_files_installed["install_files_button"]["text"],
+            text_color=handle_all_files_installed["install_files_button"]["text_color"],
+            state=handle_all_files_installed["install_files_button"]["state"],
             image=self.check_icon,
-            state="disabled",
         )
-        self.install_button.configure(state="normal")
-        self.recheck_button.grid(row=7, column=1, padx=0, pady=10, sticky="")
+        self.install_button.configure(state=handle_all_files_installed["install_button"]["state"])
+        self.recheck_button.grid(
+            row=handle_all_files_installed["recheck_button"]["grid_data"]["row"],
+            column=handle_all_files_installed["recheck_button"]["grid_data"]["column"],
+            padx=handle_all_files_installed["recheck_button"]["grid_data"]["padx"],
+            pady=handle_all_files_installed["recheck_button"]["grid_data"]["pady"],
+            sticky=handle_all_files_installed["recheck_button"]["grid_data"]["sticky"],
+        )
         self.clean_install.grid_remove()
 
     def handle_missing_files(self):
+        """Update UI when some theme files are missing."""
+        handle_missing_files = self.config_data["handle_missing_files"]
         self.install_files_button.configure(
-            text="Some Files Are Missing",
-            text_color="#f04141",
-            image=self.attention_icon,
-            command=self.install_files,
-            state="normal",
+            text=handle_missing_files["install_files_button"]["text"],
+            text_color=handle_missing_files["install_files_button"]["text_color"],
+            state=handle_missing_files["install_files_button"]["state"],
+            width=handle_missing_files["install_files_button"]["width"],
+            image=self.attention_icon, command=self.install_files
         )
-        self.install_files_button.grid(row=2, column=0, padx=10, pady=10, sticky="")
-        self.recheck_button.grid(row=7, column=1, padx=0, pady=10, sticky="")
+        self.install_files_button.grid(
+            row=handle_missing_files["install_files_button"]["grid_data"]["row"],
+            column=handle_missing_files["install_files_button"]["grid_data"]["column"],
+            padx=handle_missing_files["install_files_button"]["grid_data"]["padx"],
+            pady=handle_missing_files["install_files_button"]["grid_data"]["pady"],
+            sticky=handle_missing_files["install_files_button"]["grid_data"]["sticky"],
+        )
+        self.recheck_button.grid(
+            row=handle_missing_files["recheck_button"]["grid_data"]["row"],
+            column=handle_missing_files["recheck_button"]["grid_data"]["column"],
+            padx=handle_missing_files["recheck_button"]["grid_data"]["padx"],
+            pady=handle_missing_files["recheck_button"]["grid_data"]["pady"],
+            sticky=handle_missing_files["recheck_button"]["grid_data"]["sticky"],
+        )
 
     def install_files(self):
-        modal = FileInstallerModal(self, self.base_dir)
+        """Open modal to install missing files and recheck afterward."""
+        theme_dir=self.theme_data.get("path")
+        modal = FileInstallerModal(self, self.base_dir, theme_dir)
         self.wait_window(modal)
         self.recheck_files()
 
     def refetch_files(self):
+        """Refetch necessary files and update UI."""
+        refetch_files = self.config_data["refetch_files"]
         self.install_files_button.configure(
-            text="Fetching The Files", text_color="#000000", state="disabled"
+            text=refetch_files["install_files_button"]["text"],
+            text_color=refetch_files["install_files_button"]["text_color"],
+            state=refetch_files["install_files_button"]["state"],
         )
-        self.install_button.configure(state="disabled")
+        self.install_button.configure(state=refetch_files["install_button"]["state"])
         self.clean_install.grid_remove()
-        thread = Thread(target=self.fetch_files)
-        thread.start()
+        self.start_thread(self.fetch_files)
 
+    # Thread and file fetching management
     def get_theme(self):
         """Handle the theme installation process."""
-        self.start_loading_animation()  # Start the loading GIF
+        get_theme = self.config_data["get_theme"]
+        self.start_loading_animation()
         self.get_neccessary_files()
         self.install_files_button.configure(
-            text="Installing Files", text_color="#000000", state="disabled"
+            text=get_theme["install_files_button"]["text"],
+            text_color=get_theme["install_files_button"]["text_color"],
+            state=get_theme["install_files_button"]["state"],
         )
-        self.detect_files_text.config(text="Installing Theme Files", fg="#000000")
-        thread = Thread(target=self.run_theme_process)
-        thread.start()
-        self.check_thread(thread)
+        self.detect_files_text.config(
+            text=get_theme["detect_files_text"]["text"], fg=get_theme["detect_files_text"]["fg"]
+        )
+        self.start_thread(self.run_theme_process)
 
     def get_neccessary_files(self):
-        # Disable the button and change the text
-        self.detect_files_text.config(text="Installing Necessary Files", fg="#000000")
-        custom_script_loader = FileManager(
-            self.CUSTOM_SCRIPT_LOADER_PATH
-        ).load_json_data()
+        """Fetch and check necessary files for the theme."""
+        get_neccessary_files = self.config_data["get_neccessary_files"]
+        self.detect_files_text.config(
+            text=get_neccessary_files["detect_files_text"]["text"],
+            fg=get_neccessary_files["detect_files_text"]["fg"],
+        )
+        custom_script_loader = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).load_json_data()
 
         if custom_script_loader:
-            missing_files = FileManager(
-                self.CUSTOM_SCRIPT_LOADER_PATH
-            ).check_files_exist(custom_script_loader)
+            missing_files = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).check_files_exist(custom_script_loader)
             if missing_files:
-                thread = Thread(
-                    target=FileManager(
-                        self.CUSTOM_SCRIPT_LOADER_PATH
-                    ).download_missing_files,
-                    args=(missing_files,),
-                )
-                thread.start()
-                self.check_thread(thread)
+                self.start_thread(FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).download_missing_files, missing_files)
             else:
-                # print("All necessary files are already present.")
                 self.stop_loading_animation()
         else:
-            # print("Failed to load custom script loader data.")
             self.stop_loading_animation()
+
+    def fetch_files(self):
+        """Fetch files based on data JSON path."""
+        fetch_files = self.config_data["fetch_files"]
+        self.start_loading_animation()
+        fetch_files_data = FileManager(self.data_json_path).load_json_data()
+        self.recheck_button.configure(
+            fetch_files["recheck_button"]["state"],
+            command=self.refetch_files)
+        self.recheck_button.grid(
+            row=fetch_files["recheck_button"]["grid_data"]["row"],
+            column=fetch_files["recheck_button"]["grid_data"]["column"],
+            padx=fetch_files["recheck_button"]["grid_data"]["padx"],
+            pady=fetch_files["recheck_button"]["grid_data"]["pady"],
+            sticky=fetch_files["recheck_button"]["grid_data"]["sticky"],
+        )
+
+        if fetch_files_data:
+            self.start_thread(self.locate_files)
+        else:
+            self.handle_fetch_files_failure()
+            self.stop_loading_animation()
+
+    def recheck_files(self):
+        """Recheck file status and update UI."""
+        recheck_files = self.config_data["recheck_files"]
+        self.start_loading_animation()
+        self.install_files_button.configure(
+            text=recheck_files["install_files_button"]["text"],
+            text_color=recheck_files["install_files_button"]["text_color"],
+            state=recheck_files["install_files_button"]["state"],
+        )
+        self.install_button.configure(recheck_files["install_button"]["state"])
+        self.clean_install.grid_remove()
+        self.start_thread(self.locate_files)
+
+    # Helper functions
+    def start_thread(self, target, *args):
+        """Start a new thread for the specified target function."""
+        thread = Thread(target=target, args=args)
+        thread.start()
+        self.check_thread(thread)
 
     def check_thread(self, thread):
         """Check if the thread is finished and update the UI accordingly."""
         if thread.is_alive():
             self.after(100, self.check_thread, thread)
         else:
-            self.stop_loading_animation()  # Stop the loading GIF
+            self.stop_loading_animation()
 
-    def fetch_files(self):
-        self.start_loading_animation()  # Start the loading GIF
-        fetch_files_data = FileManager(self.data_json_path).load_json_data()
-        self.recheck_button.configure(state="normal", command=self.refetch_files)
-        self.recheck_button.grid(
-            row=1, column=0, padx=0, pady=5, columnspan=2, sticky=""
-        )
-
-        if fetch_files_data:
-            thread = Thread(target=self.locate_files)
-            thread.start()
-            self.check_thread(thread)
-        else:
-            self.handle_fetch_files_failure()
-            self.stop_loading_animation()  # Stop the loading GIF
-
-    def recheck_files(self):
-        self.start_loading_animation()  # Start the loading GIF
+    def handle_fetch_files_failure(self):
+        """Handle the failure to fetch files."""
+        handle_fetch_files_failure = self.config_data["handle_fetch_files_failure"]
         self.install_files_button.configure(
-            text="Checking The Files", text_color="#000000", state="disabled"
+            image=self.attention_icon,
+            text=handle_fetch_files_failure["install_files_button"]["text"],
+            text_color=handle_fetch_files_failure["install_files_button"]["text_color"],
+            state=handle_fetch_files_failure["install_files_button"]["state"],
         )
-        self.install_button.configure(state="disabled")
-        self.clean_install.grid_remove()
-        thread = Thread(target=self.locate_files)
-        thread.start()
-        self.check_thread(thread)
+        self.clean_install.grid(
+            row=handle_fetch_files_failure["clean_install"]["grid_data"]["row"],
+            column=handle_fetch_files_failure["clean_install"]["grid_data"]["column"],
+            padx=handle_fetch_files_failure["clean_install"]["grid_data"]["padx"],
+            pady=handle_fetch_files_failure["clean_install"]["grid_data"]["pady"],
+            sticky=handle_fetch_files_failure["clean_install"]["grid_data"]["sticky"],
+        )
+
 
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed

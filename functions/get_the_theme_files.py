@@ -4,7 +4,6 @@ import os
 import shutil
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
-# import logging
 
 class ThemeDownloader:
     def __init__(self, theme_data, extract_path, clean_install, base_dir=None):
@@ -17,18 +16,37 @@ class ThemeDownloader:
         self.base_dir = base_dir
 
         os.makedirs(extract_path, exist_ok=True)
-        # logging.basicConfig(level=logging.INFO)
 
     def theme_already_downloaded(self):
+        # Check if the theme folder already exists
         return os.path.exists(self.theme_folder_path)
-    
+
+    def zip_file_exists_and_valid(self):
+        # Check if the zip file exists and is not corrupted
+        if not os.path.exists(self.zip_path):
+            return False
+        try:
+            with zipfile.ZipFile(self.zip_path, 'r') as zip_ref:
+                bad_file = zip_ref.testzip()
+                if bad_file is not None:
+                    print(f"Corrupt file detected: {bad_file}")
+                    return False
+            return True
+        except zipfile.BadZipFile:
+            print("Bad zip file detected.")
+            return False
+
     def download_theme(self):
+        if self.zip_file_exists_and_valid():
+            print("Zip file already downloaded and valid.")
+            return True
+        
         # Define a session to manage retries
         session = requests.Session()
         retry = Retry(
-            total=5,  # Total retries
-            backoff_factor=0.3,  # Wait time between retries
-            status_forcelist=[500, 502, 503, 504]  # Retry on these status codes
+            total=5,  
+            backoff_factor=0.3,  
+            status_forcelist=[500, 502, 503, 504]  
         )
         adapter = HTTPAdapter(max_retries=retry)
         session.mount('http://', adapter)
@@ -52,38 +70,39 @@ class ThemeDownloader:
 
     def extract_theme(self):
         if self.theme_already_downloaded() and not self.clean_install:
-            # logging.info("Theme already extracted.")
+            print("Theme already extracted.")
             return True
 
+        # Clean install: remove existing folder if it exists
         if self.clean_install and os.path.exists(self.theme_folder_path):
             shutil.rmtree(self.theme_folder_path)
-            # logging.info("Existing theme directory removed for clean install.")
+            print("Existing theme directory removed for clean install.")
 
         try:
-            # logging.info("Starting extraction...")
+            print("Starting extraction...")
             with zipfile.ZipFile(self.zip_path, "r") as zip_ref:
                 zip_ref.extractall(self.extract_path)
-            # logging.info("Extraction completed successfully.")
+            print("Extraction completed successfully.")
             return True
         except zipfile.BadZipFile as e:
-            # logging.error(f"Failed to extract theme: {e}")
+            print(f"Failed to extract theme: {e}")
             raise e
 
     def check_theme_files(self):
         data_json_path = os.path.join(self.theme_folder_path, "data", "installer_files_data.json")
 
         if os.path.exists(data_json_path):
-            # logging.info("Theme has its own data JSON.")
+            print("Theme has its own data JSON.")
             self.user_js_target_dir = os.path.join(self.base_dir, "chrome")
             return {"type": "data", "path": data_json_path}
 
         for root, dirs, files in os.walk(self.theme_folder_path):
             if "userChrome.css" in files:
-                # logging.info("Theme has userChrome.css file.")
+                print("Theme has userChrome.css file.")
                 self.user_js_target_dir = root
                 return {"type": "userChrome.css", "path": root}
 
-        # logging.warning("No theme data or chrome/userChrome.css found.")
+        print("No theme data or chrome/userChrome.css found.")
         return None
 
     def process_theme(self):
@@ -93,5 +112,5 @@ class ThemeDownloader:
                 return theme_data
             return False
         except Exception as e:
-            # logging.error(f"An error occurred: {e}")
+            print(f"An error occurred: {e}")
             raise e
