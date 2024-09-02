@@ -1,0 +1,21 @@
+{
+    "data_paths": {
+        "ASSETS_PATH": "assets",
+        "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
+        "OS_PROPERTIES_PATH": "data/OS data/os_properties.json",
+        "INPUTS_DATA_PATH": "data/components/inputs_data.json"
+    },
+    "icons": {
+        "attention_icon": "icons/attention.png",
+        "header_title_bg": "backgrounds/header_title_background.png",
+        "line_top_img": "backgrounds/line_top.png",
+        "preview_icon": "icons/preview_icon.png",
+        "theme_not_detected_icon": "icons/theme-not-selected.png",
+        "theme_detected_icon": "icons/theme-selected.png",
+        "os_icons": {
+          "windows": "icons/windows.png",
+          "linux": "icons/linux.png",
+          "mac": "icons/mac.png"
+        }
+      }
+}

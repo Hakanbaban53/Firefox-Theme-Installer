@@ -14,10 +14,19 @@ class Theme:
 
     def convert_image_url(self, image_path):
         base_url = 'https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/'
-        return base_url + image_path
-
-    def __repr__(self):
-        return f"Theme(title={self.title}, link={self.link})"
+        if image_path.startswith('https://') or image_path.startswith('http://'):
+            return image_path
+        else:
+            return base_url + image_path
+    
+    def to_dict(self):
+        return {
+            "title": self.title,
+            "link": self.link,
+            "description": self.description,
+            "image": self.image,
+            "tags": self.tags,
+        }
 
 class ThemeManager:
     def __init__(self, json_file_path, json_file_url, check_file_age=False):

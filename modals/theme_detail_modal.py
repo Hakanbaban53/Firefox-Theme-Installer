@@ -17,7 +17,6 @@ class ThemeDetailModal(tk.Toplevel):
         self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.theme = theme
-        print(f"Opening theme detail for: {theme}")
 
         self.data = self.load_ui_data()  # Load UI data from JSON
         self.cache_expiration = self.data["ThemeDetailModal"]["cache_expiration"]

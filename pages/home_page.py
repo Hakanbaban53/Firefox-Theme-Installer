@@ -322,6 +322,7 @@ class HomePage(CTkFrame):
                     if self.theme_data.get("type") == "userChrome.css"
                     else path.join(self.base_dir, "chrome")
                 ),
+                selected_theme_data = self.modal_theme.theme_selected.to_dict() # We sent the selected theme data a dictionary format.
             ),
             padding_x=(5, 5),
             side="right",

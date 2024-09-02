@@ -1,8 +1,8 @@
-from json import load
+from json import JSONDecodeError, load
 from os import path
 
 import threading
-from tkinter import BooleanVar, colorchooser
+from tkinter import BooleanVar
 from customtkinter import (
     CTkFrame,
     CTkImage,
@@ -11,15 +11,19 @@ from customtkinter import (
     CTkEntry,
     CTkCheckBox,
     StringVar,
+    CTkButton,
 )
 from PIL import Image
 
+from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
+from functions.get_theme_data import Theme
 from functions.preview_theme import PreviewTheme
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.get_folder_locations import GetFolderLocations
 from functions.special_input_functions import SpecialInputFunc
+from modals.theme_detail_modal import ThemeDetailModal
 
 
 class InstallPage(CTkFrame):
@@ -28,26 +32,45 @@ class InstallPage(CTkFrame):
         self.controller = controller
         self.base_dir = base_dir
         self.theme_dir = None
+        self.theme_data = None
 
-        self.ICON_PATH = path.join(base_dir, "assets", "icons/")
-        self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds/")
-        self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
-        self.NAVIGATION_BUTTON_DATA_PATH = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
-        self.OS_PROPERTIES_PATH = path.join(base_dir, "data", "OS data", "os_properties.json")
-        self.INPUTS_DATA_PATH = path.join(base_dir, "data", "components", "inputs_data.json")
+        self.config_data = self.load_json_data(
+            path.join(base_dir, "data", "pages", "install_page_data.json")
+        )
 
+        # Set the paths
+        self.ASSETS_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["ASSETS_PATH"]
+        )
+        self.NAVIGATION_BUTTON_DATA_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+        )
+        self.OS_PROPERTIES_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["OS_PROPERTIES_PATH"]
+        )
+        self.INPUTS_DATA_PATH = path.join(
+            base_dir, self.config_data["data_paths"]["INPUTS_DATA_PATH"]
+        )
+        self.cache_dir = path.join(self.base_dir, "image_cache")
 
-        self.text_data = self.load_json_data(self.DATA_PATH)
-        self.navigation_button_data=self.load_json_data(self.NAVIGATION_BUTTON_DATA_PATH)
+        self.navigation_button_data = self.load_json_data(
+            self.NAVIGATION_BUTTON_DATA_PATH
+        )
         self.inputs_data = self.load_json_data(self.INPUTS_DATA_PATH)
 
         self.button_data = self.navigation_button_data["navigation_buttons"]
         self.input_data = self.inputs_data["inputs"]
 
+        self.header = CreateHeader()
         self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.input_values = OSProperties(self.OS_PROPERTIES_PATH).get_locations()
         self.navigation_button = NavigationButton(self.button_data)
-        self.profile_folder_location = GetFolderLocations(self.os_values).get_profile_folder()
+        self.profile_folder_location = GetFolderLocations(
+            self.os_values
+        ).get_profile_folder()
+
+        self.chrome_folder = path.join(self.profile_folder_location, "chrome")
+        self.theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
 
         self.configure_layout()
         self.create_widgets()
@@ -55,13 +78,6 @@ class InstallPage(CTkFrame):
     def load_json_data(self, path):
         with open(path, "r") as file:
             return load(file)
-
-    def load_image(self, file_name, size):
-        return CTkImage(
-            light_image=Image.open(file_name),
-            dark_image=Image.open(file_name),
-            size=size,
-        )
 
     def configure_layout(self):
         self.fg_color = "#2B2631"
@@ -76,35 +92,122 @@ class InstallPage(CTkFrame):
         self.install_page_frame.columnconfigure(0, weight=1)
 
     def create_widgets(self):
+        self.create_images()
         self.create_header()
+        self.create_installed_themes_frame()
         self.create_inputs()
         self.create_invalid_entry_frame()
         self.create_preview_theme()
         self.create_bottom_widgets()
         self.update_button_and_frame()
         self.checkbox_event()
+        self.detect_installed_theme()
+
+    def create_images(self):
+        # Load icons and images based on JSON paths
+        icons = self.config_data["icons"]
+        self.attention_icon = CTkImage(
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["attention_icon"])
+            ),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["attention_icon"])),
+            size=(24, 24),
+        )
+        self.header_title_bg = CTkImage(
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["header_title_bg"])
+            ),
+            dark_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["header_title_bg"])
+            ),
+            size=(390, 64),
+        )
+        self.line_top_img = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
+            size=(650, 6),
+        )
+        self.os_icon_image = CTkImage(
+            light_image=Image.open(
+                path.join(
+                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
+                )
+            ),
+            dark_image=Image.open(
+                path.join(
+                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
+                )
+            ),
+            size=(20, 24),
+        )
+        self.preview_icon = CTkImage(
+            light_image=Image.open(path.join(self.ASSETS_PATH, icons["preview_icon"])),
+            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["preview_icon"])),
+            size=(24, 24),
+        )
+
+        self.theme_detected_icon = CTkImage(
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["theme_detected_icon"])
+            ),
+            dark_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["theme_detected_icon"])
+            ),
+            size=(24, 32),
+        )
+        self.theme_not_detected_icon = CTkImage(
+            light_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["theme_not_detected_icon"])
+            ),
+            dark_image=Image.open(
+                path.join(self.ASSETS_PATH, icons["theme_not_detected_icon"])
+            ),
+            size=(24, 32),
+        )
 
     def create_header(self):
-        header_title_bg = self.load_image(
-            f"{self.BACKGROUND_PATH}header_title_background.png", (300, 64)
+        self.header.create_header(
+            self.install_page_frame, self.header_title_bg, self.line_top_img
         )
-        line_top_img = self.load_image(f"{self.BACKGROUND_PATH}line_top.png", (650, 6))
 
-        header_label = CTkLabel(
+    def create_installed_themes_frame(self):
+        installed_themes_frame = CTkFrame(
             self.install_page_frame,
-            text="Install RealFire",
-            image=header_title_bg,
-            text_color="White",
-            font=CTkFont(family="Inter", size=24, weight="bold"),
-            bg_color="#2B2631",
+            width=440,
+            height=60,
+            corner_radius=12,
+            fg_color="white",
         )
-        header_label.grid(
-            row=0, column=0, columnspan=2, padx=203, pady=(35, 0), sticky="NSEW"
+        installed_themes_frame.grid(
+            row=2, column=0, columnspan=2, padx=40, pady=0, sticky=""
         )
 
-        line_top_label = CTkLabel(self.install_page_frame, text="", image=line_top_img)
-        line_top_label.grid(
-            row=1, column=0, columnspan=2, padx=10, pady=10, sticky="NSEW"
+        self.installed_themes_label = CTkLabel(
+            installed_themes_frame,
+            text="",
+            text_color="black",
+            font=("Arial", 18, "bold"),
+            compound="right",
+        )
+        self.installed_themes_label.pack(padx=(10, 4), pady=10, side="left")
+
+        self.theme_details_button = CTkButton(
+            installed_themes_frame,
+            text="Theme Details",
+            height=42,
+            fg_color="#D9D9D9",
+            hover_color="#EEEEEE",
+            corner_radius=12,
+            text_color="#000000",
+            compound="right",
+            font=("Arial", 16, "bold"),
+            image=self.theme_detected_icon,
+            command=lambda: ThemeDetailModal(
+                self,
+                theme=self.theme_data,
+                cache_dir=self.cache_dir,
+                base_dir=self.base_dir,
+            ),
         )
 
     def create_inputs(self):
@@ -116,7 +219,7 @@ class InstallPage(CTkFrame):
             fg_color="#2B2631",
         )
         inputs_frame.grid(
-            row=2, column=0, columnspan=2, padx=40, pady=(10, 20), sticky="NSEW"
+            row=3, column=0, columnspan=2, padx=40, pady=(10, 20), sticky="NSEW"
         )
 
         self.create_input_widgets(inputs_frame)
@@ -239,13 +342,12 @@ class InstallPage(CTkFrame):
             row=4, column=0, columnspan=2, padx=(10, 4), pady=10
         )
 
-        attention_icon = self.load_image(f"{self.ICON_PATH}attention.png", (24, 24))
         self.invalid_entries_text = CTkLabel(
             self.invalid_entry_frame,
             text="",
             text_color="#f04141",
             font=("Arial", 16, "bold"),
-            image=attention_icon,
+            image=self.attention_icon,
             compound="left",
         )
         self.invalid_entries_text.pack(padx=10, pady=10)
@@ -273,7 +375,7 @@ class InstallPage(CTkFrame):
         self.navigation_button.create_navigation_button(
             preview_frame,
             text="Preview Theme",
-            image_path=self.ICON_PATH + "preview_icon.png",
+            image_path=path.join(self.ASSETS_PATH, "icons/preview_icon.png"),
             side="right",
             padding_x=10,
             command=self.start_theme_preview_thread,  # Updated to use threading
@@ -285,9 +387,9 @@ class InstallPage(CTkFrame):
         preview_thread.start()
 
     def preview_theme(self):
-        profile_folder = (SpecialInputFunc().get_variables(self.profile_folder_entry))
-        application_folder = (
-            SpecialInputFunc().get_variables(self.application_folder_entry)
+        profile_folder = SpecialInputFunc().get_variables(self.profile_folder_entry)
+        application_folder = SpecialInputFunc().get_variables(
+            self.application_folder_entry
         )
 
         self.preview = PreviewTheme(
@@ -324,7 +426,7 @@ class InstallPage(CTkFrame):
         self.install_button = self.navigation_button.create_navigation_button(
             parent,
             "Install",
-            self.ICON_PATH + "install_icon.png",
+            path.join(self.ASSETS_PATH, "icons/install_icon.png"),
             command=lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="install",
@@ -334,6 +436,11 @@ class InstallPage(CTkFrame):
                 application_folder=SpecialInputFunc().get_variables(
                     self.application_folder_entry
                 ),
+                base_dir=self.base_dir,
+                theme_dir=self.theme_dir,
+                temp_dir="/tmp/theme_preview",
+                custom_script_loader=self.CSL.get(),
+                selected_theme_data=self.selected_theme_data,
             ),
             padding_x=(10, 20),
             side="right",
@@ -343,7 +450,7 @@ class InstallPage(CTkFrame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "Back",
-            self.ICON_PATH + "back_icon.png",
+            path.join(self.ASSETS_PATH, "icons/back_icon.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
@@ -351,16 +458,13 @@ class InstallPage(CTkFrame):
         self.navigation_button.create_navigation_button(
             parent,
             "Exit",
-            self.ICON_PATH + "exit_icon.png",
+            path.join(self.ASSETS_PATH, "icons/exit_icon.png"),
             lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
 
     def create_os_info(self, parent):
-        os_icon_image = self.load_image(
-            f"{self.ICON_PATH}{self.os_values['os_name'].lower()}.png", (20, 24)
-        )
 
         os_frame = CTkFrame(parent, corner_radius=12, fg_color="white")
         os_frame.grid(row=0, column=0, padx=20, sticky="W")
@@ -370,7 +474,7 @@ class InstallPage(CTkFrame):
             text=f"{self.os_values['os_name']} ",
             text_color=self.os_values["os_color"],
             font=("Arial", 20, "bold"),
-            image=os_icon_image,
+            image=self.os_icon_image,
             compound="right",
         )
         os_label.pack(padx=10, pady=10, side="right")
@@ -412,5 +516,59 @@ class InstallPage(CTkFrame):
             self.application_folder_entry.configure(state="disabled")
             self.profile_folder_entry.configure(state="disabled")
 
+    def detect_installed_theme(self):
+        # Start the detection in a separate thread
+        thread = threading.Thread(target=self._detect_installed_theme)
+        thread.start()
+        thread.join()  # Wait for the thread to finish
+        result = self._detect_installed_theme()  # Get the result
+
+        # Update the label based on the result
+        self.update_ui(result)
+
+    def _detect_installed_theme(self):
+        # Check if the chrome folder exists
+        if path.exists(self.chrome_folder):
+            # Check for the theme data file
+            if path.isfile(self.theme_data_path):
+                try:
+                    with open(self.theme_data_path, "r") as file:
+                        data = load(file)
+                        # Assuming 'title' is a key in the JSON file
+                        self.theme_data = Theme(**data)
+                        if self.theme_data.title:
+                            return self.theme_data.title
+                        else:
+                            return False
+                except (JSONDecodeError, IOError) as e:
+                    print(f"Error reading theme data file: {e}")
+                    return False
+            else:
+                # Check if userChrome.css exists
+                user_chrome_css_path = path.join(self.chrome_folder, "userChrome.css")
+                if path.isfile(user_chrome_css_path):
+                    return True
+                else:
+                    return False
+        else:
+            return False
+
+    def update_ui(self, result):
+        # Use the Tkinter `after` method to safely update the UI from the main thread
+        def update_label():
+            if result is True:
+                self.installed_themes_label.configure(text="Unknow Theme Installed ")
+            elif result is False:
+                self.installed_themes_label.configure(text="No Theme Installed ")
+            else:
+                self.installed_themes_label.configure(
+                    text=f"Theme Installed: {result} "
+                )
+                self.theme_details_button.pack(padx=10, pady=10, side="right")
+
+        # Call the update function after a delay to ensure it's on the main thread
+        self.installed_themes_label.after(0, update_label)
+
     def update_parameters(self, **kwargs):
         self.theme_dir = kwargs.get("theme_dir")
+        self.selected_theme_data = kwargs.get("selected_theme_data")

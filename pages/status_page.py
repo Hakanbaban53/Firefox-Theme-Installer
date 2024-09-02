@@ -1,5 +1,5 @@
-from os import path
-from json import load
+from os import listdir, makedirs, path
+from json import load, dump
 from threading import Thread
 from customtkinter import (
     CTkFrame,
@@ -27,17 +27,18 @@ class StatusPage(CTkFrame):
         self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds")
         self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
         self.navigation_button_data_path = path.join(self.base_dir,"data", "components", "navigation_button_data.json")
-
+        self.OS_PROPERTIES_PATH = path.join(
+            base_dir, "data/OS data/os_properties.json"
+        )
 
         self.text_data = self.load_json_data(self.DATA_PATH)
         self.navigation_button_data=self.load_json_data(self.navigation_button_data_path)
         self.button_data = self.navigation_button_data["navigation_buttons"]
         self.come_from_which_page = None
 
-        self.os_values = OSProperties(self.DATA_PATH).get_values()
+        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
         self.file_actions = FileActions(self.os_values["os_name"])
-
 
         self.configure_layout()
         self.create_widgets()
@@ -203,50 +204,24 @@ class StatusPage(CTkFrame):
                 text="Removed  ",
                 image=self.load_image(path.join(self.ICON_PATH, "check.png"), (20, 20)),
                 compound="right",
-            )
+            )        
 
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
-        profile_folder = kwargs.get("profile_folder")
-        application_folder = kwargs.get("application_folder")
+        self.profile_folder = kwargs.get("profile_folder")
+        self.application_folder = kwargs.get("application_folder")
+        self.base_dir = kwargs.get("base_dir")
+        self.theme_dir = kwargs.get("theme_dir")
+        self.custom_script_loader = kwargs.get("custom_script_loader")
+        self.selected_theme_data = kwargs.get("selected_theme_data")
+        self.chrome_folder = path.join(self.profile_folder, "chrome")
+        print(self.selected_theme_data)
 
+        # Decide which function to call based on the page source
         if self.come_from_which_page == "install":
-            self.action_label.configure(text="Installing...")
-
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "config.js"), application_folder
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "mozilla.cfg"), application_folder,
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "config-prefs.js"),
-                path.join(application_folder, "defaults", "pref"),
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "local-settings.js"),
-                path.join(application_folder, "defaults", "pref"),
-            )
-            self.file_actions.move_folder(
-                path.join(self.base_dir, "chrome"), profile_folder
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "user.js"), profile_folder
-            )
-
+            self.install()
         elif self.come_from_which_page == "remove":
-            self.action_label.configure(text="Removing...")
-
-            self.file_actions.remove_file(path.join(application_folder, "config.js"))
-            self.file_actions.remove_file(path.join(application_folder, "mozilla.cfg"))
-            self.file_actions.remove_file(
-                path.join(application_folder, "defaults", "pref", "config-prefs.js")
-            )
-            self.file_actions.remove_file(
-                path.join(application_folder, "defaults", "pref", "local-settings.js")
-            )
-            self.file_actions.remove_file(path.join(profile_folder, "user.js"))
-            self.file_actions.remove_folder(path.join(profile_folder, "chrome"))
+            self.remove()
 
         operation_thread = Thread(
             target=self.file_actions.execute_operations,
@@ -256,10 +231,61 @@ class StatusPage(CTkFrame):
 
         self.after(500, self.update_text)
 
-        # For Testing
-        # self.back_button.configure(
-        #     command=lambda: self.controller.show_frame(
-        #         f"{self.come_from_which_page}_page"
-        #     ),
-        # )
+    def install(self):
+        # Handles the installation process
+        user_js_src = path.join(self.base_dir, "fx-autoconfig", "user.js")
+        if path.exists(user_js_src):
+            self.file_actions.copy_file(user_js_src, self.profile_folder)
+
+        if self.custom_script_loader:
+            self.file_actions.copy_file(
+                path.join(self.base_dir, "fx-autoconfig", "config.js"),
+                self.application_folder,
+            )
+            self.file_actions.copy_file(
+                path.join(self.base_dir, "fx-autoconfig", "mozilla.cfg"),
+                self.application_folder,
+            )
+            self.file_actions.copy_file(
+                path.join(self.base_dir, "fx-autoconfig", "config-prefs.js"),
+                path.join(self.application_folder, "defaults", "pref"),
+            )
+            self.file_actions.copy_file(
+                path.join(self.base_dir, "fx-autoconfig", "local-settings.js"),
+                path.join(self.application_folder, "defaults", "pref"),
+            )
+
+        # Copy all other files and folders into the chrome folder (excluding user.js)
+        for item in listdir(self.theme_dir):
+            src_path = path.join(self.theme_dir, item)
+            dest_path = path.join(self.chrome_folder, item)  # Copy into chrome folder
+            if path.isdir(src_path):
+                self.file_actions.copy_folder(src_path, dest_path)
+            elif path.isfile(src_path) and item != "user.js":
+                makedirs(path.dirname(dest_path), exist_ok=True)
+                self.file_actions.copy_file(src_path, dest_path)
+
+        theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
+        with open(theme_data_path, 'w') as json_file:
+            dump(self.selected_theme_data, json_file, indent=4)
+
+    def remove(self):
+        # Handles the removal process
+        self.action_label.configure(text="Removing...")
+
+        self.file_actions.remove_file(path.join(self.application_folder, "config.js"))
+        self.file_actions.remove_file(path.join(self.application_folder, "mozilla.cfg"))
+        self.file_actions.remove_file(
+            path.join(self.application_folder, "defaults", "pref", "config-prefs.js")
+        )
+        self.file_actions.remove_file(
+            path.join(self.application_folder, "defaults", "pref", "local-settings.js")
+        )
+        self.file_actions.remove_file(path.join(self.profile_folder, "user.js"))
+        self.file_actions.remove_folder(path.join(self.profile_folder, "chrome"))
+
+        theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
+        if path.exists(theme_data_path):
+            self.file_actions.remove_file(theme_data_path)
+
 
