@@ -11,7 +11,7 @@ from modals.theme_detail_modal import ThemeDetailModal
 
 
 class ThemeModal(tk.Toplevel):
-    def __init__(self, parent, base_dir):
+    def __init__(self, parent, base_dir, cache_dir):
         super().__init__(parent)
         self.load_ui_data(base_dir)
         self.configure(bg=self.data["ThemeModal"]["window"]["background_color"])
@@ -21,11 +21,12 @@ class ThemeModal(tk.Toplevel):
         self.grab_set()
 
         self.base_dir = base_dir
+        self.cache_dir = cache_dir
         self.theme_manager = ThemeManager(
             os.path.join(self.base_dir, self.data["ThemeModal"]["themes"]["data_path"]),
             self.data["ThemeModal"]["themes"]["data_url"]
         )
-        self.cache_dir = os.path.join(self.base_dir, "image_cache")
+        self.cache_dir = os.path.join(self.cache_dir, "image_cache")
         os.makedirs(self.cache_dir, exist_ok=True)
 
         self.sort_order = "asc"

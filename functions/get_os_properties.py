@@ -1,5 +1,4 @@
 from json import load
-import os
 from platform import system
 
 class OSProperties:

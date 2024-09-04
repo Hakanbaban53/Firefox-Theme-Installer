@@ -4,11 +4,11 @@ class CreateHeader:
     def __init__(self):
         pass
     
-    def create_header(self , home_page_frame, header_title_bg, line_top_img):
+    def create_header(self , home_page_frame, header_title_bg, line_top_img, text):
 
         header_label = CTkLabel(
             home_page_frame,
-            text="Welcome to the RealFire Installer",
+            text=text,
             image=header_title_bg,
             text_color="White",
             font=("Inter", 22, "bold"),

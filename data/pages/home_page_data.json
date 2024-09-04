@@ -8,7 +8,8 @@
     "ASSETS_PATH": "assets",
     "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
     "OS_PROPERTIES_PATH": "data/OS data/os_properties.json",
-    "THEME_PATH": "~/.cache/RealFire/Themes",
+    "CACHE_PATH": "~/.cache/Firefox Theme Installer/",
+    "THEME_PATH": "themes/",
     "CUSTOM_SCRIPT_LOADER_PATH": "data/files data/fx-autoconfig.json"
   },
 
@@ -23,12 +24,11 @@
     "reload_icon": "icons/reload_icon.png",
     "remove_icon": "icons/remove_icon.png",
     "exit_icon": "icons/exit_icon.png",
-    "block_spin_gif": "icons/block_spin.gif",
-    "os_icons": {
-      "windows": "icons/windows.png",
-      "linux": "icons/linux.png",
-      "mac": "icons/mac.png"
-    }
+    "block_spin_gif": "icons/block_spin.gif"
+  },
+
+  "header_data": {
+    "text":"Welcome to the Theme Installer"
   },
 
   "create_os_info": {

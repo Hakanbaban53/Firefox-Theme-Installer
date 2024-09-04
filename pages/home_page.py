@@ -43,8 +43,11 @@ class HomePage(CTkFrame):
         self.OS_PROPERTIES_PATH = path.join(
             base_dir, self.config_data["data_paths"]["OS_PROPERTIES_PATH"]
         )
-        self.THEME_PATH = Path(
-            path.expanduser(self.config_data["data_paths"]["THEME_PATH"])
+        self.CACHE_PATH = Path(
+            path.expanduser(self.config_data["data_paths"]["CACHE_PATH"])
+        )
+        self.THEME_PATH = path.join(
+            self.CACHE_PATH, self.config_data["data_paths"]["THEME_PATH"]
         )
         self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
             base_dir, self.config_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
@@ -163,8 +166,9 @@ class HomePage(CTkFrame):
         )
 
     def create_header(self):
+        header_data = self.config_data["header_data"]
         self.header.create_header(
-            self.home_page_frame, self.header_title_bg, self.line_top_img
+            self.home_page_frame, header_title_bg=self.header_title_bg, line_top_img=self.line_top_img, text=header_data["text"]
         )
 
     def create_os_info(self):
@@ -458,7 +462,7 @@ class HomePage(CTkFrame):
     # Theme selection and processing
     def select_theme(self):
         """Open the theme selection modal and configure UI elements based on selection."""
-        self.modal_theme = ThemeModal(self, self.base_dir)
+        self.modal_theme = ThemeModal(self, self.base_dir, self.CACHE_PATH)
         self.wait_window(self.modal_theme)
         self.recheck_button.grid_remove()
 
@@ -681,11 +685,11 @@ class HomePage(CTkFrame):
             fg=get_neccessary_files["detect_files_text"]["fg"],
         )
         custom_script_loader = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).load_json_data()
-
+        print(custom_script_loader)
         if custom_script_loader:
             missing_files = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).check_files_exist(custom_script_loader)
             if missing_files:
-                self.start_thread(FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).download_missing_files, missing_files)
+                self.start_thread(FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).download_missing_files, missing_files, self.CACHE_PATH)
             else:
                 self.stop_loading_animation()
         else:

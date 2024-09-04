@@ -1,0 +1,43 @@
+{
+  "create_installed_themes": {
+    "installed_themes_frame": {
+      "width": 440,
+      "height": 60,
+      "fg_color": "white",
+      "corner_radius": 12,
+      "grid_data": {
+        "row": 0,
+        "column": 0,
+        "padx": 10,
+        "pady": 0,
+        "sticky": ""
+      }
+    },
+    "installed_themes_label": {
+      "text": "",
+      "text_color": "black",
+      "font": "(\"Arial\", 18, \"bold\")",
+      "compound": "right",
+      "pack_data": {
+        "padx": [10, 4],
+        "pady": 10,
+        "side": "top"
+      }
+    },
+    "theme_details_button": {
+      "text": "Theme Details",
+      "text_color": "black",
+      "height": 42,
+      "font": "(\"Arial\", 16, \"bold\")",
+      "fg_color": "#D9D9D9",
+      "hover_color": "#EEEEEE",
+      "corner_radius": 12,
+      "compound": "right"
+    }
+  },
+  "update_ui": {
+    "installed_themes_label_unkown":"Unknow Installed Theme Detected ",
+    "installed_themes_label_no_theme":"No Installed Theme Detected ",
+    "installed_themes_label_theme":"Installed Theme Detected: "
+  }
+}

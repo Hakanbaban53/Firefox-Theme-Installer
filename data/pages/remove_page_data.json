@@ -1,0 +1,64 @@
+{
+    "data_paths": {
+      "ASSETS_PATH": "assets",
+      "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
+      "OS_PROPERTIES_PATH": "data/OS data/os_properties.json",
+      "INPUTS_DATA_PATH": "data/components/inputs_data.json"
+    },
+    "icons": {
+      "attention_icon": "icons/attention.png",
+      "header_title_bg": "backgrounds/header_title_background.png",
+      "line_top_img": "backgrounds/line_top.png",
+      "theme_detected_icon": "icons/theme-selected.png"
+    },
+    "header_data": {
+      "text":"Check the Remove Config"
+    },
+    "create_inputs":{
+      "inputs_frame":{
+        "width":440,
+        "height":54,
+        "corner_radius":12,
+        "fg_color":"#2B2631",
+        "grid_data":{
+          "row":3,
+          "column":0,
+          "columnspan":2,
+          "padx":40,
+          "pady":[10,20],
+          "sticky":"NSEW"
+        }
+      }
+    },
+
+      "create_invalid_entry_frame": {
+        "invalid_entry_frame": {
+          "width": 440,
+          "height": 54,
+          "corner_radius": 12,
+          "fg_color": "white",
+          "grid_data": {
+            "row": 5,
+            "column": 0,
+            "padx": [10,4],
+            "pady": 10
+          }
+        },
+        "invalid_entries_text": {
+          "text": "",
+          "text_color": "#f04141",
+          "font": "(\"Arial\", 16, \"bold\")",
+          "compound":"left",
+          "pack_data": {
+            "padx": 10,
+            "pady": 10
+          }
+        }
+      },
+      "update_button_and_frame": {
+        "invalid_entries_text":{
+          "text":" entries is invalid"
+        }
+      }
+  }
+  

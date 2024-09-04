@@ -8,28 +8,27 @@ from functions.install_files import FileActions
 class PreviewTheme:
     def __init__(
         self,
-        base_dir,
+        cache_dir,
         theme_dir,
         temp_profile_folder,
         os_name,
         CSL,
         profile_folder,
         application_folder,
-        progress_bar=None,
-        output_entry=None,
+
     ):
         self.application_folder = application_folder
         self.profile_folder = profile_folder
         self.custom_script_loader = CSL
-        self.base_dir = base_dir
+        self.cache_dir = cache_dir
         self.theme_dir = theme_dir
         self.temp_profile_folder = temp_profile_folder
         self.os_name = os_name
         self.chrome_folder = path.join(self.temp_profile_folder, "chrome")
         self.file_actions = FileActions(os_name)
-        self.progress_bar = progress_bar
-        self.output_entry = output_entry
         print(self.application_folder)
+        print(self.cache_dir)
+        
 
     def copy_files(self):
         self.cleanup()  # Ensure no leftover profile folder
@@ -49,27 +48,28 @@ class PreviewTheme:
         )
 
         print(self.custom_script_loader )
-        user_js_src = path.join(self.base_dir, "fx-autoconfig", "user.js")
+        user_js_src = path.join(self.cache_dir, "fx-autoconfig", "user.js")
         if path.exists(user_js_src):
             self.file_actions.copy_file(user_js_src, self.temp_profile_folder)
             print("user.js copied.")
         if self.custom_script_loader:
             self.file_actions.copy_file(
-                path.join(self.base_dir, "fx-autoconfig", "config.js"),
+                path.join(self.cache_dir, "fx-autoconfig", "config.js"),
                 self.application_folder,
             )
             self.file_actions.copy_file(
-                path.join(self.base_dir, "fx-autoconfig", "mozilla.cfg"),
+                path.join(self.cache_dir, "fx-autoconfig", "mozilla.cfg"),
                 self.application_folder,
             )
             self.file_actions.copy_file(
-                path.join(self.base_dir, "fx-autoconfig", "config-prefs.js"),
+                path.join(self.cache_dir, "fx-autoconfig", "config-prefs.js"),
                 path.join(self.application_folder, "defaults", "pref"),
             )
             self.file_actions.copy_file(
-                path.join(self.base_dir, "fx-autoconfig", "local-settings.js"),
+                path.join(self.cache_dir, "fx-autoconfig", "local-settings.js"),
                 path.join(self.application_folder, "defaults", "pref"),
             )
+            print("Custom script loader files copied.")
 
         # Copy all other files and folders into the chrome folder (excluding user.js)
         for item in os.listdir(self.theme_dir):
@@ -81,7 +81,7 @@ class PreviewTheme:
                 os.makedirs(path.dirname(dest_path), exist_ok=True)
                 self.file_actions.copy_file(src_path, dest_path)
 
-        self.file_actions.execute_operations(self.progress_bar, self.output_entry)
+        self.file_actions.execute_operations()
         print("Files and folders copied into the chrome folder.")
 
     def run_firefox(self):
@@ -89,7 +89,7 @@ class PreviewTheme:
         print(f"Starting Firefox with profile: {self.temp_profile_folder}")
         subprocess.run(["firefox", "-no-remote", "-profile", self.temp_profile_folder])
         self.cleanup()
-        self.file_actions.execute_operations(self.progress_bar, self.output_entry)
+        self.file_actions.execute_operations()
         print("Deleted temporary profile folder.")
 
     def cleanup(self):

@@ -1,29 +1,27 @@
-from json import JSONDecodeError, load
+from json import load
 from os import path
 
-import threading
+from pathlib import Path
+from threading import Thread
 from tkinter import BooleanVar
 from customtkinter import (
     CTkFrame,
     CTkImage,
     CTkLabel,
-    CTkFont,
     CTkEntry,
     CTkCheckBox,
-    StringVar,
     CTkButton,
 )
 from PIL import Image
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
-from functions.get_theme_data import Theme
+from components.create_detect_installed_theme import DetectInstalledTheme
 from functions.preview_theme import PreviewTheme
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.get_folder_locations import GetFolderLocations
 from functions.special_input_functions import SpecialInputFunc
-from modals.theme_detail_modal import ThemeDetailModal
 
 
 class InstallPage(CTkFrame):
@@ -51,15 +49,15 @@ class InstallPage(CTkFrame):
         self.INPUTS_DATA_PATH = path.join(
             base_dir, self.config_data["data_paths"]["INPUTS_DATA_PATH"]
         )
-        self.cache_dir = path.join(self.base_dir, "image_cache")
+        self.CACHE_PATH = Path(
+            path.expanduser(self.config_data["data_paths"]["CACHE_PATH"])
+        )
+        self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
         self.navigation_button_data = self.load_json_data(
             self.NAVIGATION_BUTTON_DATA_PATH
         )
-        self.inputs_data = self.load_json_data(self.INPUTS_DATA_PATH)
-
         self.button_data = self.navigation_button_data["navigation_buttons"]
-        self.input_data = self.inputs_data["inputs"]
 
         self.header = CreateHeader()
         self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
@@ -69,8 +67,10 @@ class InstallPage(CTkFrame):
             self.os_values
         ).get_profile_folder()
 
+
         self.chrome_folder = path.join(self.profile_folder_location, "chrome")
-        self.theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
+
+
 
         self.configure_layout()
         self.create_widgets()
@@ -80,28 +80,22 @@ class InstallPage(CTkFrame):
             return load(file)
 
     def configure_layout(self):
-        self.fg_color = "#2B2631"
-        self.grid(row=0, column=1, sticky="SW")
-        self.columnconfigure(0, weight=1)
-
         self.install_page_frame = CTkFrame(
             self,
             fg_color="#2B2631",
         )
-        self.install_page_frame.grid(row=0, column=0, sticky="SW")
+        self.install_page_frame.grid(row=0, column=1, sticky="SW")
         self.install_page_frame.columnconfigure(0, weight=1)
 
     def create_widgets(self):
         self.create_images()
         self.create_header()
-        self.create_installed_themes_frame()
-        self.create_inputs()
+        self.create_inputs_and_checkboxes()
         self.create_invalid_entry_frame()
-        self.create_preview_theme()
+        self.create_preview_and_check_installed_theme()
         self.create_bottom_widgets()
         self.update_button_and_frame()
         self.checkbox_event()
-        self.detect_installed_theme()
 
     def create_images(self):
         # Load icons and images based on JSON paths
@@ -120,7 +114,7 @@ class InstallPage(CTkFrame):
             dark_image=Image.open(
                 path.join(self.ASSETS_PATH, icons["header_title_bg"])
             ),
-            size=(390, 64),
+            size=(300, 64),
         )
         self.line_top_img = CTkImage(
             light_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
@@ -155,129 +149,114 @@ class InstallPage(CTkFrame):
             ),
             size=(24, 32),
         )
-        self.theme_not_detected_icon = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["theme_not_detected_icon"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["theme_not_detected_icon"])
-            ),
-            size=(24, 32),
-        )
 
     def create_header(self):
+        header_data = self.config_data["header_data"]
+
         self.header.create_header(
-            self.install_page_frame, self.header_title_bg, self.line_top_img
-        )
-
-    def create_installed_themes_frame(self):
-        installed_themes_frame = CTkFrame(
             self.install_page_frame,
-            width=440,
-            height=60,
-            corner_radius=12,
-            fg_color="white",
-        )
-        installed_themes_frame.grid(
-            row=2, column=0, columnspan=2, padx=40, pady=0, sticky=""
+            header_title_bg=self.header_title_bg,
+            line_top_img=self.line_top_img,
+            text=header_data["text"],
         )
 
-        self.installed_themes_label = CTkLabel(
-            installed_themes_frame,
-            text="",
-            text_color="black",
-            font=("Arial", 18, "bold"),
-            compound="right",
-        )
-        self.installed_themes_label.pack(padx=(10, 4), pady=10, side="left")
+    def create_inputs_and_checkboxes(self):
+        inputs_data = self.load_json_data(self.INPUTS_DATA_PATH)
+        inputs_data = inputs_data["create_inputs_and_checkboxes"]
 
-        self.theme_details_button = CTkButton(
-            installed_themes_frame,
-            text="Theme Details",
-            height=42,
-            fg_color="#D9D9D9",
-            hover_color="#EEEEEE",
-            corner_radius=12,
-            text_color="#000000",
-            compound="right",
-            font=("Arial", 16, "bold"),
-            image=self.theme_detected_icon,
-            command=lambda: ThemeDetailModal(
-                self,
-                theme=self.theme_data,
-                cache_dir=self.cache_dir,
-                base_dir=self.base_dir,
-            ),
-        )
-
-    def create_inputs(self):
-        inputs_frame = CTkFrame(
+        inputs_checkboxes_frame = CTkFrame(
             self.install_page_frame,
-            width=440,
-            height=54,
-            corner_radius=12,
-            fg_color="#2B2631",
+            width=inputs_data["inputs_checkboxes_frame"]["width"],
+            height=inputs_data["inputs_checkboxes_frame"]["height"],
+            corner_radius=inputs_data["inputs_checkboxes_frame"]["corner_radius"],
+            fg_color=inputs_data["inputs_checkboxes_frame"]["fg_color"],
         )
-        inputs_frame.grid(
-            row=3, column=0, columnspan=2, padx=40, pady=(10, 20), sticky="NSEW"
+        inputs_checkboxes_frame.grid(
+            row=inputs_data["inputs_checkboxes_frame"]["grid_data"]["row"],
+            column=inputs_data["inputs_checkboxes_frame"]["grid_data"]["column"],
+            columnspan=inputs_data["inputs_checkboxes_frame"]["grid_data"][
+                "columnspan"
+            ],
+            padx=inputs_data["inputs_checkboxes_frame"]["grid_data"]["padx"],
+            pady=inputs_data["inputs_checkboxes_frame"]["grid_data"]["pady"],
+            sticky=inputs_data["inputs_checkboxes_frame"]["grid_data"]["sticky"],
         )
 
-        self.create_input_widgets(inputs_frame)
-        self.create_edit_checkbox(inputs_frame)
+        self.create_input_and_checkbox_widgets(
+            inputs_checkboxes_frame, inputs_data["create_input_and_checkbox_widgets"]
+        )
 
-    def create_input_widgets(self, frame):
+    def create_input_and_checkbox_widgets(self, frame, inputs_data):
+
         # Profile Name
         self.profile_folder_label = CTkLabel(
             master=frame,
-            text_color="white",
-            font=CTkFont(family="Inter", size=18, weight="bold"),
-            text="Profile Folder",
+            text=inputs_data["profile_folder_label"]["text"],
+            text_color=inputs_data["profile_folder_label"]["text_color"],
+            font=eval(inputs_data["profile_folder_label"]["font"]),
         )
         self.profile_folder_label.grid(
-            row=0, column=0, padx=(10, 4), pady=(14, 2), sticky="w"
+            row=inputs_data["profile_folder_label"]["grid_data"]["row"],
+            column=inputs_data["profile_folder_label"]["grid_data"]["column"],
+            padx=inputs_data["profile_folder_label"]["grid_data"]["padx"],
+            pady=inputs_data["profile_folder_label"]["grid_data"]["pady"],
+            sticky=inputs_data["profile_folder_label"]["grid_data"]["sticky"],
         )
 
         self.profile_folder_entry = CTkEntry(
             master=frame,
-            width=int(self.input_data["width"]),
-            height=int(self.input_data["height"]),
-            fg_color=self.input_data["fg_color"],
-            text_color=self.input_data["text_color"],
-            corner_radius=int(self.input_data["corner_radius"]),
-            border_width=int(self.input_data["border_width"]),
-            bg_color=self.input_data["bg_color"],
-            border_color=self.input_data["border_color"],
+            width=inputs_data["profile_folder_entry"]["width"],
+            height=inputs_data["profile_folder_entry"]["height"],
+            fg_color=inputs_data["profile_folder_entry"]["fg_color"],
+            text_color=inputs_data["profile_folder_entry"]["text_color"],
+            corner_radius=inputs_data["profile_folder_entry"]["corner_radius"],
+            border_width=inputs_data["profile_folder_entry"]["border_width"],
+            bg_color=inputs_data["profile_folder_entry"]["bg_color"],
+            border_color=inputs_data["profile_folder_entry"]["border_color"],
             placeholder_text=self.profile_folder_location,
         )
         self.profile_folder_entry.grid(
-            row=1, column=0, padx=(10, 4), pady=10, sticky="ew"
+            row=inputs_data["profile_folder_entry"]["grid_data"]["row"],
+            column=inputs_data["profile_folder_entry"]["grid_data"]["column"],
+            padx=inputs_data["profile_folder_entry"]["grid_data"]["padx"],
+            pady=inputs_data["profile_folder_entry"]["grid_data"]["pady"],
+            sticky=inputs_data["profile_folder_entry"]["grid_data"]["sticky"],
+
         )
 
         # Application Folder
         self.application_folder_label = CTkLabel(
             master=frame,
-            text_color="white",
-            font=CTkFont(family="Inter", size=18, weight="bold"),
-            text="Application Folder",
+            text=inputs_data["application_folder_label"]["text"],
+            text_color=inputs_data["application_folder_label"]["text_color"],
+            font=eval(inputs_data["application_folder_label"]["font"]),
         )
         self.application_folder_label.grid(
-            row=0, column=1, padx=(10, 4), pady=(14, 2), sticky="w"
+            row=inputs_data["application_folder_label"]["grid_data"]["row"],
+            column=inputs_data["application_folder_label"]["grid_data"]["column"],
+            padx=inputs_data["application_folder_label"]["grid_data"]["padx"],
+            pady=inputs_data["application_folder_label"]["grid_data"]["pady"],
+            sticky=inputs_data["application_folder_label"]["grid_data"]["sticky"],
         )
 
         self.application_folder_entry = CTkEntry(
             master=frame,
-            width=int(self.input_data["width"]),
-            height=int(self.input_data["height"]),
-            fg_color=self.input_data["fg_color"],
-            text_color=self.input_data["text_color"],
-            corner_radius=int(self.input_data["corner_radius"]),
-            border_width=int(self.input_data["border_width"]),
-            bg_color=self.input_data["bg_color"],
-            border_color=self.input_data["border_color"],
+            width=inputs_data["application_folder_entry"]["width"],
+            height=inputs_data["application_folder_entry"]["height"],
+            fg_color=inputs_data["application_folder_entry"]["fg_color"],
+            text_color=inputs_data["application_folder_entry"]["text_color"],
+            corner_radius=inputs_data["application_folder_entry"]["corner_radius"],
+            border_width=inputs_data["application_folder_entry"]["border_width"],
+            bg_color=inputs_data["application_folder_entry"]["bg_color"],
+            border_color=inputs_data["application_folder_entry"]["border_color"],
             placeholder_text=self.input_values["application_folder"],
         )
         self.application_folder_entry.grid(
-            row=1, column=1, padx=(10, 4), pady=10, sticky="ew"
+            row=inputs_data["application_folder_entry"]["grid_data"]["row"],
+            column=inputs_data["application_folder_entry"]["grid_data"]["column"],
+            padx=inputs_data["application_folder_entry"]["grid_data"]["padx"],
+            pady=inputs_data["application_folder_entry"]["grid_data"]["pady"],
+            sticky=inputs_data["application_folder_entry"]["grid_data"]["sticky"],
         )
 
         self.key_bind(self.profile_folder_entry)
@@ -286,122 +265,159 @@ class InstallPage(CTkFrame):
         self.CSL = BooleanVar(value=False)
         CSL_checkbox = CTkCheckBox(
             master=frame,
-            text="Enable Custom Script Loader",
+            text=inputs_data["CSL_checkbox"]["text"],
+            fg_color=inputs_data["CSL_checkbox"]["fg_color"],
+            hover_color=inputs_data["CSL_checkbox"]["hover_color"],
+            text_color=inputs_data["CSL_checkbox"]["text_color"],
+            bg_color=inputs_data["CSL_checkbox"]["bg_color"],
+            font=eval(inputs_data["CSL_checkbox"]["font"]),
+            border_color=inputs_data["CSL_checkbox"]["border_color"],
             command=self.checkbox_event,
-            fg_color="#F08D27",
-            hover_color="#F08D27",
-            bg_color="#2B2631",
-            text_color="white",
             variable=self.CSL,
             onvalue=True,
             offvalue=False,
         )
-        CSL_checkbox.grid(row=2, column=0, padx=(10, 4), pady=10, sticky="ew")
-
-        self.telemetry = BooleanVar(value=False)
-        telemetry_checkbox = CTkCheckBox(
+        CSL_checkbox.grid(
+            row=inputs_data["CSL_checkbox"]["grid_data"]["row"],
+            column=inputs_data["CSL_checkbox"]["grid_data"]["column"],
+            padx=inputs_data["CSL_checkbox"]["grid_data"]["padx"],
+            pady=inputs_data["CSL_checkbox"]["grid_data"]["pady"],
+            sticky=inputs_data["CSL_checkbox"]["grid_data"]["sticky"],
+        )
+        self.check_var = BooleanVar(value=False)
+        edit_checkbox = CTkCheckBox(
             master=frame,
-            text="Disable Firefox Telemetry",
+            text=inputs_data["edit_checkbox"]["text"],
+            fg_color=inputs_data["edit_checkbox"]["fg_color"],
+            hover_color=inputs_data["edit_checkbox"]["hover_color"],
+            text_color=inputs_data["edit_checkbox"]["text_color"],
+            bg_color=inputs_data["edit_checkbox"]["bg_color"],
+            font=eval(inputs_data["edit_checkbox"]["font"]),
+            border_color=inputs_data["edit_checkbox"]["border_color"],
             command=self.checkbox_event,
-            fg_color="#F08D27",
-            hover_color="#F08D27",
-            bg_color="#2B2631",
-            text_color="white",
-            variable=self.telemetry,
+            variable=self.check_var,
             onvalue=True,
             offvalue=False,
         )
-        telemetry_checkbox.grid(row=2, column=1, padx=(10, 4), pady=10, sticky="ew")
-
-    def create_edit_checkbox(self, frame):
-        self.check_var = StringVar(value="off")
-        edit_checkbox = CTkCheckBox(
-            master=frame,
-            text="Edit Inputs",
-            command=self.checkbox_event,
-            fg_color="#F08D27",
-            hover_color="#F08D27",
-            bg_color="#2B2631",
-            text_color="white",
-            variable=self.check_var,
-            onvalue="on",
-            offvalue="off",
+        edit_checkbox.grid(
+            row=inputs_data["edit_checkbox"]["grid_data"]["row"],
+            column=inputs_data["edit_checkbox"]["grid_data"]["column"],
+            padx=inputs_data["edit_checkbox"]["grid_data"]["padx"],
+            pady=inputs_data["edit_checkbox"]["grid_data"]["pady"],
+            sticky=inputs_data["edit_checkbox"]["grid_data"]["sticky"],
         )
-        edit_checkbox.grid(row=3, column=1, padx=(10, 4), pady=10, sticky="ew")
 
-    def create_invalid_entry_frame(self):
-        self.invalid_entry_frame = CTkFrame(
+
+    def create_preview_and_check_installed_theme(self):
+        preview_and_check_installed_theme_frame = CTkFrame(
             self.install_page_frame,
-            width=440,
-            height=54,
-            corner_radius=12,
-            bg_color="#2B2631",
-            fg_color="white",
+            fg_color="#2B2631",
         )
-        self.invalid_entry_frame.grid(
-            row=4, column=0, columnspan=2, padx=(10, 4), pady=10
+        preview_and_check_installed_theme_frame.grid(
+            row=4, column=0, padx=(10, 4), pady=10
         )
 
-        self.invalid_entries_text = CTkLabel(
-            self.invalid_entry_frame,
-            text="",
-            text_color="#f04141",
-            font=("Arial", 16, "bold"),
-            image=self.attention_icon,
-            compound="left",
+        self.detect_installed_theme_component = DetectInstalledTheme(
+            self,
+            chrome_folder=self.chrome_folder,
+            theme_detected_icon=self.theme_detected_icon,
+            cache_dir=self.image_cache_dir,
+            base_dir=self.base_dir
         )
-        self.invalid_entries_text.pack(padx=10, pady=10)
+        self.detect_installed_theme_component.create_installed_themes(preview_and_check_installed_theme_frame)
 
-    def create_preview_theme(self):
+        self.create_preview_theme(preview_and_check_installed_theme_frame)
+
+        self.detect_installed_theme_component.detect_installed_theme()
+
+
+    def create_preview_theme(self, preview_and_check_installed_theme_frame):
+        preview_theme_data = self.config_data["create_preview_theme"]
         preview_frame = CTkFrame(
-            self.install_page_frame,
-            width=440,
-            height=60,
-            corner_radius=12,
-            fg_color="white",
+            preview_and_check_installed_theme_frame,
+            width=preview_theme_data["preview_frame"]["width"],
+            height=preview_theme_data["preview_frame"]["height"],
+            corner_radius=preview_theme_data["preview_frame"][
+                "corner_radius"
+            ],
+            fg_color=preview_theme_data["preview_frame"]["fg_color"],
         )
         preview_frame.grid(
-            row=5, column=0, columnspan=2, padx=40, pady=(20, 30), sticky=""
+            row=preview_theme_data["preview_frame"]["grid_data"]["row"],
+            column=preview_theme_data["preview_frame"]["grid_data"][
+                "column"
+            ],
+            padx=preview_theme_data["preview_frame"]["grid_data"]["padx"],
+            pady=preview_theme_data["preview_frame"]["grid_data"]["pady"],
+            sticky=preview_theme_data["preview_frame"]["grid_data"][
+                "sticky"
+            ],
         )
 
         preview_label = CTkLabel(
             preview_frame,
-            text="Preview Theme in Firefox",
-            text_color="black",
-            font=("Arial", 18, "bold"),
+            text=preview_theme_data["preview_label"]["text"],
+            text_color=preview_theme_data["preview_label"]["text_color"],
+            font=eval(preview_theme_data["preview_label"]["font"]),
         )
-        preview_label.pack(padx=(10, 4), pady=10, side="left")
+        preview_label.pack(
+            padx=preview_theme_data["preview_label"]["pack_data"]["padx"],
+            pady=preview_theme_data["preview_label"]["pack_data"]["pady"],
+            side=preview_theme_data["preview_label"]["pack_data"]["side"],
 
-        self.navigation_button.create_navigation_button(
+        )
+
+        preview_button =CTkButton(
             preview_frame,
-            text="Preview Theme",
-            image_path=path.join(self.ASSETS_PATH, "icons/preview_icon.png"),
-            side="right",
-            padding_x=10,
-            command=self.start_theme_preview_thread,  # Updated to use threading
+            text=preview_theme_data["preview_button"]["text"],
+            height=preview_theme_data["preview_button"]["height"],
+            fg_color=preview_theme_data["preview_button"]["fg_color"],
+            hover_color=preview_theme_data["preview_button"]["hover_color"],
+            corner_radius=preview_theme_data["preview_button"]["corner_radius"],
+            font=eval(preview_theme_data["preview_button"]["font"]),
+            text_color=preview_theme_data["preview_button"]["text_color"],
+            image=self.preview_icon,
+            command=self.start_theme_preview_thread,
+        )
+        preview_button.pack(
+            padx=preview_theme_data["preview_button"]["pack_data"]["padx"],
+            pady=preview_theme_data["preview_button"]["pack_data"]["pady"],
+        )
+    
+    def create_invalid_entry_frame(self):
+        invalid_entry_frame_data = self.config_data["create_invalid_entry_frame"]
+        self.invalid_entry_frame = CTkFrame(
+            self.install_page_frame,
+            width=invalid_entry_frame_data["invalid_entry_frame"]["width"],
+            height=invalid_entry_frame_data["invalid_entry_frame"]["height"],
+            corner_radius=invalid_entry_frame_data["invalid_entry_frame"][
+                "corner_radius"
+            ],
+            fg_color=invalid_entry_frame_data["invalid_entry_frame"]["fg_color"],
+        )
+        self.invalid_entry_frame.grid(
+            row=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"]["row"],
+            column=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"][
+                "column"
+            ],
+            padx=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"]["padx"],
+            pady=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"]["pady"],
         )
 
-    def start_theme_preview_thread(self):
-        # Start the preview in a new thread
-        preview_thread = threading.Thread(target=self.preview_theme)
-        preview_thread.start()
+        self.invalid_entries_text = CTkLabel(
+            self.invalid_entry_frame,
+            text=invalid_entry_frame_data["invalid_entries_text"]["text"],
+            text_color=invalid_entry_frame_data["invalid_entries_text"]["text_color"],
+            font=eval(invalid_entry_frame_data["invalid_entries_text"]["font"]),
+            compound=invalid_entry_frame_data["invalid_entries_text"]["compound"],
+            image=self.attention_icon,
+        )
+        self.invalid_entries_text.pack(
+            padx=invalid_entry_frame_data["invalid_entries_text"]["pack_data"]["padx"],
+            pady=invalid_entry_frame_data["invalid_entries_text"]["pack_data"]["pady"],
 
-    def preview_theme(self):
-        profile_folder = SpecialInputFunc().get_variables(self.profile_folder_entry)
-        application_folder = SpecialInputFunc().get_variables(
-            self.application_folder_entry
         )
 
-        self.preview = PreviewTheme(
-            self.base_dir,
-            self.theme_dir,
-            "/tmp/theme_preview",
-            self.os_values["os_name"],
-            self.CSL.get(),
-            profile_folder,
-            application_folder,
-        )
-        self.preview.run_firefox()
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
@@ -479,6 +495,28 @@ class InstallPage(CTkFrame):
         )
         os_label.pack(padx=10, pady=10, side="right")
 
+    def start_theme_preview_thread(self):
+        # Start the preview in a new thread
+        preview_thread = Thread(target=self.preview_theme)
+        preview_thread.start()
+
+    def preview_theme(self):
+        profile_folder = SpecialInputFunc().get_variables(self.profile_folder_entry)
+        application_folder = SpecialInputFunc().get_variables(
+            self.application_folder_entry
+        )
+
+        self.preview = PreviewTheme(
+            self.CACHE_PATH,
+            self.theme_dir,
+            "/tmp/theme_preview",
+            self.os_values["os_name"],
+            self.CSL.get(),
+            profile_folder,
+            application_folder,
+        )
+        self.preview.run_firefox()
+
     def key_bind(self, entry_widget, file_extension=None):
         entry_widget.bind(
             "<KeyRelease>",
@@ -494,80 +532,24 @@ class InstallPage(CTkFrame):
         self.update_button_and_frame()
 
     def update_button_and_frame(self):
+        update_button_and_frame_data = self.config_data["update_button_and_frame"]
         if SpecialInputFunc().update_invalid_entries_display():
             self.install_button.configure(state="normal")
             self.invalid_entry_frame.grid_remove()
         else:
             self.install_button.configure(state="disabled")
             self.invalid_entries_text.configure(
-                text=f"  {len(SpecialInputFunc().return_invalid_entries())} entries is invalid"
+                text=f"  {len(SpecialInputFunc().return_invalid_entries())}" + update_button_and_frame_data["invalid_entries_text"]["text"]
             )
             self.invalid_entry_frame.grid()
 
-    def get_variables_combobox(self, combobox_widget):
-        selected_value = combobox_widget.get()
-        return selected_value if selected_value else "Blue"
-
     def checkbox_event(self):
-        if self.check_var.get() == "on":
+        if self.check_var.get():
             self.application_folder_entry.configure(state="normal")
             self.profile_folder_entry.configure(state="normal")
         else:
             self.application_folder_entry.configure(state="disabled")
             self.profile_folder_entry.configure(state="disabled")
-
-    def detect_installed_theme(self):
-        # Start the detection in a separate thread
-        thread = threading.Thread(target=self._detect_installed_theme)
-        thread.start()
-        thread.join()  # Wait for the thread to finish
-        result = self._detect_installed_theme()  # Get the result
-
-        # Update the label based on the result
-        self.update_ui(result)
-
-    def _detect_installed_theme(self):
-        # Check if the chrome folder exists
-        if path.exists(self.chrome_folder):
-            # Check for the theme data file
-            if path.isfile(self.theme_data_path):
-                try:
-                    with open(self.theme_data_path, "r") as file:
-                        data = load(file)
-                        # Assuming 'title' is a key in the JSON file
-                        self.theme_data = Theme(**data)
-                        if self.theme_data.title:
-                            return self.theme_data.title
-                        else:
-                            return False
-                except (JSONDecodeError, IOError) as e:
-                    print(f"Error reading theme data file: {e}")
-                    return False
-            else:
-                # Check if userChrome.css exists
-                user_chrome_css_path = path.join(self.chrome_folder, "userChrome.css")
-                if path.isfile(user_chrome_css_path):
-                    return True
-                else:
-                    return False
-        else:
-            return False
-
-    def update_ui(self, result):
-        # Use the Tkinter `after` method to safely update the UI from the main thread
-        def update_label():
-            if result is True:
-                self.installed_themes_label.configure(text="Unknow Theme Installed ")
-            elif result is False:
-                self.installed_themes_label.configure(text="No Theme Installed ")
-            else:
-                self.installed_themes_label.configure(
-                    text=f"Theme Installed: {result} "
-                )
-                self.theme_details_button.pack(padx=10, pady=10, side="right")
-
-        # Call the update function after a delay to ensure it's on the main thread
-        self.installed_themes_label.after(0, update_label)
 
     def update_parameters(self, **kwargs):
         self.theme_dir = kwargs.get("theme_dir")
