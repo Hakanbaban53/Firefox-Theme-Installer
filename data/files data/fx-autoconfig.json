@@ -4,6 +4,6 @@
     "config.js": "https://raw.githubusercontent.com/MrOtherGuy/fx-autoconfig/master/program/config.js",
     "config-prefs.js": "https://raw.githubusercontent.com/MrOtherGuy/fx-autoconfig/master/program/defaults/pref/config-prefs.js",
     "local-settings.js": "https://raw.githubusercontent.com/Hakanbaban53/RealFire/main/programs/local-settings.js",
-    "user.js": "https://github.com/Hakanbaban53/RealFire/raw/main/programs/user.js"
+    "user.js": "https://raw.githubusercontent.com/Hakanbaban53/RealFire/main/programs/user.js"
   }
 }

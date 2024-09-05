@@ -1,6 +1,6 @@
 from pathlib import Path
 from subprocess import run, CalledProcessError, PIPE
-import shlex
+from shlex import quote
 
 class FileActions:
     def __init__(self, os_name):
@@ -28,7 +28,7 @@ class FileActions:
             self.log_operation(f"Source file does not exist: {source_path}")
             return
         
-        command = f'cp {shlex.quote(str(source_path))} {shlex.quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'copy "{source_path}" "{destination_path}"'
+        command = f'cp {quote(str(source_path))} {quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'copy "{source_path}" "{destination_path}"'
         self.schedule_command(command, destination_path)
 
     def move_file(self, source, destination):
@@ -39,7 +39,7 @@ class FileActions:
             self.log_operation(f"Source file does not exist: {source_path}")
             return
         
-        command = f'mv {shlex.quote(str(source_path))} {shlex.quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'move "{source_path}" "{destination_path}"'
+        command = f'mv {quote(str(source_path))} {quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'move "{source_path}" "{destination_path}"'
         self.schedule_command(command, destination_path)
 
     def copy_folder(self, source, destination):
@@ -50,7 +50,7 @@ class FileActions:
             self.log_operation(f"Source folder does not exist or is not a directory: {source_path}")
             return
         
-        command = f'cp -r {shlex.quote(str(source_path))} {shlex.quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'xcopy /e /i "{source_path}" "{destination_path}"'
+        command = f'cp -r {quote(str(source_path))} {quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'xcopy /e /i "{source_path}" "{destination_path}"'
         self.schedule_command(command, destination_path)
 
     def move_folder(self, source, destination):
@@ -61,7 +61,7 @@ class FileActions:
             self.log_operation(f"Source folder does not exist or is not a directory: {source_path}")
             return
         
-        command = f'mv {shlex.quote(str(source_path))} {shlex.quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'move "{source_path}" "{destination_path}"'
+        command = f'mv {quote(str(source_path))} {quote(str(destination_path))}' if self.os_name.lower() in ["linux", "darwin"] else f'move "{source_path}" "{destination_path}"'
         self.schedule_command(command, destination_path)
 
     def remove_file(self, file_path):
@@ -70,7 +70,7 @@ class FileActions:
             self.log_operation(f"File does not exist: {path}")
             return
         
-        command = f'rm {shlex.quote(str(path))}' if self.os_name.lower() in ["linux", "darwin"] else f'del "{path}"'
+        command = f'rm {quote(str(path))}' if self.os_name.lower() in ["linux", "darwin"] else f'del "{path}"'
         self.schedule_command(command, path)
 
     def remove_folder(self, folder_path):
@@ -79,7 +79,7 @@ class FileActions:
             self.log_operation(f"Folder does not exist: {path}")
             return
         
-        command = f'rm -rf {shlex.quote(str(path))}' if self.os_name.lower() in ["linux", "darwin"] else f'rd /s /q "{path}"'
+        command = f'rm -rf {quote(str(path))}' if self.os_name.lower() in ["linux", "darwin"] else f'rd /s /q "{path}"'
         self.schedule_command(command, path)
 
     def schedule_command(self, command, path):

@@ -1,5 +1,5 @@
 from os import listdir, makedirs, path
-from json import load, dump
+from json import dump
 from pathlib import Path
 from threading import Thread
 from customtkinter import (
@@ -13,38 +13,41 @@ from customtkinter import (
 from PIL import Image
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
+from functions.load_json_data import LoadJsonData
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
-from functions.install_files import FileActions
+from functions.file_actions import FileActions
 
 
 class StatusPage(CTkFrame):
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
+        # Load the UI data from the JSON file
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "status_page_data.json")
+        load_json_data = LoadJsonData()
+        self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+        
         self.controller = controller
         self.base_dir = base_dir
 
-        self.config_data = self.load_json_data(
-            path.join(base_dir, "data", "pages", "status_page_data.json")
-        )
-
         # Set the paths
         self.ASSETS_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["ASSETS_PATH"]
-        )
-        self.NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+            base_dir, self.ui_data["data_paths"]["ASSETS_PATH"]
         )
         self.OS_PROPERTIES_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["OS_PROPERTIES_PATH"]
-        )
-        self.navigation_button_data = self.load_json_data(
-            self.NAVIGATION_BUTTON_DATA_PATH
+            base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
         )
         self.CACHE_PATH = Path(
-            path.expanduser(self.config_data["data_paths"]["CACHE_PATH"])
+            path.expanduser(self.ui_data["data_paths"]["CACHE_PATH"])
         )
         
+        # Get navigation button data
+        NAVIGATION_BUTTON_DATA_PATH = path.join(
+            base_dir, self.ui_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+        )
+        self.navigation_button_data = load_json_data.load_json_data(
+            NAVIGATION_BUTTON_DATA_PATH
+        )
         self.button_data = self.navigation_button_data["navigation_buttons"]
 
         self.header = CreateHeader()
@@ -59,10 +62,6 @@ class StatusPage(CTkFrame):
 
         self.configure_layout()
         self.create_widgets()
-
-    def load_json_data(self, path):
-        with open(path, "r") as file:
-            return load(file)
 
     def load_image(self, file_name, size):
         return CTkImage(
@@ -89,7 +88,7 @@ class StatusPage(CTkFrame):
 
     def create_images(self):
         # Load icons and images based on JSON paths
-        icons = self.config_data["icons"]
+        icons = self.ui_data["icons"]
         self.attention_icon = CTkImage(
             light_image=Image.open(
                 path.join(self.ASSETS_PATH, icons["attention_icon"])
@@ -132,7 +131,7 @@ class StatusPage(CTkFrame):
 
 
     def create_header(self):
-        header_data = self.config_data["header_data"]
+        header_data = self.ui_data["header_data"]
 
         self.header.create_header(
             self.status_page_frame,
@@ -269,13 +268,25 @@ class StatusPage(CTkFrame):
         elif self.come_from_which_page == "remove":
             self.remove()
 
-        operation_thread = Thread(
+        self.start_thread(
             target=self.file_actions.execute_operations,
-            args=(self.progress_bar, self.output_entry),
+            args=(self.progress_bar, self.output_entry)
         )
-        operation_thread.start()
 
-        self.after(500, self.update_text)
+    def start_thread(self, target, args=()):
+        """Start a new thread for the specified target function with args."""
+        thread = Thread(target=target, args=args)
+        thread.daemon = True  # Allows the program to exit even if the thread is still running
+        thread.start()
+        self.check_thread(thread)
+
+    def check_thread(self, thread):
+        """Check if the thread is finished and update the UI accordingly."""
+        if thread.is_alive():
+            self.after(100, self.check_thread, thread)
+        else:
+            # Call a thread-safe method to update the UI
+            self.after(0, self.update_text)
 
     def install(self):
         # Handles the installation process

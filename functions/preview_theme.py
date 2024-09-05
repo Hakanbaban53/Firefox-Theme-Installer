@@ -1,9 +1,10 @@
-import os
-import subprocess
-from os import path
+from os import path, makedirs, listdir
+from subprocess import run, CalledProcessError
+from functions.file_actions import FileActions
+# from logging import basicConfig, info, error, warning, INFO
 
-from functions.install_files import FileActions
-
+# Configure logging
+# basicConfig(level=INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class PreviewTheme:
     def __init__(
@@ -15,7 +16,6 @@ class PreviewTheme:
         CSL,
         profile_folder,
         application_folder,
-
     ):
         self.application_folder = application_folder
         self.profile_folder = profile_folder
@@ -26,92 +26,119 @@ class PreviewTheme:
         self.os_name = os_name
         self.chrome_folder = path.join(self.temp_profile_folder, "chrome")
         self.file_actions = FileActions(os_name)
-        print(self.application_folder)
-        print(self.cache_dir)
-        
+        # info(f"PreviewTheme initialized with temp profile folder: {self.temp_profile_folder}")
 
     def copy_files(self):
-        self.cleanup()  # Ensure no leftover profile folder
-        os.makedirs(
-            self.temp_profile_folder, exist_ok=True
-        )  # Create the profile folder
-        os.makedirs(
-            self.chrome_folder, exist_ok=True
-        )  # Ensure the chrome folder exists
+        self.cleanup()  # Ensure no leftover profile folder or files
+        makedirs(self.temp_profile_folder, exist_ok=True)  # Create the profile folder
+        makedirs(self.chrome_folder, exist_ok=True)  # Ensure the chrome folder exists
 
-        subprocess.run(
-            [
-                "firefox",
-                "-CreateProfile",
-                f"temp_theme_profile {self.temp_profile_folder}",
-            ]
-        )
+        # Create a temporary Firefox profile
+        try:
+            run(
+                ["firefox", "-CreateProfile", f"temp_theme_profile {self.temp_profile_folder}"],
+                check=True
+            )
+            # info("Temporary Firefox profile created.")
+        except CalledProcessError as e:
+            # error(f"Failed to create Firefox profile: {e}")
+            return
 
-        print(self.custom_script_loader )
         user_js_src = path.join(self.cache_dir, "fx-autoconfig", "user.js")
         if path.exists(user_js_src):
             self.file_actions.copy_file(user_js_src, self.temp_profile_folder)
-            print("user.js copied.")
+            # info("Copied user.js to the temporary profile folder.")
+
         if self.custom_script_loader:
-            self.file_actions.copy_file(
-                path.join(self.cache_dir, "fx-autoconfig", "config.js"),
-                self.application_folder,
-            )
-            self.file_actions.copy_file(
-                path.join(self.cache_dir, "fx-autoconfig", "mozilla.cfg"),
-                self.application_folder,
-            )
-            self.file_actions.copy_file(
-                path.join(self.cache_dir, "fx-autoconfig", "config-prefs.js"),
-                path.join(self.application_folder, "defaults", "pref"),
-            )
-            self.file_actions.copy_file(
-                path.join(self.cache_dir, "fx-autoconfig", "local-settings.js"),
-                path.join(self.application_folder, "defaults", "pref"),
-            )
-            print("Custom script loader files copied.")
+            self._copy_custom_script_files()
 
         # Copy all other files and folders into the chrome folder (excluding user.js)
-        for item in os.listdir(self.theme_dir):
+        for item in listdir(self.theme_dir):
             src_path = path.join(self.theme_dir, item)
             dest_path = path.join(self.chrome_folder, item)  # Copy into chrome folder
-            if os.path.isdir(src_path):
+            if path.isdir(src_path):
                 self.file_actions.copy_folder(src_path, dest_path)
-            elif os.path.isfile(src_path) and item != "user.js":
-                os.makedirs(path.dirname(dest_path), exist_ok=True)
+                # info(f"Copied folder {src_path} to {dest_path}.")
+            elif path.isfile(src_path) and item != "user.js":
+                makedirs(path.dirname(dest_path), exist_ok=True)
                 self.file_actions.copy_file(src_path, dest_path)
+                # info(f"Copied file {src_path} to {dest_path}.")
 
         self.file_actions.execute_operations()
-        print("Files and folders copied into the chrome folder.")
+        # info("All files and folders copied into the chrome folder.")
+
+    def _copy_custom_script_files(self):
+        # Helper function to copy custom script files if CSL is enabled
+        try:
+            custom_files = {
+                "config.js": self.application_folder,
+                "mozilla.cfg": self.application_folder,
+                "config-prefs.js": path.join(self.application_folder, "defaults", "pref"),
+                "local-settings.js": path.join(self.application_folder, "defaults", "pref"),
+            }
+
+            for filename, dest_dir in custom_files.items():
+                src = path.join(self.cache_dir, "fx-autoconfig", filename)
+                if path.exists(src):
+                    self.file_actions.copy_file(src, dest_dir)
+                    # info(f"Copied {filename} to {dest_dir}.")
+        except Exception as e:
+            # error(f"An error occurred while copying custom script files: {e}")
+            return
 
     def run_firefox(self):
         self.copy_files()
-        print(f"Starting Firefox with profile: {self.temp_profile_folder}")
-        subprocess.run(["firefox", "-no-remote", "-profile", self.temp_profile_folder])
-        self.cleanup()
-        self.file_actions.execute_operations()
-        print("Deleted temporary profile folder.")
+        # info(f"Starting Firefox with profile: {self.temp_profile_folder}")
+        try:
+            run(["firefox", "-no-remote", "-profile", self.temp_profile_folder], check=True)
+        except CalledProcessError as e:
+            return
+            # error(f"Failed to run Firefox: {e}")
+        finally:
+            self.cleanup()
+            # info("Cleaned up temporary profile folder after Firefox run.")
 
     def cleanup(self):
-        # Check if the temporary profile folder exists before attempting to remove it
-        if os.path.exists(self.temp_profile_folder):
-            self.file_actions.remove_folder(self.temp_profile_folder)
-        
-        # List of files to check and remove if they exist
+        # Ensure clean removal of the temporary profile folder
+        if path.exists(self.temp_profile_folder):
+            try:
+                if path.isfile(self.temp_profile_folder):
+                    self.file_actions.remove_file(self.temp_profile_folder)  # Handle case where a file exists with the same name
+                    # warning(f"Removed stray file named {self.temp_profile_folder}.")
+                else:
+                    self.file_actions.remove_folder(self.temp_profile_folder)
+                    # info(f"Deleted temporary profile folder: {self.temp_profile_folder}.")
+            except Exception as e:
+                return
+                # error(f"Failed to delete temporary profile folder: {e}")
+
+        # Clean up custom script loader files
         if self.custom_script_loader:
             files_to_remove = [
-                os.path.join(self.application_folder, "config.js"),
-                os.path.join(self.application_folder, "mozilla.cfg"),
-                os.path.join(self.application_folder, "defaults", "pref", "config-prefs.js"),
-                os.path.join(self.application_folder, "defaults", "pref", "local-settings.js")
+                path.join(self.application_folder, "config.js"),
+                path.join(self.application_folder, "mozilla.cfg"),
+                path.join(self.application_folder, "defaults", "pref", "config-prefs.js"),
+                path.join(self.application_folder, "defaults", "pref", "local-settings.js")
             ]
 
-            # Check and remove each file if it exists
             for file_path in files_to_remove:
-                if os.path.isfile(file_path):
-                    self.file_actions.remove_file(file_path)
-                    print(f"Deleted file: {file_path}")
-                else:
-                    print(f"File not found, skipping: {file_path}")
+                if path.isfile(file_path):
+                    try:
+                        self.file_actions.remove_file(file_path)
+                        # info(f"Deleted file: {file_path}.")
+                    except Exception as e:
+                        return
+                        # error(f"Failed to delete file {file_path}: {e}")
+        self.file_actions.execute_operations()
 
-
+# Example usage:
+# preview_theme = PreviewTheme(
+#     cache_dir="/path/to/cache",
+#     theme_dir="/path/to/theme",
+#     temp_profile_folder="/path/to/temp/profile",
+#     os_name="Linux",
+#     CSL=True,
+#     profile_folder="/path/to/profile",
+#     application_folder="/path/to/application"
+# )
+# preview_theme.run_firefox()

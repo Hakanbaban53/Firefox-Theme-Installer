@@ -1,23 +1,30 @@
 {
-    "ThemeDetailModal": {
-      "title_prefix": "Theme Details: ",
-      "cache_expiration": 86400,
-      "window_geometry": "700x700",
-      "background_color": "#2B2631",
-      "text_frame": {
-        "font": ["Arial", 16],
-        "wrap": "WORD"
-      },
-      "loading_image_text": "Loading image...",
-      "failed_image_text": "Failed to load image.",
-      "buttons": {
-        "open_theme_page": "Open Theme Page",
-        "provide_feedback": "Provide Feedback",
-        "feedback_prompt": "Please provide your feedback or report an issue:",
-        "feedback_received": "Thank you for your feedback!",
-        "feedback_received_title": "Feedback Received"
-      },
-      "image_size": [550, 400]
+  "ThemeDetailModal": {
+    "title_prefix": "Theme Details: ",
+    "cache_expiration": 86400,
+    "window_geometry": "700x700",
+    "background_color": "#2B2631",
+    "text_frame": {
+      "font": ["Arial", 16],
+      "height": 100,
+      "background_color": "#3B3B3B"
+    },
+    "loading_image_text": "Loading image...",
+    "failed_image_text": "Failed to load image.",
+    "open_theme_page_button": {
+      "text": "Open Theme Page",
+      "text_color": "#FFFFFF",
+      "fg_color": "#7D31DF",
+      "hover_color": "#9747FF",
+      "font": "(\"Arial\", 16, \"bold\")"
+    },
+    "image_size": [550, 400],
+    "add_tags_widget": {
+      "text": "Tags:",
+      "height": 40,
+      "fg_color": "#F0F0F0",
+      "corner_radius": 5,
+      "orientation": "horizontal"
     }
   }
-  
+}

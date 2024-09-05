@@ -1,5 +1,4 @@
 from itertools import cycle
-from json import load
 from os import path
 from pathlib import Path
 from tkinter import BooleanVar, PhotoImage, Label, TclError
@@ -11,6 +10,7 @@ from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox, CTkImage
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
 from functions.get_the_theme_files import ThemeDownloader
+from functions.load_json_data import LoadJsonData
 from modals.check_files_modal import FileInstallerModal
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
@@ -22,42 +22,43 @@ class HomePage(CTkFrame):
 
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
+        # Load the UI data from the JSON file
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "home_page_data.json")
+        load_json_data = LoadJsonData()
+        self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
 
         self.controller = controller
         self.base_dir = base_dir
 
-        self.config_data = self.load_json_data(
-            path.join(base_dir, "data", "pages", "home_page_data.json")
-        ) 
-
         # Set the animation speed
-        self.ANIMATION_SPEED = self.config_data["additional_settings"]["animation_speed"]
+        self.ANIMATION_SPEED = self.ui_data["additional_settings"]["animation_speed"]
 
         # Set the paths
         self.ASSETS_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["ASSETS_PATH"]
+            base_dir, self.ui_data["data_paths"]["ASSETS_PATH"]
         )
         self.NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+            base_dir, self.ui_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
         )
         self.OS_PROPERTIES_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["OS_PROPERTIES_PATH"]
+            base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
         )
         self.CACHE_PATH = Path(
-            path.expanduser(self.config_data["data_paths"]["CACHE_PATH"])
+            path.expanduser(self.ui_data["data_paths"]["CACHE_PATH"])
         )
         self.THEME_PATH = path.join(
-            self.CACHE_PATH, self.config_data["data_paths"]["THEME_PATH"]
+            self.CACHE_PATH, self.ui_data["data_paths"]["THEME_PATH"]
         )
         self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
+            base_dir, self.ui_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
         )
 
         # Load additional data
-        self.navigation_button_data = self.load_json_data(
+        self.navigation_button_data = load_json_data.load_json_data(
             self.NAVIGATION_BUTTON_DATA_PATH
         )
         self.button_data = self.navigation_button_data["navigation_buttons"]
+
         self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
         self.header = CreateHeader()
@@ -70,10 +71,6 @@ class HomePage(CTkFrame):
         # Configure layout and create widgets
         self.configure_layout()
         self.create_widgets()
-
-    def load_json_data(self, path):
-        with open(path, "r") as file:
-            return load(file)
 
     def configure_layout(self):
         self.home_page_frame = CTkFrame(self, fg_color="#2B2631")
@@ -91,7 +88,7 @@ class HomePage(CTkFrame):
 
     def create_images(self):
         # Load icons and images based on JSON paths
-        icons = self.config_data["icons"]
+        icons = self.ui_data["icons"]
         self.attention_icon = CTkImage(
             light_image=Image.open(
                 path.join(self.ASSETS_PATH, icons["attention_icon"])
@@ -166,13 +163,13 @@ class HomePage(CTkFrame):
         )
 
     def create_header(self):
-        header_data = self.config_data["header_data"]
+        header_data = self.ui_data["header_data"]
         self.header.create_header(
             self.home_page_frame, header_title_bg=self.header_title_bg, line_top_img=self.line_top_img, text=header_data["text"]
         )
 
     def create_os_info(self):
-        os_info = self.config_data["create_os_info"]
+        os_info = self.ui_data["create_os_info"]
 
         os_label = CTkLabel(
             self.home_page_frame,
@@ -217,7 +214,7 @@ class HomePage(CTkFrame):
         )
 
     def theme_select(self):
-        theme_select = self.config_data["theme_select"]
+        theme_select = self.ui_data["theme_select"]
 
         theme_frame = CTkFrame(
             self.home_page_frame,
@@ -268,7 +265,7 @@ class HomePage(CTkFrame):
 
     def create_navigation_buttons(self):
 
-        navigation_buttons = self.config_data["create_navigation_buttons"]
+        navigation_buttons = self.ui_data["create_navigation_buttons"]
 
         select_action_label = CTkLabel(
             self.home_page_frame,
@@ -343,7 +340,7 @@ class HomePage(CTkFrame):
 
     def create_file_detection(self):
 
-        file_detection = self.config_data["create_file_detection"]
+        file_detection = self.ui_data["create_file_detection"]
 
         self.detect_files_frame = CTkFrame(
             self.home_page_frame,
@@ -391,7 +388,7 @@ class HomePage(CTkFrame):
         )
 
     def create_recheck_skip_section(self):
-        create_section = self.config_data["create_recheck_skip_section"]
+        create_section = self.ui_data["create_recheck_skip_section"]
 
         self.recheck_skip_frame = CTkFrame(
             self.home_page_frame,
@@ -444,7 +441,7 @@ class HomePage(CTkFrame):
         while True:
             try:
                 frame = PhotoImage(
-                    file=path.join(self.ASSETS_PATH, self.config_data["icons"]["block_spin_gif"]),
+                    file=path.join(self.ASSETS_PATH, self.ui_data["icons"]["block_spin_gif"]),
                     format=f"gif -index {index}",
                 )
                 frames.append(frame)
@@ -468,11 +465,24 @@ class HomePage(CTkFrame):
 
         if getattr(self.modal_theme, "theme_selected", False):
             self.update_ui_for_selected_theme()
+        else:
+            self.clear_selection()
+
+    def clear_selection(self):
+        self.modal_theme = None
+        self.theme_label.configure(text="Select Theme: None")
+        self.detect_files_text.configure(
+            text="Please Select a Theme",
+            fg="#000000",
+            image=self.theme_not_selected_icon,
+        )
+        self.install_button.configure(state="disabled")
+        self.install_files_button.grid_remove()
 
 
     def update_ui_for_selected_theme(self):
         """Update UI when a theme is selected."""
-        updated_ui_data = self.config_data["update_ui_for_selected_theme"]
+        updated_ui_data = self.ui_data["update_ui_for_selected_theme"]
 
         self.detect_files_text.configure(
         image=self.theme_selected_icon,
@@ -526,7 +536,7 @@ class HomePage(CTkFrame):
 
     def handle_data_json_theme(self):
         """Handle themes that have their own data JSON file."""
-        handle_data_json_theme = self.config_data["handle_data_json_theme"]
+        handle_data_json_theme = self.ui_data["handle_data_json_theme"]
         self.detect_files_text.configure(
             text=handle_data_json_theme["detect_files_text"]["text"],
             fg=handle_data_json_theme["detect_files_text"]["fg"],
@@ -537,7 +547,7 @@ class HomePage(CTkFrame):
 
     def handle_userChrome_theme(self):
         """Handle themes that include a userChrome.css file."""
-        handle_userChrome_theme = self.config_data["handle_userChrome_theme"]
+        handle_userChrome_theme = self.ui_data["handle_userChrome_theme"]
         self.detect_files_text.configure(
             text=handle_userChrome_theme["detect_files_text"]["text"],
             fg=handle_userChrome_theme["detect_files_text"]["fg"],
@@ -568,7 +578,7 @@ class HomePage(CTkFrame):
 
     def no_theme_data_found(self):
         """Handle cases where no valid theme data is found."""
-        no_theme_data_found = self.config_data["no_theme_data_found"]
+        no_theme_data_found = self.ui_data["no_theme_data_found"]
         self.detect_files_text.configure(
             text=no_theme_data_found["detect_files_text"]["text"],
             fg=no_theme_data_found["detect_files_text"]["fg"],
@@ -599,7 +609,7 @@ class HomePage(CTkFrame):
 
     def handle_all_files_installed(self):
         """Update UI when all theme files are installed."""
-        handle_all_files_installed = self.config_data["handle_all_files_installed"]
+        handle_all_files_installed = self.ui_data["handle_all_files_installed"]
         self.install_files_button.configure(
             width=handle_all_files_installed["install_files_button"]["width"],
             text=handle_all_files_installed["install_files_button"]["text"],
@@ -619,7 +629,7 @@ class HomePage(CTkFrame):
 
     def handle_missing_files(self):
         """Update UI when some theme files are missing."""
-        handle_missing_files = self.config_data["handle_missing_files"]
+        handle_missing_files = self.ui_data["handle_missing_files"]
         self.install_files_button.configure(
             text=handle_missing_files["install_files_button"]["text"],
             text_color=handle_missing_files["install_files_button"]["text_color"],
@@ -651,7 +661,7 @@ class HomePage(CTkFrame):
 
     def refetch_files(self):
         """Refetch necessary files and update UI."""
-        refetch_files = self.config_data["refetch_files"]
+        refetch_files = self.ui_data["refetch_files"]
         self.install_files_button.configure(
             text=refetch_files["install_files_button"]["text"],
             text_color=refetch_files["install_files_button"]["text_color"],
@@ -664,7 +674,7 @@ class HomePage(CTkFrame):
     # Thread and file fetching management
     def get_theme(self):
         """Handle the theme installation process."""
-        get_theme = self.config_data["get_theme"]
+        get_theme = self.ui_data["get_theme"]
         self.start_loading_animation()
         self.get_neccessary_files()
         self.install_files_button.configure(
@@ -679,17 +689,16 @@ class HomePage(CTkFrame):
 
     def get_neccessary_files(self):
         """Fetch and check necessary files for the theme."""
-        get_neccessary_files = self.config_data["get_neccessary_files"]
+        get_neccessary_files = self.ui_data["get_neccessary_files"]
         self.detect_files_text.config(
             text=get_neccessary_files["detect_files_text"]["text"],
             fg=get_neccessary_files["detect_files_text"]["fg"],
         )
-        custom_script_loader = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).load_json_data()
-        print(custom_script_loader)
-        if custom_script_loader:
-            missing_files = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).check_files_exist(custom_script_loader)
+        file_manager = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH)
+        if file_manager.json_data:
+            missing_files = file_manager.check_files_exist()
             if missing_files:
-                self.start_thread(FileManager(self.CUSTOM_SCRIPT_LOADER_PATH).download_missing_files, missing_files, self.CACHE_PATH)
+                self.start_thread(file_manager.download_missing_files, missing_files, self.CACHE_PATH)
             else:
                 self.stop_loading_animation()
         else:
@@ -697,11 +706,11 @@ class HomePage(CTkFrame):
 
     def fetch_files(self):
         """Fetch files based on data JSON path."""
-        fetch_files = self.config_data["fetch_files"]
+        fetch_files = self.ui_data["fetch_files"]
         self.start_loading_animation()
-        fetch_files_data = FileManager(self.data_json_path).load_json_data()
+        file_manager = FileManager(self.data_json_path)
         self.recheck_button.configure(
-            fetch_files["recheck_button"]["state"],
+            state=fetch_files["recheck_button"]["state"],
             command=self.refetch_files)
         self.recheck_button.grid(
             row=fetch_files["recheck_button"]["grid_data"]["row"],
@@ -711,7 +720,7 @@ class HomePage(CTkFrame):
             sticky=fetch_files["recheck_button"]["grid_data"]["sticky"],
         )
 
-        if fetch_files_data:
+        if file_manager.json_data:
             self.start_thread(self.locate_files)
         else:
             self.handle_fetch_files_failure()
@@ -719,7 +728,7 @@ class HomePage(CTkFrame):
 
     def recheck_files(self):
         """Recheck file status and update UI."""
-        recheck_files = self.config_data["recheck_files"]
+        recheck_files = self.ui_data["recheck_files"]
         self.start_loading_animation()
         self.install_files_button.configure(
             text=recheck_files["install_files_button"]["text"],
@@ -746,7 +755,7 @@ class HomePage(CTkFrame):
 
     def handle_fetch_files_failure(self):
         """Handle the failure to fetch files."""
-        handle_fetch_files_failure = self.config_data["handle_fetch_files_failure"]
+        handle_fetch_files_failure = self.ui_data["handle_fetch_files_failure"]
         self.install_files_button.configure(
             image=self.attention_icon,
             text=handle_fetch_files_failure["install_files_button"]["text"],

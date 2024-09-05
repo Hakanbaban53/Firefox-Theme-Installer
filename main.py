@@ -5,6 +5,7 @@ from sys import exit
 import sys
 from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
 from PIL import Image, ImageTk
+from components.set_window_icon import SetWindowIcon
 from modals.info_modals import InfoModals
 from pages.home_page import HomePage
 from pages.install_page import InstallPage
@@ -33,13 +34,9 @@ class MultiPageApp(CTk):
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
 
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        if os.name == "nt":
-            self.iconbitmap(icon_path)
-        else:
-            icon = Image.open(icon_path)
-            self.iconphoto(True, ImageTk.PhotoImage(icon))
-
+        icon_setter = SetWindowIcon(self.base_dir)
+        icon_setter.set_window_icon(self)
+        
         self.center_window()
 
         self.installer_img = CTkImage(

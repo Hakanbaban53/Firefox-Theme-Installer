@@ -135,4 +135,5 @@ class DetectInstalledTheme:
 
         # Call the update function after a delay to ensure it's on the main thread
         self.installed_themes_label.after(0, update_label)
+        return result
 

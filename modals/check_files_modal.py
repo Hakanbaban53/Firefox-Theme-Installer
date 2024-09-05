@@ -1,60 +1,53 @@
-import json
-import os
-import tkinter as tk
+from os import path, name
+from tkinter import Toplevel, Label, Frame
 from tkinter import ttk
 from threading import Thread
 from PIL import Image, ImageTk
 from customtkinter import CTkButton
+from components.set_window_icon import SetWindowIcon
 from functions.detect_and_download_files import FileManager
 from modals.info_modals import InfoModals
+from functions.load_json_data import LoadJsonData
 
 
-class FileInstallerModal(tk.Toplevel):
+class FileInstallerModal(Toplevel):
     def __init__(self, parent, base_dir, theme_dir):
         super().__init__(parent)
+        # Load the UI data from the JSON file
+        UI_DATA_PATH = path.join(
+            base_dir, "data", "modals", "check_files_modal_data.json"
+        )
+        load_json_data = LoadJsonData()
+        self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+        
+        self.file_manager = FileManager(theme_dir)
+        self.title(self.ui_data["FileInstallerModal"]["title"])
+
+        self.base_dir = base_dir
+        self.theme_dir = theme_dir
+
+        self.configure_layout(parent)
+        self.center_window()
+        self.create_widgets()
+
+    def configure_layout(self, parent):
+        """Configure the layout of the modal."""
         self.transient(parent)
         self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-
-        self.base_dir = base_dir
-        self.theme_dir = theme_dir
-        self.data = self.load_ui_data()  # Load UI data from JSON
-
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        if os.name == "nt":
-            self.iconbitmap(icon_path)
-        else:
-            icon = Image.open(icon_path)
-            self.iconphoto(True, ImageTk.PhotoImage(icon))
-
-        self.file_manager = FileManager(self.theme_dir)
-        self.title(self.data["FileInstallerModal"]["title"])
-        self.center_window()
-        self.create_widgets()
-
-    def load_ui_data(self):
-        """Load UI configuration data from JSON file."""
-        ui_data_path = os.path.join(self.base_dir, "data", "modals", "check_files_modal_data.json")  # Path to UI JSON
-        try:
-            with open(ui_data_path, "r") as file:
-                return json.load(file)
-        except FileNotFoundError:
-            raise FileNotFoundError("The UI configuration file was not found.")
-        except json.JSONDecodeError:
-            raise ValueError("Error parsing the UI configuration JSON file.")
-        except Exception as e:
-            raise Exception(f"An error occurred while loading the UI data file: {e}")
+        icon_setter = SetWindowIcon(self.base_dir)
+        icon_setter.set_window_icon(self)
 
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""
-        modal_config = self.data["FileInstallerModal"]
+        modal_config = self.ui_data["FileInstallerModal"]
 
-        self.files_modal_frame = tk.Frame(self, bg="#2B2631")
+        self.files_modal_frame = Frame(self, bg="#2B2631")
         self.files_modal_frame.pack(padx=20, pady=10)
 
-        self.missing_files_label = tk.Label(
+        self.missing_files_label = Label(
             master=self.files_modal_frame,
             text=modal_config["missing_files_label"],
             fg="#FFFFFF",
@@ -80,7 +73,7 @@ class FileInstallerModal(tk.Toplevel):
             for file in files:
                 self.treeview.insert(folder_id, "end", text="", values=(file,))
 
-        self.buttons_frame = tk.Frame(master=self.files_modal_frame, bg="#2B2631")
+        self.buttons_frame = Frame(master=self.files_modal_frame, bg="#2B2631")
         self.buttons_frame.grid(row=3, column=0, columnspan=2, padx=0, pady=(20, 10))
 
         self.check_button = CTkButton(

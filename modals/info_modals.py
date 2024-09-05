@@ -1,51 +1,41 @@
-import os
 from PIL import Image, ImageTk
 import tkinter as tk
 from customtkinter import CTkButton
-from json import load
-from os import path
+from os import path, name
+
+from components.set_window_icon import SetWindowIcon
+from functions.load_json_data import LoadJsonData
 
 class InfoModals(tk.Toplevel):
     def __init__(self, parent, base_dir, modal):
         super().__init__(parent)
+        # Load the UI data from the JSON file
+        INFO_MODALS_DATA_PATH = path.join(
+                base_dir, "data", "modals","info_modals_data.json"
+            )
+
+        load_json_data = LoadJsonData()
+        self.info_modals_data = load_json_data.load_json_data(INFO_MODALS_DATA_PATH)
         
         self.base_dir = base_dir
+        self.modals_data = self.info_modals_data.get(
+                "modals", {}
+            )
 
-        self._configure_window(parent)
-        self._load_data()
+        self.configure_window(parent)
         self.create_modal(modal)
         self.center_window()
 
-    def _configure_window(self, parent):
+    def configure_window(self, parent):
         """Configure the modal window properties."""
         self.transient(parent)
         self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        if os.name == "nt":
-            self.iconbitmap(icon_path)
-        else:
-            icon = Image.open(icon_path)
-            self.iconphoto(True, ImageTk.PhotoImage(icon))
-
-    def _load_data(self):
-        """Load data from JSON file."""
-        try:
-            data_file_path = path.join(
-                self.base_dir, "data", "modals","info_modals_data.json"
-            )
-            with open(data_file_path, "r", encoding="utf-8") as file:
-                self.installer_data = load(file)
-            self.text_data = self.installer_data.get(
-                "modals", {}
-            )
-        except FileNotFoundError:
-            raise FileNotFoundError("The installer data file was not found.")
-        except Exception as e:
-            raise Exception(f"An error occurred while loading the data file: {e}")
+        
+        icon_setter = SetWindowIcon(self.base_dir)
+        icon_setter.set_window_icon(self)
 
     def create_modal(self, modal):
         """Create the modal based on the type specified."""
@@ -58,7 +48,7 @@ class InfoModals(tk.Toplevel):
 
         modal_key = modal_mapping.get(modal.lower())
         if modal_key:
-            modal_data = self.text_data.get(modal_key)
+            modal_data = self.modals_data.get(modal_key)
             if modal_data:
                 self.title(modal_data["modal_title"])
                 self.create_label(modal_data["modal_label"])

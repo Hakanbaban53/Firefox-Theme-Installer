@@ -1,4 +1,4 @@
-import os
+from os import getlogin, path, getenv
 from re import search
 
 class GetFolderLocations:
@@ -13,20 +13,20 @@ class GetFolderLocations:
 
         # Get the current user's username
         try:
-            current_user = os.getlogin()
+            current_user = getlogin()
         except OSError:
-            current_user = os.getenv('USERNAME') or os.getenv('USER')
+            current_user = getenv('USERNAME') or getenv('USER')
 
         if "$USER" in FIREFOXFOLDER:
             # Construct the Firefox folder path with the current user's username
             FIREFOXFOLDER = FIREFOXFOLDER.replace("$USER", current_user)
         
         # Expand environment variables in the FIREFOXFOLDER path
-        FIREFOXFOLDER = os.path.expandvars(FIREFOXFOLDER)
+        FIREFOXFOLDER = path.expandvars(FIREFOXFOLDER)
         
         # Check if profiles.ini exists
-        PROFILES_FILE = os.path.join(FIREFOXFOLDER, "profiles.ini")
-        if not os.path.isfile(PROFILES_FILE):
+        PROFILES_FILE = path.join(FIREFOXFOLDER, "profiles.ini")
+        if not path.isfile(PROFILES_FILE):
             return ""
 
         # Define default Profile folder path else use -p option
@@ -36,8 +36,8 @@ class GetFolderLocations:
                 match = search(r'\[Install.*?\]\nDefault=(.*?)\n', content)
                 if match:
                     default_profile = match.group(1)
-                    PROFILEFOLDER = os.path.join(FIREFOXFOLDER, default_profile)
+                    PROFILEFOLDER = path.join(FIREFOXFOLDER, default_profile)
                     return PROFILEFOLDER
         else:
-            PROFILEFOLDER = os.path.join(FIREFOXFOLDER, PROFILENAME)
+            PROFILEFOLDER = path.join(FIREFOXFOLDER, PROFILENAME)
             return PROFILEFOLDER

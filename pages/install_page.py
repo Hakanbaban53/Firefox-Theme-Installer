@@ -1,4 +1,3 @@
-from json import load
 from os import path
 
 from pathlib import Path
@@ -17,6 +16,7 @@ from PIL import Image
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
 from components.create_detect_installed_theme import DetectInstalledTheme
+from functions.load_json_data import LoadJsonData
 from functions.preview_theme import PreviewTheme
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
@@ -27,37 +27,42 @@ from functions.special_input_functions import SpecialInputFunc
 class InstallPage(CTkFrame):
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
+        # Load the UI data from the JSON file
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "install_page_data.json")
+        load_json_data = LoadJsonData()
+        self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+        
         self.controller = controller
         self.base_dir = base_dir
         self.theme_dir = None
         self.theme_data = None
 
-        self.config_data = self.load_json_data(
-            path.join(base_dir, "data", "pages", "install_page_data.json")
-        )
-
         # Set the paths
         self.ASSETS_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["ASSETS_PATH"]
-        )
-        self.NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+            base_dir, self.ui_data["data_paths"]["ASSETS_PATH"]
         )
         self.OS_PROPERTIES_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["OS_PROPERTIES_PATH"]
-        )
-        self.INPUTS_DATA_PATH = path.join(
-            base_dir, self.config_data["data_paths"]["INPUTS_DATA_PATH"]
+            base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
         )
         self.CACHE_PATH = Path(
-            path.expanduser(self.config_data["data_paths"]["CACHE_PATH"])
+            path.expanduser(self.ui_data["data_paths"]["CACHE_PATH"])
         )
         self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
-        self.navigation_button_data = self.load_json_data(
-            self.NAVIGATION_BUTTON_DATA_PATH
+        # Get navigation button data
+        NAVIGATION_BUTTON_DATA_PATH = path.join(
+            base_dir, self.ui_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+        )
+        self.navigation_button_data = load_json_data.load_json_data(
+            NAVIGATION_BUTTON_DATA_PATH
         )
         self.button_data = self.navigation_button_data["navigation_buttons"]
+
+        # Get inputs data
+        INPUTS_DATA_PATH = path.join(
+            base_dir, self.ui_data["data_paths"]["INPUTS_DATA_PATH"]
+        )
+        self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
 
         self.header = CreateHeader()
         self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
@@ -74,10 +79,6 @@ class InstallPage(CTkFrame):
 
         self.configure_layout()
         self.create_widgets()
-
-    def load_json_data(self, path):
-        with open(path, "r") as file:
-            return load(file)
 
     def configure_layout(self):
         self.install_page_frame = CTkFrame(
@@ -99,7 +100,7 @@ class InstallPage(CTkFrame):
 
     def create_images(self):
         # Load icons and images based on JSON paths
-        icons = self.config_data["icons"]
+        icons = self.ui_data["icons"]
         self.attention_icon = CTkImage(
             light_image=Image.open(
                 path.join(self.ASSETS_PATH, icons["attention_icon"])
@@ -151,7 +152,7 @@ class InstallPage(CTkFrame):
         )
 
     def create_header(self):
-        header_data = self.config_data["header_data"]
+        header_data = self.ui_data["header_data"]
 
         self.header.create_header(
             self.install_page_frame,
@@ -161,8 +162,7 @@ class InstallPage(CTkFrame):
         )
 
     def create_inputs_and_checkboxes(self):
-        inputs_data = self.load_json_data(self.INPUTS_DATA_PATH)
-        inputs_data = inputs_data["create_inputs_and_checkboxes"]
+        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]
 
         inputs_checkboxes_frame = CTkFrame(
             self.install_page_frame,
@@ -332,7 +332,7 @@ class InstallPage(CTkFrame):
 
 
     def create_preview_theme(self, preview_and_check_installed_theme_frame):
-        preview_theme_data = self.config_data["create_preview_theme"]
+        preview_theme_data = self.ui_data["create_preview_theme"]
         preview_frame = CTkFrame(
             preview_and_check_installed_theme_frame,
             width=preview_theme_data["preview_frame"]["width"],
@@ -385,7 +385,7 @@ class InstallPage(CTkFrame):
         )
     
     def create_invalid_entry_frame(self):
-        invalid_entry_frame_data = self.config_data["create_invalid_entry_frame"]
+        invalid_entry_frame_data = self.ui_data["create_invalid_entry_frame"]
         self.invalid_entry_frame = CTkFrame(
             self.install_page_frame,
             width=invalid_entry_frame_data["invalid_entry_frame"]["width"],
@@ -532,7 +532,7 @@ class InstallPage(CTkFrame):
         self.update_button_and_frame()
 
     def update_button_and_frame(self):
-        update_button_and_frame_data = self.config_data["update_button_and_frame"]
+        update_button_and_frame_data = self.ui_data["update_button_and_frame"]
         if SpecialInputFunc().update_invalid_entries_display():
             self.install_button.configure(state="normal")
             self.invalid_entry_frame.grid_remove()

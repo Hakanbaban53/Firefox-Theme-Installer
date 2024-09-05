@@ -10,19 +10,25 @@
         "items_per_page": 15
       },
       "search_bar": {
-        "placeholder_text": "Search themes..."
+        "text_color": "#000000",
+        "border_width": 0,
+        "placeholder_text": "🔍 Search theme..."
       },
       "treeview": {
         "columns": ["Title", "Description"],
         "description_column_width": 400,
         "oddrow_background": "#f2f2f2",
-        "evenrow_background": "#ffffff"
+        "evenrow_background": "#ffffff",
+        "font": "(\"Arial\", 12, \"normal\")"
       },
       "buttons": {
         "select_button": {
           "text": "Select Theme",
+          "text_color": "#FFFFFF",
           "width": 75,
-          "disabled_color": "#D8000C"
+          "fg_color": "#7D31DF",
+          "hover_color": "#9747FF",
+          "font": "(\"Arial\", 16, \"bold\")"
         },
         "retry_button": {
           "text": "Retry",
@@ -48,7 +54,7 @@
         }
       },
       "tags": {
-        "info_label": "Select a tag to filter"
+        "text": "🔎 Filter"
       },
       "pagination": {
         "label_template": "Page {current} of {total}"
