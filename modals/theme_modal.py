@@ -21,10 +21,12 @@ class ThemeModal(Toplevel):
         self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.theme_manager = ThemeManager(
-            path.join(self.base_dir, self.ui_data["ThemeModal"]["themes"]["data_path"]),
-            self.ui_data["ThemeModal"]["themes"]["data_url"],
+            json_file_path=path.join(
+                self.cache_dir, self.ui_data["ThemeModal"]["themes"]["data_path"]
+            ),
+            json_file_url=self.ui_data["ThemeModal"]["themes"]["data_url"],
         )
-        self.cache_dir = path.join(self.cache_dir, "image_cache")
+        self.image_cache_dir = path.join(self.cache_dir, "image_cache")
 
         self.sort_order = "asc"
         self.sort_column = "Title"
@@ -224,7 +226,7 @@ class ThemeModal(Toplevel):
             self.select_button.configure(text="Retrying")
             self.theme_manager = ThemeManager(
                 path.join(
-                    self.base_dir, self.ui_data["ThemeModal"]["themes"]["data_path"]
+                    self.cache_dir, self.ui_data["ThemeModal"]["themes"]["data_path"]
                 ),
                 self.ui_data["ThemeModal"]["themes"]["data_url"],
             )
@@ -375,7 +377,7 @@ class ThemeModal(Toplevel):
 
             if theme_data:
                 ThemeDetailModal(
-                    self, theme_data, self.cache_dir, base_dir=self.base_dir
+                    self, theme_data, self.image_cache_dir, base_dir=self.base_dir
                 )
 
     def next_page(self):

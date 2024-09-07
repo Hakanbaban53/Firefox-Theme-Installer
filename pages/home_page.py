@@ -50,7 +50,7 @@ class HomePage(CTkFrame):
             self.CACHE_PATH, self.ui_data["data_paths"]["THEME_PATH"]
         )
         self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
+            self.CACHE_PATH, self.ui_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
         )
 
         # Load additional data
@@ -694,7 +694,7 @@ class HomePage(CTkFrame):
             text=get_neccessary_files["detect_files_text"]["text"],
             fg=get_neccessary_files["detect_files_text"]["fg"],
         )
-        file_manager = FileManager(self.CUSTOM_SCRIPT_LOADER_PATH)
+        file_manager = FileManager(json_file_path=self.CUSTOM_SCRIPT_LOADER_PATH, json_file_url=self.ui_data["data_paths"]["CUSTOM_SCRIPT_LOADER_URL"])
         if file_manager.json_data:
             missing_files = file_manager.check_files_exist()
             if missing_files:
@@ -769,7 +769,6 @@ class HomePage(CTkFrame):
             pady=handle_fetch_files_failure["clean_install"]["grid_data"]["pady"],
             sticky=handle_fetch_files_failure["clean_install"]["grid_data"]["sticky"],
         )
-
 
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed

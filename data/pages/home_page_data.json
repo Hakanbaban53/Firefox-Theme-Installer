@@ -10,7 +10,8 @@
     "OS_PROPERTIES_PATH": "data/OS data/os_properties.json",
     "CACHE_PATH": "~/.cache/Firefox Theme Installer/",
     "THEME_PATH": "themes/",
-    "CUSTOM_SCRIPT_LOADER_PATH": "data/files data/fx-autoconfig.json"
+    "CUSTOM_SCRIPT_LOADER_URL": "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/files%20data/fx-autoconfig.json",
+    "CUSTOM_SCRIPT_LOADER_PATH": "data/fx-autoconfig.json"
   },
 
   "icons": {

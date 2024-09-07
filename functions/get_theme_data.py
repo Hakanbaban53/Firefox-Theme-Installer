@@ -26,12 +26,8 @@ class Theme:
 
 class ThemeManager:
     def __init__(self, json_file_path, json_file_url):
-        self.json_file_url = json_file_url
-        self.json_file_path = json_file_path
-
-        load_json_data = LoadJsonData()
-
-        json_data = load_json_data.load_json_data(self.json_file_path)
+        load_json_data = LoadJsonData(json_file_url)
+        json_data = load_json_data.load_json_data(json_file_path)
         self.themes = [Theme(**theme_data) for theme_data in json_data]
 
     def get_all_themes(self):

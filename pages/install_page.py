@@ -321,7 +321,7 @@ class InstallPage(CTkFrame):
             self,
             chrome_folder=self.chrome_folder,
             theme_detected_icon=self.theme_detected_icon,
-            cache_dir=self.image_cache_dir,
+            image_cache_dir=self.image_cache_dir,
             base_dir=self.base_dir
         )
         self.detect_installed_theme_component.create_installed_themes(preview_and_check_installed_theme_frame)

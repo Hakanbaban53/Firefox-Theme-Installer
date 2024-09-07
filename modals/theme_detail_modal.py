@@ -20,7 +20,7 @@ from functions.load_json_data import LoadJsonData
 
 
 class ThemeDetailModal(Toplevel):
-    def __init__(self, parent, theme, cache_dir, base_dir):
+    def __init__(self, parent, theme, image_cache_dir, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
@@ -30,7 +30,7 @@ class ThemeDetailModal(Toplevel):
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
 
         self.base_dir = base_dir
-        self.cache_dir = cache_dir
+        self.image_cache_dir = image_cache_dir
         self.theme = theme
 
         self.cache_expiration = self.ui_data["ThemeDetailModal"]["cache_expiration"]
@@ -108,10 +108,15 @@ class ThemeDetailModal(Toplevel):
         else:
             self.display_image_error(image_label)
 
+    def sanitize_title(self, title):
+        # # Replace any problematic characters with underscores or remove them
+        return title.replace('/', '_').replace('\\', '_')
+
     def load_image(self, theme):
         """Loads the image from cache or downloads it."""
-        makedirs(self.cache_dir, exist_ok=True)  # Ensure cache directory exists
-        image_cache_path = path.join(self.cache_dir, f"{theme.title}.webp")
+        makedirs(self.image_cache_dir, exist_ok=True)  # Ensure cache directory exists
+        sanitized_title = self.sanitize_title(theme.title)
+        image_cache_path = path.join(self.image_cache_dir, f"{sanitized_title}.webp")
         current_time = time()
 
         if (

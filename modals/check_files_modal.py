@@ -1,8 +1,7 @@
-from os import path, name
+from os import path
 from tkinter import Toplevel, Label, Frame
 from tkinter import ttk
 from threading import Thread
-from PIL import Image, ImageTk
 from customtkinter import CTkButton
 from components.set_window_icon import SetWindowIcon
 from functions.detect_and_download_files import FileManager

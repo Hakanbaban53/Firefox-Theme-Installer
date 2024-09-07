@@ -1,17 +1,14 @@
 import os
-import ctypes
-from json import load
-from sys import exit
 import sys
-from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
-from PIL import Image, ImageTk
+from json import load
+from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame
+from PIL import Image
 from components.set_window_icon import SetWindowIcon
 from modals.info_modals import InfoModals
 from pages.home_page import HomePage
 from pages.install_page import InstallPage
 from pages.remove_page import RemovePage
 from pages.status_page import StatusPage
-
 
 class MultiPageApp(CTk):
     def __init__(self, *args, **kwargs):
@@ -20,10 +17,6 @@ class MultiPageApp(CTk):
         self.base_dir = getattr(
             sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
         )  # Also I send the other pages and functions this path.
-
-        # if not self.is_admin():
-        #     self.show_admin_error(self)
-        #     exit()
 
         installer_data_path = os.path.join(self.base_dir, "data", "installer_data.json")
         with open(installer_data_path, "r", encoding="utf-8") as file:
@@ -38,6 +31,9 @@ class MultiPageApp(CTk):
         icon_setter.set_window_icon(self)
         
         self.center_window()
+
+        # Set the main background color to match frames
+        self.configure(bg="#2B2631")  # Match the frame background color
 
         self.installer_img = CTkImage(
             light_image=Image.open(
@@ -62,7 +58,7 @@ class MultiPageApp(CTk):
         )
         self.installer_img_label.place(x=0, y=0)  # Place image label at (0, 0)
 
-        self.container = CTkFrame(self)
+        self.container = CTkFrame(self, fg_color="#2B2631")  # Set matching background color
         self.container.pack(side="top", fill="both", expand=True)
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
@@ -79,47 +75,34 @@ class MultiPageApp(CTk):
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
 
-    def slide_to_frame(self, current_frame, next_frame, x, speed=35, direction=None):
-        if direction is None:
-            current_index = list(self.frames.values()).index(current_frame)
-            next_index = list(self.frames.values()).index(next_frame)
-            direction = "left" if current_index > next_index else "right"
+    def slide_to_frame(self, current_frame, next_frame, x=0, speed=20, direction='left'):
+        # Determine slide directions based on relative positions
+        window_width = self.winfo_width()
+        target_x = 0 if direction == 'left' else window_width + 315
 
-        if direction == "right":
-            next_x = self.winfo_width() - x
-            current_x = -x + 315
-        else:
-            next_x = x - self.winfo_width() + 625
-            current_x = x + 2 * 315
+        # Apply easing for smoother sliding effect
+        def ease_in_out(t):
+            return 3 * (t ** 2) - 2 * (t ** 3)
 
-        next_frame.place(x=next_x, y=0, relwidth=1, relheight=1)
-        current_frame.place(x=current_x, y=0, relwidth=1, relheight=1)
-
+        next_frame.place(x=target_x + window_width if direction == 'left' else -window_width, y=0, relwidth=1, relheight=1)
         next_frame.lift()
         self.update()
 
-        if direction == "left" and x <= self.winfo_width() - 315:
-            self.after(
-                1,
-                self.slide_to_frame,
-                current_frame,
-                next_frame,
-                x + speed,
-                speed,
-                direction,
-            )
-        elif direction == "right" and x <= self.winfo_width() - 315:
-            self.after(
-                1,
-                self.slide_to_frame,
-                current_frame,
-                next_frame,
-                x + speed,
-                speed,
-                direction,
-            )
-        else:
-            current_frame.place_forget()
+        def slide_step(position):
+            ease_position = int(ease_in_out(position / window_width) * window_width)
+            current_pos = ease_position + 315 if direction == 'left' else window_width - ease_position
+
+            # Position frames based on easing calculation
+            next_frame.place(x=target_x - (window_width - current_pos), y=0)
+            current_frame.place(x=current_pos, y=0) if direction == 'left' else current_frame.place(x=current_pos -800, y=0)
+
+            if position < window_width:
+                self.after(5, slide_step, position + speed)
+            else:
+                current_frame.place_forget()
+                next_frame.place(x=315, y=0, relwidth=1, relheight=1)
+
+        slide_step(x)
 
     def show_frame(self, page_name, **kwargs):
         self.installer_img_label.lift()
@@ -143,26 +126,13 @@ class MultiPageApp(CTk):
 
             next_frame = self.frames[page_class]
             if current_frame is not None:
-                self.slide_to_frame(current_frame, next_frame, 0)
+                direction = 'left' if list(self.frames.values()).index(current_frame) > list(self.frames.values()).index(next_frame) else 'right'
+                self.slide_to_frame(current_frame, next_frame, 0, speed=20, direction=direction)
             else:
                 next_frame.place(x=315, y=0, relwidth=1, relheight=1)
 
             next_frame.update_parameters(**kwargs)
             next_frame.tkraise()
-
-    def is_admin(self):
-        try:
-            if os.name == "nt":  # Windows
-                try:
-                    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-                except AttributeError:
-                    is_admin = False
-                return is_admin
-            else:  # Unix-like systems
-                return os.getuid() == 0
-        except Exception as e:
-            print(f"Error checking admin rights: {e}")
-            return False
 
     def exit_confirmation(self):
         InfoModals(self, self.base_dir, "Exit")
@@ -179,53 +149,6 @@ class MultiPageApp(CTk):
         y = (screen_height - window_height) // 2
 
         self.geometry("+{}+{}".format(x, y))
-
-    def show_admin_error(self, master):
-        master.title("Admin Error")
-        master.geometry("300x150")
-        master.configure(fg_color="#2B2631")
-        master.resizable(False, False)
-
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        if os.name == "nt":
-            self.iconbitmap(icon_path)
-        else:
-            icon = Image.open(icon_path)
-            self.iconphoto(True, ImageTk.PhotoImage(icon))
-
-        label = CTkLabel(
-            master,
-            text="Administrative privileges are required.",
-            text_color="white",
-            font=CTkFont(family="Segoe UI", size=15),
-        )
-        label.pack(padx=20, pady=20)
-
-        ok_button = CTkButton(
-            master,
-            text="OK",
-            text_color="white",
-            command=exit,
-            bg_color="#2B2631",
-            fg_color="#f04141",
-            font=("Arial", 14),
-        )
-        ok_button.pack(pady=10)
-
-        # Bind the close event to the exit function
-        master.protocol("WM_DELETE_WINDOW", exit)
-
-        # Center the master window
-        master.update_idletasks()
-        width = master.winfo_width()
-        height = master.winfo_height()
-        x = (master.winfo_screenwidth() // 2) - (width // 2)
-        y = (master.winfo_screenheight() // 2) - (height // 2)
-        master.geometry(f"{width}x{height}+{x}+{y}")
-
-        master.grab_set()
-        master.mainloop()
-
 
 if __name__ == "__main__":
     app = MultiPageApp()

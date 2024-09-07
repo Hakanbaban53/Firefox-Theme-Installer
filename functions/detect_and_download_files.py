@@ -7,12 +7,10 @@ from functions.load_json_data import LoadJsonData
 
 class FileManager:
     def __init__(self, json_file_path, json_file_url=None):
-        self.json_file_path = json_file_path
-        self.json_file_url = json_file_url
         self.missing_files = {}
 
-        load_json_data = LoadJsonData()
-        self.json_data = load_json_data.load_json_data(self.json_file_path)
+        load_json_data = LoadJsonData(json_file_url)
+        self.json_data = load_json_data.load_json_data(json_file_path)
 
 
     def download_from_github(self, download_link, destination, max_retries=3):

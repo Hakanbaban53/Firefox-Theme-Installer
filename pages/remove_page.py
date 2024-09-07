@@ -1,4 +1,5 @@
 from os import path
+from pathlib import Path
 from tkinter import BooleanVar
 from customtkinter import (
     CTkFrame,
@@ -38,7 +39,10 @@ class RemovePage(CTkFrame):
         self.OS_PROPERTIES_PATH = path.join(
             base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
         )
-        self.cache_dir = path.join(self.base_dir, "image_cache")
+        self.CACHE_PATH = Path(
+            path.expanduser(self.ui_data["data_paths"]["CACHE_PATH"])
+        )
+        self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
         # Get navigation button data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
@@ -311,7 +315,7 @@ class RemovePage(CTkFrame):
             self,
             chrome_folder=self.chrome_folder,
             theme_detected_icon=self.theme_detected_icon,
-            cache_dir=self.cache_dir,
+            image_cache_dir=self.image_cache_dir,
             base_dir=self.base_dir
         )
         self.detect_installed_theme_component.create_installed_themes(preview_and_check_installed_theme_frame)

@@ -6,7 +6,7 @@
       },
       "themes": {
         "data_url": "https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/themes.json",
-        "data_path": "data/files data/themes.json",
+        "data_path": "data/themes.json",
         "items_per_page": 15
       },
       "search_bar": {

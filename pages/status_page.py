@@ -213,7 +213,7 @@ class StatusPage(CTkFrame):
             command=lambda: self.controller.show_frame(
                 f"{self.come_from_which_page}_page"
             ),
-            state="disabled",
+            # state="disabled",
         )
         self.navigation_button.create_navigation_button(
             parent,
@@ -341,3 +341,11 @@ class StatusPage(CTkFrame):
         )
         self.file_actions.remove_file(path.join(self.profile_folder, "user.js"))
         self.file_actions.remove_folder(path.join(self.profile_folder, "chrome"))
+
+        # # For Testing
+        # self.back_button.configure(
+        #     command=lambda: self.controller.show_frame(
+        #         f"{self.come_from_which_page}_page",
+        #         status="normal"
+        #     ),
+        # )
