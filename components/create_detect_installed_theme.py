@@ -6,12 +6,11 @@ from modals.theme_detail_modal import ThemeDetailModal
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 
 class DetectInstalledTheme:
-    def __init__(self, parent, chrome_folder, theme_detected_icon, image_cache_dir, base_dir):
+    def __init__(self, parent, chrome_folder, theme_detected_icon, base_dir):
         self.parent = parent
         self.chrome_folder = chrome_folder
         self.theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
         self.theme_detected_icon = theme_detected_icon
-        self.image_cache_dir = image_cache_dir
         self.base_dir = base_dir
         self.theme_data = None
         self.installed_themes_label = None
@@ -77,7 +76,6 @@ class DetectInstalledTheme:
             command=lambda: ThemeDetailModal(
                 self.parent,
                 theme=self.theme_data,
-                image_cache_dir=self.image_cache_dir,
                 base_dir=self.base_dir,
             ),
         )

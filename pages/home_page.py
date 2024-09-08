@@ -3,13 +3,13 @@ from os import path
 from pathlib import Path
 from tkinter import BooleanVar, PhotoImage, Label, TclError
 from threading import Thread
-from PIL import Image
 
-from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox, CTkImage
+from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
 from functions.get_the_theme_files import ThemeDownloader
+from functions.image_loader import ImageLoader
 from functions.load_json_data import LoadJsonData
 from modals.check_files_modal import FileInstallerModal
 from modals.info_modals import InfoModals
@@ -63,6 +63,9 @@ class HomePage(CTkFrame):
         self.navigation_button = NavigationButton(self.button_data)
         self.header = CreateHeader()
 
+        # Initialize ImageLoader with the asset path and OS name
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
+
         # Initialize variables
         self.data_json_path = None
         self.modal_theme = None
@@ -87,81 +90,21 @@ class HomePage(CTkFrame):
         self.create_recheck_skip_section()
 
     def create_images(self):
-        # Load icons and images based on JSON paths
+        # Load icons and images using the ImageLoader
         icons = self.ui_data["icons"]
-        self.attention_icon = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["attention_icon"])
-            ),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["attention_icon"])),
-            size=(24, 24),
+        self.attention_icon = self.image_loader.load_attention_icon(icons)
+        self.check_icon = self.image_loader.load_check_icon(icons)
+        self.install_files_icon = self.image_loader.load_install_files_icon(icons)
+        self.theme_not_selected_icon = self.image_loader.load_theme_not_selected_icon(icons)
+        self.theme_selected_icon = self.image_loader.load_theme_selected_icon(icons)
+        self.header_title_bg = self.image_loader.load_header_title_bg(
+            icons, size=(390, 64)  # Specific size for HomePage
         )
-        self.check_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["check_icon"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["check_icon"])),
-            size=(24, 24),
-        )
-        self.install_files_icon = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["install_files_icon"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["install_files_icon"])
-            ),
-            size=(24, 24),
-        )
-        self.theme_not_selected_icon = PhotoImage(
-            file=path.join(self.ASSETS_PATH, icons["theme_not_selected_icon"]),
-            height=32,
-            width=24,
-        )
-        self.theme_selected_icon = PhotoImage(
-            file=path.join(self.ASSETS_PATH, icons["theme_selected_icon"]),
-            height=32,
-            width=24,
-        )
-        self.header_title_bg = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            size=(390, 64),
-        )
-        self.line_top_img = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
-            size=(650, 6),
-        )
-        self.os_icon_image = CTkImage(
-            light_image=Image.open(
-                path.join(
-                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-                )
-            ),
-            dark_image=Image.open(
-                path.join(
-                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-                )
-            ),
-            size=(20, 24),
-        )
-        self.select_action_img = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            size=(270, 36),
-        )
-        self.reload_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["reload_icon"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["reload_icon"])),
-            size=(24, 24),
-        )
-
+        self.line_top_img = self.image_loader.load_line_top_img(icons)
+        self.os_icon_image = self.image_loader.load_os_icon_image()
+        self.select_action_img = self.image_loader.load_select_action_img(icons)
+        self.reload_icon = self.image_loader.load_reload_icon(icons)
+        
     def create_header(self):
         header_data = self.ui_data["header_data"]
         self.header.create_header(
@@ -307,7 +250,7 @@ class HomePage(CTkFrame):
         self.navigation_button.create_navigation_button(
             navigation_frame,
             "Remove",
-            path.join(self.ASSETS_PATH, "icons/remove_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/remove.png"),
             lambda: self.controller.show_frame("remove_page"),
             padding_x=(10, 20),
             side="right",
@@ -315,7 +258,7 @@ class HomePage(CTkFrame):
         self.install_button = self.navigation_button.create_navigation_button(
             navigation_frame,
             "Install",
-            path.join(self.ASSETS_PATH, "icons/install_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/install.png"),
             lambda: self.controller.show_frame(
                 "install_page",
                 theme_dir=(
@@ -332,7 +275,7 @@ class HomePage(CTkFrame):
         self.navigation_button.create_navigation_button(
             navigation_frame,
             "Exit",
-            path.join(self.ASSETS_PATH, "icons/exit_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
@@ -484,6 +427,8 @@ class HomePage(CTkFrame):
         """Update UI when a theme is selected."""
         updated_ui_data = self.ui_data["update_ui_for_selected_theme"]
 
+        self.install_button.configure(state="disabled")
+        
         self.detect_files_text.configure(
         image=self.theme_selected_icon,
         text=updated_ui_data["detect_files_text"]["text"],
@@ -508,7 +453,6 @@ class HomePage(CTkFrame):
             sticky=updated_ui_data["clean_install"]["grid_data"]["sticky"], 
         )
         self.install_files_button.grid(pady=updated_ui_data["install_files_button"]["grid_data"]["pady"])
-        self.install_button.configure(updated_ui_data["install_button"]["state"])
 
     def run_theme_process(self):
         """Run the theme processing logic."""

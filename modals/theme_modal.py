@@ -377,7 +377,7 @@ class ThemeModal(Toplevel):
 
             if theme_data:
                 ThemeDetailModal(
-                    self, theme_data, self.image_cache_dir, base_dir=self.base_dir
+                    self, theme_data, base_dir=self.base_dir
                 )
 
     def next_page(self):

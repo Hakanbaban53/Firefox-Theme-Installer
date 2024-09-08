@@ -1,4 +1,5 @@
 from os import path, makedirs
+from pathlib import Path
 from time import time
 from tkinter import Toplevel, BOTH, END, DISABLED, X, LEFT
 from customtkinter import (
@@ -20,7 +21,7 @@ from functions.load_json_data import LoadJsonData
 
 
 class ThemeDetailModal(Toplevel):
-    def __init__(self, parent, theme, image_cache_dir, base_dir):
+    def __init__(self, parent, theme, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
@@ -30,7 +31,12 @@ class ThemeDetailModal(Toplevel):
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
 
         self.base_dir = base_dir
-        self.image_cache_dir = image_cache_dir
+
+        self.CACHE_PATH = Path(
+            path.expanduser(self.ui_data["ThemeDetailModal"]["CACHE_PATH"])
+        )
+        self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
+
         self.theme = theme
 
         self.cache_expiration = self.ui_data["ThemeDetailModal"]["cache_expiration"]

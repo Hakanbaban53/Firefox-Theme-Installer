@@ -4,15 +4,14 @@ from pathlib import Path
 from threading import Thread
 from customtkinter import (
     CTkFrame,
-    CTkImage,
     CTkLabel,
     CTkFont,
     CTkTextbox,
     CTkProgressBar,
 )
-from PIL import Image
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
+from functions.image_loader import ImageLoader
 from functions.load_json_data import LoadJsonData
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
@@ -59,16 +58,11 @@ class StatusPage(CTkFrame):
         self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
         self.file_actions = FileActions(self.os_values["os_name"])
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
+
 
         self.configure_layout()
         self.create_widgets()
-
-    def load_image(self, file_name, size):
-        return CTkImage(
-            light_image=Image.open(file_name),
-            dark_image=Image.open(file_name),
-            size=size,
-        )
 
     def configure_layout(self):
         self.status_page_frame = CTkFrame(
@@ -87,47 +81,12 @@ class StatusPage(CTkFrame):
         self.create_bottom_widgets()
 
     def create_images(self):
-        # Load icons and images based on JSON paths
-        icons = self.ui_data["icons"]
-        self.attention_icon = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["attention_icon"])
-            ),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["attention_icon"])),
-            size=(24, 24),
+        self.check_icon = self.image_loader.load_check_icon(self.ui_data["icons"])
+        self.os_icon_image = self.image_loader.load_os_icon_image()
+        self.header_title_bg = self.image_loader.load_header_title_bg(
+            self.ui_data["icons"],
         )
-        self.header_title_bg = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            size=(300, 64),
-        )
-        self.line_top_img = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
-            size=(650, 6),
-        )
-        self.os_icon_image = CTkImage(
-            light_image=Image.open(
-                path.join(
-                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-                )
-            ),
-            dark_image=Image.open(
-                path.join(
-                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-                )
-            ),
-            size=(20, 24),
-        )
-        self.check_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["check_icon"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["check_icon"])),
-            size=(24, 24),
-        )
+        self.line_top_img = self.image_loader.load_line_top_img(self.ui_data["icons"])
 
 
     def create_header(self):
@@ -197,7 +156,7 @@ class StatusPage(CTkFrame):
         self.navigation_button.create_navigation_button(
             parent,
             "Finish",
-            path.join(self.ASSETS_PATH, "icons/finish_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/finish.png"),
             lambda: InfoModals(self, self.base_dir, "Attention"),
             padding_x=(10, 20),
             side="right",
@@ -207,7 +166,7 @@ class StatusPage(CTkFrame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "Back",
-            path.join(self.ASSETS_PATH, "icons/back_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/back.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame(
@@ -218,7 +177,7 @@ class StatusPage(CTkFrame):
         self.navigation_button.create_navigation_button(
             parent,
             "Exit",
-            path.join(self.ASSETS_PATH, "icons/exit_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",

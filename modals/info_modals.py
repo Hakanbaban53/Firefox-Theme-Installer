@@ -1,7 +1,6 @@
-from PIL import Image, ImageTk
 import tkinter as tk
 from customtkinter import CTkButton
-from os import path, name
+from os import path
 
 from components.set_window_icon import SetWindowIcon
 from functions.load_json_data import LoadJsonData

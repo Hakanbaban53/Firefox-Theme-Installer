@@ -5,24 +5,22 @@ from threading import Thread
 from tkinter import BooleanVar
 from customtkinter import (
     CTkFrame,
-    CTkImage,
     CTkLabel,
     CTkEntry,
     CTkCheckBox,
     CTkButton,
 )
-from PIL import Image
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
 from components.create_detect_installed_theme import DetectInstalledTheme
+from functions.image_loader import ImageLoader
 from functions.load_json_data import LoadJsonData
 from functions.preview_theme import PreviewTheme
 from modals.info_modals import InfoModals
 from functions.get_os_properties import OSProperties
 from functions.get_folder_locations import GetFolderLocations
 from functions.special_input_functions import SpecialInputFunc
-
 
 class InstallPage(CTkFrame):
     def __init__(self, parent, controller, base_dir):
@@ -31,7 +29,7 @@ class InstallPage(CTkFrame):
         UI_DATA_PATH = path.join(base_dir, "data", "pages", "install_page_data.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        
+
         self.controller = controller
         self.base_dir = base_dir
         self.theme_dir = None
@@ -47,7 +45,6 @@ class InstallPage(CTkFrame):
         self.CACHE_PATH = Path(
             path.expanduser(self.ui_data["data_paths"]["CACHE_PATH"])
         )
-        self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
         # Get navigation button data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
@@ -72,10 +69,10 @@ class InstallPage(CTkFrame):
             self.os_values
         ).get_profile_folder()
 
-
         self.chrome_folder = path.join(self.profile_folder_location, "chrome")
 
-
+        # Initialize ImageLoader with the asset path and OS name
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
 
         self.configure_layout()
         self.create_widgets()
@@ -99,57 +96,15 @@ class InstallPage(CTkFrame):
         self.checkbox_event()
 
     def create_images(self):
-        # Load icons and images based on JSON paths
+        # Load icons and images using the ImageLoader
         icons = self.ui_data["icons"]
-        self.attention_icon = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["attention_icon"])
-            ),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["attention_icon"])),
-            size=(24, 24),
-        )
-        self.header_title_bg = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["header_title_bg"])
-            ),
-            size=(300, 64),
-        )
-        self.line_top_img = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["line_top_img"])),
-            size=(650, 6),
-        )
-        self.os_icon_image = CTkImage(
-            light_image=Image.open(
-                path.join(
-                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-                )
-            ),
-            dark_image=Image.open(
-                path.join(
-                    self.ASSETS_PATH, f"icons/{self.os_values['os_name'].lower()}.png"
-                )
-            ),
-            size=(20, 24),
-        )
-        self.preview_icon = CTkImage(
-            light_image=Image.open(path.join(self.ASSETS_PATH, icons["preview_icon"])),
-            dark_image=Image.open(path.join(self.ASSETS_PATH, icons["preview_icon"])),
-            size=(24, 24),
-        )
+        self.attention_icon = self.image_loader.load_attention_icon(icons)
+        self.header_title_bg = self.image_loader.load_header_title_bg(icons)
+        self.line_top_img = self.image_loader.load_line_top_img(icons)
+        self.os_icon_image = self.image_loader.load_os_icon_image()
+        self.preview_icon = self.image_loader.load_preview_icon(icons)
+        self.theme_detected_icon = self.image_loader.load_theme_detected_icon(icons)
 
-        self.theme_detected_icon = CTkImage(
-            light_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["theme_detected_icon"])
-            ),
-            dark_image=Image.open(
-                path.join(self.ASSETS_PATH, icons["theme_detected_icon"])
-            ),
-            size=(24, 32),
-        )
 
     def create_header(self):
         header_data = self.ui_data["header_data"]
@@ -321,7 +276,6 @@ class InstallPage(CTkFrame):
             self,
             chrome_folder=self.chrome_folder,
             theme_detected_icon=self.theme_detected_icon,
-            image_cache_dir=self.image_cache_dir,
             base_dir=self.base_dir
         )
         self.detect_installed_theme_component.create_installed_themes(preview_and_check_installed_theme_frame)
@@ -442,7 +396,7 @@ class InstallPage(CTkFrame):
         self.install_button = self.navigation_button.create_navigation_button(
             parent,
             "Install",
-            path.join(self.ASSETS_PATH, "icons/install_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/install.png"),
             command=lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="install",
@@ -466,7 +420,7 @@ class InstallPage(CTkFrame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "Back",
-            path.join(self.ASSETS_PATH, "icons/back_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/back.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
@@ -474,7 +428,7 @@ class InstallPage(CTkFrame):
         self.navigation_button.create_navigation_button(
             parent,
             "Exit",
-            path.join(self.ASSETS_PATH, "icons/exit_icon.png"),
+            path.join(self.ASSETS_PATH, "icons/exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit"),
             padding_x=(20, 10),
             side="left",
