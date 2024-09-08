@@ -14,13 +14,13 @@ from customtkinter import (
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
 from components.create_detect_installed_theme import DetectInstalledTheme
-from functions.image_loader import ImageLoader
-from functions.load_json_data import LoadJsonData
-from functions.preview_theme import PreviewTheme
+from installer_core.component_tools.preview_theme import PreviewTheme
+from installer_core.component_tools.special_input_functions import SpecialInputFunc
+from installer_core.data_tools.get_os_properties import OSProperties
+from installer_core.data_tools.image_loader import ImageLoader
+from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.file_utils.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
-from functions.get_os_properties import OSProperties
-from functions.get_folder_locations import GetFolderLocations
-from functions.special_input_functions import SpecialInputFunc
 
 class InstallPage(CTkFrame):
     def __init__(self, parent, controller, base_dir):

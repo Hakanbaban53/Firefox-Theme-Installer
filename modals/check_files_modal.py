@@ -3,10 +3,11 @@ from tkinter import Toplevel, Label, Frame
 from tkinter import ttk
 from threading import Thread
 from customtkinter import CTkButton
+
 from components.set_window_icon import SetWindowIcon
-from functions.detect_and_download_files import FileManager
+from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.file_utils.detect_and_download_files import FileManager
 from modals.info_modals import InfoModals
-from functions.load_json_data import LoadJsonData
 
 
 class FileInstallerModal(Toplevel):

@@ -5,8 +5,8 @@ from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry
 from threading import Thread
 
 from components.set_window_icon import SetWindowIcon
-from functions.get_theme_data import ThemeManager
-from functions.load_json_data import LoadJsonData
+from installer_core.data_tools.get_theme_data import ThemeManager
+from installer_core.data_tools.load_json_data import LoadJsonData
 from modals.theme_detail_modal import ThemeDetailModal
 
 

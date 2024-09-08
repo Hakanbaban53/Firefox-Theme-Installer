@@ -207,7 +207,7 @@
   },
   "update_ui_for_selected_theme": {
     "detect_files_text": {
-      "text": "Theme Selected",
+      "text": "Theme Selected ",
       "fg": "#000000"
     },
     "theme_label": {

@@ -1,4 +1,4 @@
-from functions.load_json_data import LoadJsonData
+from installer_core.data_tools.load_json_data import LoadJsonData
 
 class Theme:
     def __init__(self, title, link, description, image, tags):

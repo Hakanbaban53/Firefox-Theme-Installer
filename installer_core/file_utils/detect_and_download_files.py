@@ -2,9 +2,9 @@ from os import path,  makedirs
 from requests import get, exceptions
 from concurrent.futures import ThreadPoolExecutor
 
-from functions.load_json_data import LoadJsonData
-# from logging import basicConfig, INFO, info, error
+from installer_core.data_tools.load_json_data import LoadJsonData
 
+# from logging import basicConfig, INFO, info, error
 class FileManager:
     def __init__(self, json_file_path, json_file_url=None):
         self.missing_files = {}

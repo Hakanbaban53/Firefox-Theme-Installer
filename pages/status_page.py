@@ -9,14 +9,14 @@ from customtkinter import (
     CTkTextbox,
     CTkProgressBar,
 )
+
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
-from functions.image_loader import ImageLoader
-from functions.load_json_data import LoadJsonData
+from installer_core.data_tools.get_os_properties import OSProperties
+from installer_core.data_tools.image_loader import ImageLoader
+from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.file_utils.file_actions import FileActions
 from modals.info_modals import InfoModals
-from functions.get_os_properties import OSProperties
-from functions.file_actions import FileActions
-
 
 class StatusPage(CTkFrame):
     def __init__(self, parent, controller, base_dir):

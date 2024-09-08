@@ -1,7 +1,6 @@
 from platform import system
 
-from functions.load_json_data import LoadJsonData
-
+from installer_core.data_tools.load_json_data import LoadJsonData
 
 class OSProperties:
     def __init__(self, data_file_path):

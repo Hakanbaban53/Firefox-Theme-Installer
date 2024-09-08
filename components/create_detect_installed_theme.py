@@ -1,7 +1,7 @@
 from json import JSONDecodeError, load
 from os import path
 from threading import Thread
-from functions.get_theme_data import Theme
+from installer_core.data_tools.get_theme_data import Theme
 from modals.theme_detail_modal import ThemeDetailModal
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 

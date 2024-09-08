@@ -3,20 +3,18 @@ from os import path
 from pathlib import Path
 from tkinter import BooleanVar, PhotoImage, Label, TclError
 from threading import Thread
-
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
-from functions.get_the_theme_files import ThemeDownloader
-from functions.image_loader import ImageLoader
-from functions.load_json_data import LoadJsonData
+from installer_core.data_tools.get_os_properties import OSProperties
+from installer_core.data_tools.image_loader import ImageLoader
+from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.file_utils.detect_and_download_files import FileManager
+from installer_core.file_utils.get_the_theme_files import ThemeDownloader
 from modals.check_files_modal import FileInstallerModal
 from modals.info_modals import InfoModals
-from functions.get_os_properties import OSProperties
-from functions.detect_and_download_files import FileManager
 from modals.theme_modal import ThemeModal
-
 
 class HomePage(CTkFrame):
 

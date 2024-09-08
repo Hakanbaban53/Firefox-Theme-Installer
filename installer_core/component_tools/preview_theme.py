@@ -1,7 +1,8 @@
 from os import path, makedirs, listdir
 from subprocess import run, CalledProcessError
-from functions.file_actions import FileActions
 # from logging import basicConfig, info, error, warning, INFO
+
+from installer_core.file_utils.file_actions import FileActions
 
 # Configure logging
 # basicConfig(level=INFO, format='%(asctime)s - %(levelname)s - %(message)s')

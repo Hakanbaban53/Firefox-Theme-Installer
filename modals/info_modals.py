@@ -1,29 +1,42 @@
-import tkinter as tk
+from tkinter import Toplevel, Label
 from customtkinter import CTkButton
 from os import path
 
 from components.set_window_icon import SetWindowIcon
-from functions.load_json_data import LoadJsonData
+from installer_core.data_tools.load_json_data import LoadJsonData
 
-class InfoModals(tk.Toplevel):
-    def __init__(self, parent, base_dir, modal):
+class InfoModals(Toplevel):
+    MODAL_TYPES = {
+        "exit": "exit_modal",
+        "attention": "attention_modal",
+        "check_files_installed": "check_files_installed_modal",
+        "check_files_not_installed": "check_files_not_installed_modal",
+    }
+
+    def __init__(self, parent, base_dir, modal_type):
         super().__init__(parent)
-        # Load the UI data from the JSON file
-        INFO_MODALS_DATA_PATH = path.join(
-                base_dir, "data", "modals","info_modals_data.json"
-            )
-
-        load_json_data = LoadJsonData()
-        self.info_modals_data = load_json_data.load_json_data(INFO_MODALS_DATA_PATH)
         
+        # Load UI data from JSON file
         self.base_dir = base_dir
-        self.modals_data = self.info_modals_data.get(
-                "modals", {}
-            )
+        self.info_modals_data = self.load_modal_data()
+        self.modal_key = self.get_modal_key(modal_type)
+        self.modal_data = self.info_modals_data.get(self.modal_key, {})
 
         self.configure_window(parent)
-        self.create_modal(modal)
+        self.create_modal()
         self.center_window()
+
+    def load_modal_data(self):
+        """Load modal data from the JSON file."""
+        INFO_MODALS_DATA_PATH = path.join(
+            self.base_dir, "data", "modals", "info_modals_data.json"
+        )
+        load_json_data = LoadJsonData()
+        return load_json_data.load_json_data(INFO_MODALS_DATA_PATH).get("modals", {})
+
+    def get_modal_key(self, modal_type):
+        """Map modal type to modal key."""
+        return self.MODAL_TYPES.get(modal_type.lower(), None)
 
     def configure_window(self, parent):
         """Configure the modal window properties."""
@@ -36,55 +49,43 @@ class InfoModals(tk.Toplevel):
         icon_setter = SetWindowIcon(self.base_dir)
         icon_setter.set_window_icon(self)
 
-    def create_modal(self, modal):
+    def create_modal(self):
         """Create the modal based on the type specified."""
-        modal_mapping = {
-            "exit": "exit_modal",
-            "attention": "attention_modal",
-            "check_files_installed": "check_files_installed_modal",
-            "check_files_not_installed": "check_files_not_installed_modal",
-        }
+        if not self.modal_key:
+            raise ValueError(f"Invalid or unsupported modal type: {self.modal_key}")
+        
+        self.title(self.modal_data.get("modal_title", "Unknown"))
+        self.create_label(self.modal_data.get("modal_label", "No message provided"))
 
-        modal_key = modal_mapping.get(modal.lower())
-        if modal_key:
-            modal_data = self.modals_data.get(modal_key)
-            if modal_data:
-                self.title(modal_data["modal_title"])
-                self.create_label(modal_data["modal_label"])
-                self.create_buttons(modal)
-            else:
-                raise ValueError(f"No data found for the modal type: {modal}")
+        if self.modal_key == "exit_modal":
+            self.create_exit_buttons()
+        elif self.modal_key == "attention_modal":
+            self.create_attention_exit_button()
         else:
-            raise ValueError(f"Invalid modal type: {modal}")
+            self.create_button("Ok", "#10dc60", self.cancel_action).pack(pady=20)
 
     def create_label(self, text):
         """Create a label for the modal."""
-        self.message_label = tk.Label(
+        Label(
             self,
             text=text,
             fg="white",
             background="#2B2631",
             font=("Segoe UI", 15),
-        )
-        self.message_label.pack(padx=10, pady=10)
+        ).pack(padx=10, pady=10)
 
-    def create_buttons(self, modal):
-        """Create buttons based on the modal type."""
-        if modal.lower() == "exit":
-            self.create_exit_buttons()
-        elif modal.lower() == "attention":
-            self.create_attention_exit_button()
-        else:
-            self.create_button("Ok", "#10dc60", self.cancel_action).pack(pady=20)
+    def create_buttons(self, buttons):
+        """Create buttons based on a list of button configurations."""
+        for text, color, command, side in buttons:
+            self.create_button(text, color, command).pack(side=side, padx=10, pady=20)
 
     def create_exit_buttons(self):
         """Create Yes and No buttons for exit modal."""
-        self.create_button("Yes", "#f04141", self.ok_action).pack(
-            side="left", padx=10, pady=20
-        )
-        self.create_button("No", "#10dc60", self.cancel_action).pack(
-            side="right", padx=10, pady=20
-        )
+        buttons = [
+            ("Yes", "#f04141", self.ok_action, "left"),
+            ("No", "#10dc60", self.cancel_action, "right")
+        ]
+        self.create_buttons(buttons)
 
     def create_attention_exit_button(self):
         """Create Ok button for attention modal."""

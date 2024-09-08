@@ -17,8 +17,7 @@ from threading import Thread
 from requests import get, RequestException
 
 from components.set_window_icon import SetWindowIcon
-from functions.load_json_data import LoadJsonData
-
+from installer_core.data_tools.load_json_data import LoadJsonData
 
 class ThemeDetailModal(Toplevel):
     def __init__(self, parent, theme, base_dir):
