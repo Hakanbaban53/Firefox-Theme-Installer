@@ -140,13 +140,11 @@ class ThemeDownloader:
 
         if path.exists(data_json_path):
             # logger.info("Theme has its own data JSON.")
-            self.user_js_target_dir = path.join(self.base_dir, "chrome")
-            return {"type": "data", "path": data_json_path}
+            return {"type": "data", "path": self.theme_folder_path}
 
         for root, dirs, files in walk(self.theme_folder_path):
             if "userChrome.css" in files:
                 # logger.info("Theme has userChrome.css file.")
-                self.user_js_target_dir = root
                 return {"type": "userChrome.css", "path": root}
 
         # logger.warning("No theme data or chrome/userChrome.css found.")

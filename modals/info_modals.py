@@ -3,6 +3,7 @@ from customtkinter import CTkButton
 from os import path
 
 from components.set_window_icon import SetWindowIcon
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 
 class InfoModals(Toplevel):
@@ -15,6 +16,9 @@ class InfoModals(Toplevel):
 
     def __init__(self, parent, base_dir, modal_type):
         super().__init__(parent)
+
+        # Initialize ThreadManager
+        self.thread_manager = ThreadManager()
         
         # Load UI data from JSON file
         self.base_dir = base_dir
@@ -106,6 +110,8 @@ class InfoModals(Toplevel):
 
     def ok_action(self):
         """Action to be taken when Ok button is pressed."""
+        # Stop threads when exiting
+        self.thread_manager.stop_threads()
         self.master.quit()
         self.destroy()
 

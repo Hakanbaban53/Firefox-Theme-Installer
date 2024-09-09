@@ -13,10 +13,10 @@ from customtkinter import (
 from PIL import Image
 from io import BytesIO
 from webbrowser import open as openweb
-from threading import Thread
 from requests import get, RequestException
 
 from components.set_window_icon import SetWindowIcon
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 
 class ThemeDetailModal(Toplevel):
@@ -28,6 +28,9 @@ class ThemeDetailModal(Toplevel):
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+
+        self.thread_manager = ThreadManager()
+
 
         self.base_dir = base_dir
 
@@ -100,9 +103,7 @@ class ThemeDetailModal(Toplevel):
         )
         image_label.pack()
 
-        Thread(
-            target=self.load_image_in_background, args=(theme, image_label), daemon=True
-        ).start()
+        self.thread_manager.start_thread(self.load_image_in_background, theme, image_label)
 
     def load_image_in_background(self, theme, image_label):
         """Handles image loading in a background thread."""

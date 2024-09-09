@@ -1,17 +1,17 @@
 from os import path
 from tkinter import Toplevel, Label, Frame
 from tkinter import ttk
-from threading import Thread
 from customtkinter import CTkButton
 
 from components.set_window_icon import SetWindowIcon
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.detect_and_download_files import FileManager
 from modals.info_modals import InfoModals
 
 
 class FileInstallerModal(Toplevel):
-    def __init__(self, parent, base_dir, theme_dir):
+    def __init__(self, parent, base_dir, theme_data_path, theme_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
@@ -19,8 +19,9 @@ class FileInstallerModal(Toplevel):
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        
-        self.file_manager = FileManager(theme_dir)
+        self.thread_manager = ThreadManager()
+
+        self.file_manager = FileManager(theme_data_path)
         self.title(self.ui_data["FileInstallerModal"]["title"])
 
         self.base_dir = base_dir
@@ -96,20 +97,19 @@ class FileInstallerModal(Toplevel):
 
     def check_all_files_installed(self):
         """Check if all files are installed and return the missing files."""
-        self.file_check_result = self.file_manager.check_files_exist(root=self.base_dir)
+        self.file_check_result = self.file_manager.check_files_exist(root=self.theme_dir)
         return self.file_check_result
 
     def on_install_button_click(self):
         """Handle the install button click event."""
         self.install_files_button.configure(text="Installing", state="disabled")
-        thread = Thread(target=self.start_download_process)
-        thread.start()
-        self.after(100, self.check_thread, thread)
+        self.thread_manager.start_thread(target=self.start_download_process)
+        self.check_thread()
 
-    def check_thread(self, thread):
+    def check_thread(self):
         """Check if the thread is finished and update the UI accordingly."""
-        if thread.is_alive():
-            self.after(100, self.check_thread, thread)
+        if self.thread_manager.are_threads_alive():
+            self.after(100, self.check_thread)
         else:
             self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
 

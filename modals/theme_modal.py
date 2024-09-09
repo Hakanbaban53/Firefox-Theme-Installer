@@ -2,9 +2,9 @@ from os import path, name
 from tkinter import ttk, Toplevel, DISABLED, LEFT, END, NORMAL
 from PIL import Image, ImageTk
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry
-from threading import Thread
 
 from components.set_window_icon import SetWindowIcon
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.get_theme_data import ThemeManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 from modals.theme_detail_modal import ThemeDetailModal
@@ -17,6 +17,8 @@ class ThemeModal(Toplevel):
         UI_DATA_PATH = path.join(base_dir, "data", "modals", "theme_modal_data.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+
+        self.thread_manager = ThreadManager()
 
         self.base_dir = base_dir
         self.cache_dir = cache_dir
@@ -252,14 +254,12 @@ class ThemeModal(Toplevel):
 
     def load_themes(self):
         self.disable_buttons()
-        self.loading_thread = Thread(target=self.retry_loading_themes)
-        self.loading_thread.start()
+        self.thread_manager.start_thread(target=self.retry_loading_themes)
 
-        # Check the thread's status and re-enable buttons when done
         self.check_loading_thread()
 
     def check_loading_thread(self):
-        if self.loading_thread.is_alive():
+        if self.thread_manager.are_threads_alive():
             self.after(100, self.check_loading_thread)
         else:
             # Re-enable buttons after loading is done

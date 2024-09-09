@@ -1,7 +1,6 @@
 from os import listdir, makedirs, path
 from json import dump
 from pathlib import Path
-from threading import Thread
 from customtkinter import (
     CTkFrame,
     CTkLabel,
@@ -12,6 +11,7 @@ from customtkinter import (
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -25,7 +25,9 @@ class StatusPage(CTkFrame):
         UI_DATA_PATH = path.join(base_dir, "data", "pages", "status_page_data.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        
+        self.thread_manager = ThreadManager()
+
+
         self.controller = controller
         self.base_dir = base_dir
 
@@ -228,21 +230,18 @@ class StatusPage(CTkFrame):
             self.remove()
 
         self.start_thread(
-            target=self.file_actions.execute_operations,
-            args=(self.progress_bar, self.output_entry)
+            target=self.file_actions.execute_operations(self.progress_bar, self.output_entry)
         )
 
-    def start_thread(self, target, args=()):
+    def start_thread(self, target, *args):
         """Start a new thread for the specified target function with args."""
-        thread = Thread(target=target, args=args)
-        thread.daemon = True  # Allows the program to exit even if the thread is still running
-        thread.start()
-        self.check_thread(thread)
+        self.thread_manager.start_thread(target=target, *args)
+        self.check_thread()
 
-    def check_thread(self, thread):
+    def check_thread(self):
         """Check if the thread is finished and update the UI accordingly."""
-        if thread.is_alive():
-            self.after(100, self.check_thread, thread)
+        if self.thread_manager.are_threads_alive():
+            self.after(100, self.check_thread)
         else:
             # Call a thread-safe method to update the UI
             self.after(0, self.update_text)

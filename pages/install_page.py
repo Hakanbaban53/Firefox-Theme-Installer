@@ -1,7 +1,5 @@
 from os import path
-
 from pathlib import Path
-from threading import Thread
 from tkinter import BooleanVar
 from customtkinter import (
     CTkFrame,
@@ -16,6 +14,7 @@ from components.create_navigation_button import NavigationButton
 from components.create_detect_installed_theme import DetectInstalledTheme
 from installer_core.component_tools.preview_theme import PreviewTheme
 from installer_core.component_tools.special_input_functions import SpecialInputFunc
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -68,6 +67,8 @@ class InstallPage(CTkFrame):
         self.profile_folder_location = GetFolderLocations(
             self.os_values
         ).get_profile_folder()
+        self.thread_manager = ThreadManager()
+
 
         self.chrome_folder = path.join(self.profile_folder_location, "chrome")
 
@@ -451,8 +452,7 @@ class InstallPage(CTkFrame):
 
     def start_theme_preview_thread(self):
         # Start the preview in a new thread
-        preview_thread = Thread(target=self.preview_theme)
-        preview_thread.start()
+        self.thread_manager.start_thread(target=self.preview_theme)
 
     def preview_theme(self):
         profile_folder = SpecialInputFunc().get_variables(self.profile_folder_entry)

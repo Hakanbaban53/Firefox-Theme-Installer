@@ -2,11 +2,11 @@ from itertools import cycle
 from os import path
 from pathlib import Path
 from tkinter import BooleanVar, PhotoImage, Label, TclError
-from threading import Thread
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
+from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -56,6 +56,9 @@ class HomePage(CTkFrame):
             self.NAVIGATION_BUTTON_DATA_PATH
         )
         self.button_data = self.navigation_button_data["navigation_buttons"]
+
+        self.thread_manager = ThreadManager()
+
 
         self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
@@ -262,7 +265,7 @@ class HomePage(CTkFrame):
                 theme_dir=(
                     self.theme_data.get("path")
                     if self.theme_data.get("type") == "userChrome.css"
-                    else path.join(self.base_dir, "chrome")
+                    else path.join(self.theme_data.get("path"), "chrome")
                 ),
                 selected_theme_data = self.modal_theme.theme_selected.to_dict() # We sent the selected theme data a dictionary format.
             ),
@@ -370,6 +373,13 @@ class HomePage(CTkFrame):
         self.update_gif(self.frames)
 
     def stop_loading_animation(self):
+        """Stop loading animation, ensuring it's done after threads finish."""
+        if self.thread_manager.are_threads_alive():
+            self.after(100, self.stop_loading_animation)
+        else:
+            self._stop_loading_animation()
+
+    def _stop_loading_animation(self):
         """Stop the loading GIF animation."""
         if hasattr(self, "animation_id"):
             self.after_cancel(self.animation_id)
@@ -461,6 +471,7 @@ class HomePage(CTkFrame):
             self.base_dir,
         ).process_theme()
 
+        self.stop_loading_animation()
         if isinstance(self.theme_data, dict):
             theme_type = self.theme_data.get("type")
             self.handle_theme_type(theme_type)
@@ -483,8 +494,8 @@ class HomePage(CTkFrame):
             text=handle_data_json_theme["detect_files_text"]["text"],
             fg=handle_data_json_theme["detect_files_text"]["fg"],
         )
-        self.data_json_path = self.theme_data.get("path")
-        self.start_thread(self.fetch_files)
+        self.data_json_path = path.join(self.theme_data.get("path"), "data", "installer_files_data.json")
+        self.thread_manager.start_thread(self.fetch_files)
         self.clean_install.grid_remove()
 
     def handle_userChrome_theme(self):
@@ -541,9 +552,9 @@ class HomePage(CTkFrame):
     def locate_files(self):
         """Check if all necessary theme files are present."""
         file_check_result = FileManager(self.data_json_path).check_files_exist(
-            root=self.base_dir
+            root=self.theme_data.get("path")
         )
-
+        self.stop_loading_animation()
         if file_check_result:
             self.handle_missing_files()
         else:
@@ -596,8 +607,7 @@ class HomePage(CTkFrame):
 
     def install_files(self):
         """Open modal to install missing files and recheck afterward."""
-        theme_dir=self.theme_data.get("path")
-        modal = FileInstallerModal(self, self.base_dir, theme_dir)
+        modal = FileInstallerModal(self, self.base_dir, self.data_json_path, self.theme_data.get("path"))
         self.wait_window(modal)
         self.recheck_files()
 
@@ -611,7 +621,7 @@ class HomePage(CTkFrame):
         )
         self.install_button.configure(state=refetch_files["install_button"]["state"])
         self.clean_install.grid_remove()
-        self.start_thread(self.fetch_files)
+        self.thread_manager.start_thread(self.fetch_files)
 
     # Thread and file fetching management
     def get_theme(self):
@@ -627,7 +637,7 @@ class HomePage(CTkFrame):
         self.detect_files_text.config(
             text=get_theme["detect_files_text"]["text"], fg=get_theme["detect_files_text"]["fg"]
         )
-        self.start_thread(self.run_theme_process)
+        self.thread_manager.start_thread(self.run_theme_process)
 
     def get_neccessary_files(self):
         """Fetch and check necessary files for the theme."""
@@ -640,11 +650,8 @@ class HomePage(CTkFrame):
         if file_manager.json_data:
             missing_files = file_manager.check_files_exist()
             if missing_files:
-                self.start_thread(file_manager.download_missing_files, missing_files, self.CACHE_PATH)
-            else:
-                self.stop_loading_animation()
-        else:
-            self.stop_loading_animation()
+                self.thread_manager.start_thread(file_manager.download_missing_files, missing_files, self.CACHE_PATH)
+
 
     def fetch_files(self):
         """Fetch files based on data JSON path."""
@@ -663,10 +670,9 @@ class HomePage(CTkFrame):
         )
 
         if file_manager.json_data:
-            self.start_thread(self.locate_files)
+            self.thread_manager.start_thread(self.locate_files)
         else:
             self.handle_fetch_files_failure()
-            self.stop_loading_animation()
 
     def recheck_files(self):
         """Recheck file status and update UI."""
@@ -677,23 +683,9 @@ class HomePage(CTkFrame):
             text_color=recheck_files["install_files_button"]["text_color"],
             state=recheck_files["install_files_button"]["state"],
         )
-        self.install_button.configure(recheck_files["install_button"]["state"])
+        self.install_button.configure(state="disabled")
         self.clean_install.grid_remove()
-        self.start_thread(self.locate_files)
-
-    # Helper functions
-    def start_thread(self, target, *args):
-        """Start a new thread for the specified target function."""
-        thread = Thread(target=target, args=args)
-        thread.start()
-        self.check_thread(thread)
-
-    def check_thread(self, thread):
-        """Check if the thread is finished and update the UI accordingly."""
-        if thread.is_alive():
-            self.after(100, self.check_thread, thread)
-        else:
-            self.stop_loading_animation()
+        self.thread_manager.start_thread(self.locate_files)
 
     def handle_fetch_files_failure(self):
         """Handle the failure to fetch files."""
