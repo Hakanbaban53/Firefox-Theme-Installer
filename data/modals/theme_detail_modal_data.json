@@ -4,7 +4,6 @@
     "cache_expiration": 86400,
     "window_geometry": "700x700",
     "background_color": "#2B2631",
-    "CACHE_PATH": "~/.cache/Firefox Theme Installer/",
     "text_frame": {
       "font": ["Arial", 16],
       "height": 100,

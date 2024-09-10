@@ -20,7 +20,7 @@ from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 
 class ThemeDetailModal(Toplevel):
-    def __init__(self, parent, theme, base_dir):
+    def __init__(self, parent, theme, base_dir, cache_path):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
@@ -34,9 +34,7 @@ class ThemeDetailModal(Toplevel):
 
         self.base_dir = base_dir
 
-        self.CACHE_PATH = Path(
-            path.expanduser(self.ui_data["ThemeDetailModal"]["CACHE_PATH"])
-        )
+        self.CACHE_PATH = cache_path
         self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
         self.theme = theme

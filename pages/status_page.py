@@ -38,8 +38,21 @@ class StatusPage(CTkFrame):
         self.OS_PROPERTIES_PATH = path.join(
             base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
         )
-        self.CACHE_PATH = Path(
-            path.expanduser(self.ui_data["data_paths"]["CACHE_PATH"])
+        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
+
+        if self.os_values['os_name'].lower()=="windows":
+            self.CACHE_PATH = Path(
+                path.expandvars(self.ui_data["data_paths"]["CACHE_PATH_win"])
+            )
+        else:
+            self.CACHE_PATH = Path(
+                path.expanduser(self.ui_data["data_paths"]["CACHE_PATH_unix"])
+            )
+        self.THEME_PATH = path.join(
+            self.CACHE_PATH, self.ui_data["data_paths"]["THEME_PATH"]
+        )
+        self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
+            self.CACHE_PATH, self.ui_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
         )
         
         # Get navigation button data
@@ -57,7 +70,6 @@ class StatusPage(CTkFrame):
         self.navigation_button = NavigationButton(self.button_data)
         self.come_from_which_page = None
 
-        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
         self.navigation_button = NavigationButton(self.button_data)
         self.file_actions = FileActions(self.os_values["os_name"])
         self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
