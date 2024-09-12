@@ -1,4 +1,4 @@
-from pathlib import Path
+from os import path
 from platform import system
 
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -11,7 +11,7 @@ class OSProperties:
         
         :param base_dir: Base directory path for locating the JSON data file.
         """
-        self.os_properties_path = Path(base_dir) / "data" / "OS data" / "os_properties.json"
+        self.os_properties_path = path.join(base_dir, "data", "OS data", "os_properties.json")
         self.os_name = self.detect_os()
         self.os_data = self.load_os_data()
 
@@ -63,9 +63,9 @@ class OSProperties:
         :return: A Path object with expanded paths.
         """
         if self.os_name == "windows":
-            return Path(path_str).expandvars()
+            return path.expandvars(path_str)
         else:
-            return Path(path_str).expanduser()
+            return path.expanduser(path_str)
 
     def get_theme_preview_location(self):
         """

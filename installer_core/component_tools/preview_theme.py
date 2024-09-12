@@ -114,10 +114,7 @@ class PreviewTheme:
         except CalledProcessError as e:
             # error(f"Failed to run Firefox: {e}")
             return
-        finally:
-            self.cleanup()
-            # info("Cleaned up temporary profile folder after Firefox run.")
-
+        
     def cleanup(self):
         # Ensure clean removal of the temporary profile folder
         if path.exists(self.THEME_TEMP_PATH):
