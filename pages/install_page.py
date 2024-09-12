@@ -1,5 +1,4 @@
 from os import path
-from pathlib import Path
 from tkinter import BooleanVar
 from customtkinter import (
     CTkFrame,
@@ -38,11 +37,6 @@ class InstallPage(CTkFrame):
         self.ASSETS_PATH = path.join(
             base_dir, self.ui_data["data_paths"]["ASSETS_PATH"]
         )
-        self.OS_PROPERTIES_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
-        )
-        # Detect the OS and set the appropriate CACHE_PATH
-
         # Get navigation button data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
             base_dir, self.ui_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
@@ -58,17 +52,12 @@ class InstallPage(CTkFrame):
         )
         self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
 
-        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
-        if self.os_values['os_name'].lower()=="windows":
-            self.CACHE_PATH = Path(
-                path.expandvars(self.ui_data["data_paths"]["CACHE_PATH_win"])
-            )
-        else:
-            self.CACHE_PATH = Path(
-                path.expanduser(self.ui_data["data_paths"]["CACHE_PATH_unix"])
-            )
+        self.os_properties = OSProperties(base_dir)
+        self.input_values = self.os_properties.get_locations()
+        self.os_values = self.os_properties.get_values()
+
         self.header = CreateHeader()
-        self.input_values = OSProperties(self.OS_PROPERTIES_PATH).get_locations()
+
         self.navigation_button = NavigationButton(self.button_data)
         self.profile_folder_location = GetFolderLocations(
             self.os_values
@@ -415,7 +404,6 @@ class InstallPage(CTkFrame):
                 ),
                 base_dir=self.base_dir,
                 theme_dir=self.theme_dir,
-                temp_dir="/tmp/theme_preview",
                 custom_script_loader=self.CSL.get(),
                 selected_theme_data=self.selected_theme_data,
             ),
@@ -467,10 +455,8 @@ class InstallPage(CTkFrame):
         )
 
         self.preview = PreviewTheme(
-            self.CACHE_PATH,
+            self.base_dir,
             self.theme_dir,
-            "/tmp/theme_preview",
-            self.os_values["os_name"],
             self.CSL.get(),
             profile_folder,
             application_folder,

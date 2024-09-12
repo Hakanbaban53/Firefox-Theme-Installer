@@ -2,7 +2,6 @@
     "data_paths": {
       "ASSETS_PATH": "assets",
       "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
-      "OS_PROPERTIES_PATH": "data/OS data/os_properties.json",
       "INPUTS_DATA_PATH": "data/components/inputs_data.json"
     },
     "icons": {

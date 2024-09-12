@@ -137,7 +137,7 @@ class ThemeModal(Toplevel):
         self.select_button.grid(row=0, column=0, padx=10, pady=10, sticky="")
 
         self.detail_info_text = CTkLabel(
-            navigation_frame, text="Double-click to see theme details 🖼️"
+            navigation_frame, text=self.ui_data["ThemeModal"]["detail_info_text"]["text"],
         )
         self.detail_info_text.grid(row=1, column=0, sticky="")
 
@@ -377,7 +377,7 @@ class ThemeModal(Toplevel):
 
             if theme_data:
                 ThemeDetailModal(
-                    self, theme_data, base_dir=self.base_dir, cache_path=self.cache_dir
+                    self, theme_data, base_dir=self.base_dir
                 )
 
     def next_page(self):

@@ -3,57 +3,101 @@ from os import makedirs, path, remove
 from requests import get, exceptions
 from datetime import datetime, timedelta
 from logging import info, error
+import time
 
 class LoadJsonData:
     def __init__(self, json_file_url=None):
         self.json_file_url = json_file_url
 
     def load_json_data(self, json_file_path, check_file_age=False):
-        if path.exists(json_file_path) and check_file_age:
-            file_age = datetime.now() - datetime.fromtimestamp(
-                path.getmtime(json_file_path)
-            )
-            if file_age > timedelta(days=3):
-                info(f"File {json_file_path} is older than one week. Deleting and downloading a new one.")
-                remove(json_file_path)
+        """
+        Load JSON data from a file. Optionally check if the file is outdated and needs to be refreshed.
+        """
+        # Check file age if required
+        if check_file_age and self._is_file_outdated(json_file_path, days=3):
+            info(f"File {json_file_path} is older than 3 days. Deleting and downloading a new one.")
+            self._delete_file(json_file_path)
 
         try:
-            with open(json_file_path, "r") as file:
+            with open(json_file_path, "r", encoding="utf-8") as file:
                 return load(file)
         except JSONDecodeError as e:
-            error(f"Error decoding JSON: {e}")
-            return {}
+            error(f"Error decoding JSON from {json_file_path}: {e}")
         except FileNotFoundError:
             info(f"JSON file not found: {json_file_path}. Attempting to download from {self.json_file_url}")
-            return self.download_json_file(self.json_file_url, json_file_path)
+            return self._download_json_file(self.json_file_url, json_file_path)
         except Exception as e:
-            error(f"An error occurred: {e}")
-            return {}
+            error(f"Unexpected error when loading JSON from {json_file_path}: {e}")
 
-    def download_json_file(self, download_link, destination, max_retries=6):
+        return {}
+
+    def _is_file_outdated(self, file_path, days):
+        """
+        Check if a file is older than a given number of days.
+        """
+        if path.exists(file_path):
+            file_age = datetime.now() - datetime.fromtimestamp(path.getmtime(file_path))
+            return file_age > timedelta(days=days)
+        return False
+
+    def _delete_file(self, file_path):
+        """
+        Delete a file if it exists.
+        """
+        try:
+            if path.exists(file_path):
+                remove(file_path)
+                info(f"Deleted outdated file: {file_path}")
+        except Exception as e:
+            error(f"Failed to delete {file_path}: {e}")
+
+    def _download_json_file(self, download_link, destination, max_retries=6):
+        """
+        Download a JSON file from a URL with retries and save it to the specified destination.
+        """
         retries = 0
         while retries < max_retries:
             try:
                 response = get(download_link)
-                if response.status_code == 200:
-                    with open(destination, "wb") as file:
-                        file.write(response.content)
-                    info(f"Downloaded {destination}")
-                    return self.load_json_data(destination)
-                else:
-                    error(f"Failed to download {download_link}. Status code: {response.status_code}")
-                    retries += 1
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                self._save_to_file(destination, response.content)
+                info(f"Downloaded JSON file to {destination}")
+                return self.load_json_data(destination)
             except exceptions.RequestException as e:
-                error(f"An error occurred: {e}")
-                retries += 1
-            except FileNotFoundError:
-                error(f"Failed to download {download_link}. File/Folder not found. Creating folder and retrying")
-                makedirs(path.dirname(destination), exist_ok=True)
-                retries += 1
+                error(f"Request error during download attempt {retries + 1}/{max_retries}: {e}")
+            except OSError as e:
+                error(f"OS error while handling file {destination}: {e}")
+                self._ensure_directory_exists(destination)
+            retries += 1
+            time.sleep(2 ** retries)  # Exponential backoff
 
-        error(f"Failed to download after {max_retries} attempts. Showing error message.")
-        return self.show_error_message()
+        error(f"Failed to download {download_link} after {max_retries} attempts.")
+        return self._show_error_message()
 
-    def show_error_message(self):
-        error("Error fetching the file list after multiple attempts.")
+    def _save_to_file(self, file_path, content):
+        """
+        Save content to a file.
+        """
+        try:
+            with open(file_path, "wb") as file:
+                file.write(content)
+        except OSError as e:
+            error(f"Error saving file {file_path}: {e}")
+            raise
+
+    def _ensure_directory_exists(self, file_path):
+        """
+        Ensure the directory for the given file path exists.
+        """
+        try:
+            makedirs(path.dirname(file_path), exist_ok=True)
+            info(f"Created directories for {file_path}")
+        except OSError as e:
+            error(f"Failed to create directories for {file_path}: {e}")
+
+    def _show_error_message(self):
+        """
+        Log an error message when all download attempts fail.
+        """
+        error("Error fetching the JSON data after multiple attempts.")
         return {}

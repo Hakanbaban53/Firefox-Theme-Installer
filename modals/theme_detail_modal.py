@@ -1,5 +1,4 @@
 from os import path, makedirs
-from pathlib import Path
 from time import time
 from tkinter import Toplevel, BOTH, END, DISABLED, X, LEFT
 from customtkinter import (
@@ -17,10 +16,11 @@ from requests import get, RequestException
 
 from components.set_window_icon import SetWindowIcon
 from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.load_json_data import LoadJsonData
 
 class ThemeDetailModal(Toplevel):
-    def __init__(self, parent, theme, base_dir, cache_path):
+    def __init__(self, parent, theme, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
@@ -31,10 +31,14 @@ class ThemeDetailModal(Toplevel):
 
         self.thread_manager = ThreadManager()
 
-
         self.base_dir = base_dir
 
-        self.CACHE_PATH = cache_path
+        self.os_properties = OSProperties(base_dir)
+        self.os_values = self.os_properties.get_values()
+
+        self.CACHE_PATH = self.os_properties.get_cache_location()
+        self.THEME_TEMP_PATH = self.os_properties.get_theme_preview_location()
+
         self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
         self.theme = theme

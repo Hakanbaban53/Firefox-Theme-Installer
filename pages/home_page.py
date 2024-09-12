@@ -1,6 +1,5 @@
 from itertools import cycle
 from os import path
-from pathlib import Path
 from tkinter import BooleanVar, PhotoImage, Label, TclError
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
@@ -38,26 +37,17 @@ class HomePage(CTkFrame):
         self.NAVIGATION_BUTTON_DATA_PATH = path.join(
             base_dir, self.ui_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
         )
-        self.OS_PROPERTIES_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
-        )
         
-        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
-
-        if self.os_values['os_name'].lower()=="windows":
-            self.CACHE_PATH = Path(
-                path.expandvars(self.ui_data["data_paths"]["CACHE_PATH_win"])
-            )
-        else:
-            self.CACHE_PATH = Path(
-                path.expanduser(self.ui_data["data_paths"]["CACHE_PATH_unix"])
-            )
-        self.THEME_PATH = path.join(
-            self.CACHE_PATH, self.ui_data["data_paths"]["THEME_PATH"]
-        )
+        self.os_properties = OSProperties(base_dir)
+        self.os_values = self.os_properties.get_values()
+        self.CACHE_PATH = self.os_properties.get_cache_location()
         self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
             self.CACHE_PATH, self.ui_data["data_paths"]["CUSTOM_SCRIPT_LOADER_PATH"]
         )
+        self.THEME_PATH = path.join(
+            self.CACHE_PATH, self.ui_data["data_paths"]["THEME_PATH"]
+        )
+
 
         # Load additional data
         self.navigation_button_data = load_json_data.load_json_data(

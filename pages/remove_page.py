@@ -9,6 +9,7 @@ from customtkinter import (
 
 from tkinter import BooleanVar
 from customtkinter import CTkFrame
+
 from components.create_detect_installed_theme import DetectInstalledTheme
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
@@ -34,9 +35,11 @@ class RemovePage(CTkFrame):
         self.ASSETS_PATH = path.join(
             base_dir, self.ui_data["data_paths"]["ASSETS_PATH"]
         )
-        self.OS_PROPERTIES_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["OS_PROPERTIES_PATH"]
-        )
+
+        self.os_properties = OSProperties(base_dir)
+        self.input_values = self.os_properties.get_locations()
+        self.os_values = self.os_properties.get_values()
+
 
         # Get navigation button data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
@@ -54,8 +57,6 @@ class RemovePage(CTkFrame):
         self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
 
         self.header = CreateHeader()
-        self.os_values = OSProperties(self.OS_PROPERTIES_PATH).get_values()
-        self.input_values = OSProperties(self.OS_PROPERTIES_PATH).get_locations()
         self.navigation_button = NavigationButton(self.button_data)
         self.profile_folder_location = GetFolderLocations(
             self.os_values

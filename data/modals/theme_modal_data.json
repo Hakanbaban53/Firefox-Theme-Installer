@@ -12,7 +12,7 @@
       "search_bar": {
         "text_color": "#000000",
         "border_width": 0,
-        "placeholder_text": "🔍 Search theme..."
+        "placeholder_text": "Search theme..."
       },
       "treeview": {
         "columns": ["Title", "Description"],
@@ -53,8 +53,11 @@
           }
         }
       },
+      "detail_info_text": {
+        "text": "Double-click to see theme details"
+      },
       "tags": {
-        "text": "🔎 Filter"
+        "text": "Filter"
       },
       "pagination": {
         "label_template": "Page {current} of {total}"
