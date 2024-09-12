@@ -120,14 +120,12 @@ class InfoModals(Toplevel):
         self.destroy()
 
     def center_window(self):
-        """Center the modal window on the parent window."""
-        self.update_idletasks()  # Ensure that window dimensions are updated
-        parent_width = self.master.winfo_width()
-        parent_height = self.master.winfo_height()
-        width = self.winfo_width()
-        height = self.winfo_height()
-        x = (parent_width - width) // 2
-        y = (parent_height - height) // 2
-        self.geometry(
-            f"+{self.master.winfo_rootx() + x}+{self.master.winfo_rooty() + y}"
-        )
+        """Center the modal window on the screen."""
+        self.update_idletasks()
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        self.geometry("+{}+{}".format(x, y))

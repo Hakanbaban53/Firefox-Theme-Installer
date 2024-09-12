@@ -41,6 +41,7 @@ class ThemeModal(Toplevel):
         self.create_widgets()
         self.populate_tags()
         self.load_themes()
+        self.center_window()
 
     def configure_layout(self, parent):
         self.configure(bg=self.ui_data["ThemeModal"]["window"]["background_color"])
@@ -389,3 +390,15 @@ class ThemeModal(Toplevel):
         if self.current_page > 1:
             self.current_page -= 1
             self.update_treeview()
+
+
+    def center_window(self):
+        """Center the modal window on the screen."""
+        self.update_idletasks()
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        self.geometry("+{}+{}".format(x, y))

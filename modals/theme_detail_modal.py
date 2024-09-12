@@ -50,6 +50,7 @@ class ThemeDetailModal(Toplevel):
         )
         self.configure_modal_window(parent)
         self.create_detail_window(self.theme)
+        self.center_window()
 
     def configure_modal_window(self, parent):
         """Configures the modal window's basic properties."""
@@ -243,3 +244,14 @@ class ThemeDetailModal(Toplevel):
             command=lambda: openweb(theme.link),
         )
         link_button.grid(row=0, column=0, padx=10)
+
+    def center_window(self):
+        """Center the modal window on the screen."""
+        self.update_idletasks()
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        self.geometry("+{}+{}".format(x, y))

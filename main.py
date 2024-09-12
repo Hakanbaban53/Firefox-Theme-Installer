@@ -138,16 +138,14 @@ class MultiPageApp(CTk):
         InfoModals(self, self.base_dir, "Exit")
 
     def center_window(self):
+        """Center the modal window on the screen."""
         self.update_idletasks()
-
         window_width = self.winfo_width()
         window_height = self.winfo_height()
-
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         x = (screen_width - window_width) // 2
         y = (screen_height - window_height) // 2
-
         self.geometry("+{}+{}".format(x, y))
 
 if __name__ == "__main__":
