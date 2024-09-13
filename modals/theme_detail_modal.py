@@ -28,11 +28,12 @@ class ThemeDetailModal(Toplevel):
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+        
+        self.base_dir = base_dir
+        self.theme = theme
+        self.configure_modal_window(parent)
 
         self.thread_manager = ThreadManager()
-
-        self.base_dir = base_dir
-
         self.os_properties = OSProperties(base_dir)
         self.os_values = self.os_properties.get_values()
 
@@ -41,16 +42,13 @@ class ThemeDetailModal(Toplevel):
 
         self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
-        self.theme = theme
-
         self.cache_expiration = self.ui_data["ThemeDetailModal"]["cache_expiration"]
 
         self.title(
             f"{self.ui_data['ThemeDetailModal']['title_prefix']}{self.theme.title}"
         )
-        self.configure_modal_window(parent)
+
         self.create_detail_window(self.theme)
-        self.center_window()
 
     def configure_modal_window(self, parent):
         """Configures the modal window's basic properties."""
@@ -62,6 +60,7 @@ class ThemeDetailModal(Toplevel):
         self.grab_set()
         icon_setter = SetWindowIcon(self.base_dir)
         icon_setter.set_window_icon(self)
+        self.center_window()
 
     def create_detail_window(self, theme):
         """Creates and configures the theme detail window."""

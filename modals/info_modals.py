@@ -16,27 +16,22 @@ class InfoModals(Toplevel):
 
     def __init__(self, parent, base_dir, modal_type):
         super().__init__(parent)
+        INFO_MODALS_DATA_PATH = path.join(
+            base_dir, "data", "modals", "info_modals_data.json"
+        )
+        load_json_data = LoadJsonData()
+        self.info_modals_data = load_json_data.load_json_data(INFO_MODALS_DATA_PATH).get("modals", {})
+        self.base_dir = base_dir
+        self.modal_key = self.get_modal_key(modal_type)
+        self.configure_window(parent)
 
         # Initialize ThreadManager
         self.thread_manager = ThreadManager()
         
         # Load UI data from JSON file
-        self.base_dir = base_dir
-        self.info_modals_data = self.load_modal_data()
-        self.modal_key = self.get_modal_key(modal_type)
         self.modal_data = self.info_modals_data.get(self.modal_key, {})
 
-        self.configure_window(parent)
         self.create_modal()
-        self.center_window()
-
-    def load_modal_data(self):
-        """Load modal data from the JSON file."""
-        INFO_MODALS_DATA_PATH = path.join(
-            self.base_dir, "data", "modals", "info_modals_data.json"
-        )
-        load_json_data = LoadJsonData()
-        return load_json_data.load_json_data(INFO_MODALS_DATA_PATH).get("modals", {})
 
     def get_modal_key(self, modal_type):
         """Map modal type to modal key."""
@@ -49,9 +44,9 @@ class InfoModals(Toplevel):
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        
         icon_setter = SetWindowIcon(self.base_dir)
         icon_setter.set_window_icon(self)
+        self.center_window()
 
     def create_modal(self):
         """Create the modal based on the type specified."""

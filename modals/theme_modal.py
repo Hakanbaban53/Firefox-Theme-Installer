@@ -1,6 +1,5 @@
 from os import path, name
-from tkinter import ttk, Toplevel, DISABLED, LEFT, END, NORMAL
-from PIL import Image, ImageTk
+from tkinter import ttk, Toplevel, DISABLED, LEFT, END, NORMAL, BOTH
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry
 
 from components.set_window_icon import SetWindowIcon
@@ -18,10 +17,11 @@ class ThemeModal(Toplevel):
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
 
-        self.thread_manager = ThreadManager()
-
         self.base_dir = base_dir
         self.cache_dir = cache_dir
+        self.configure_layout(parent)
+
+        self.thread_manager = ThreadManager()
         self.theme_manager = ThemeManager(
             json_file_path=path.join(
                 self.cache_dir, self.ui_data["ThemeModal"]["themes"]["data_path"]
@@ -36,40 +36,28 @@ class ThemeModal(Toplevel):
         self.items_per_page = self.ui_data["ThemeModal"]["themes"]["items_per_page"]
         self.total_pages = 1
 
-        self.configure_layout(parent)
-        self.set_window_icon()
         self.create_widgets()
         self.populate_tags()
         self.load_themes()
-        self.center_window()
 
     def configure_layout(self, parent):
         self.configure(bg=self.ui_data["ThemeModal"]["window"]["background_color"])
         self.transient(parent)
+        self.geometry("640x610") # Set the size of the modal for center_window function
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
         self.theme_modal_frame = CTkFrame(
             self, fg_color=self.ui_data["ThemeModal"]["window"]["background_color"]
         )
-        self.theme_modal_frame.grid(row=0, column=1, sticky="SW")
+        self.theme_modal_frame.pack(
+            fill=BOTH, expand=True, padx=10, pady=10
+        )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
         self.theme_modal_frame.columnconfigure(0, weight=1)
-        
+
         icon_setter = SetWindowIcon(self.base_dir)
         icon_setter.set_window_icon(self)
-
-    def set_window_icon(self):
-        icon_path = path.join(
-            self.base_dir, self.ui_data["ThemeModal"]["window"]["icon_path"]
-        )
-        try:
-            if name == "nt":
-                self.iconbitmap(icon_path)
-            else:
-                icon = Image.open(icon_path)
-                self.iconphoto(True, ImageTk.PhotoImage(icon))
-        except Exception as e:
-            print(f"Error setting window icon: {e}")
+        self.center_window()
 
     def create_widgets(self):
         self.create_search_bar()
@@ -86,7 +74,7 @@ class ThemeModal(Toplevel):
                 "placeholder_text"
             ],
         )
-        self.search_entry.grid(row=0, column=0, padx=10, pady=10, sticky="EW")
+        self.search_entry.grid(row=0, column=0,sticky="EW")
         self.search_entry.bind("<KeyRelease>", self.update_search)
 
     def create_treeview(self):
@@ -112,12 +100,12 @@ class ThemeModal(Toplevel):
         self.tree.tag_configure(
             "oddrow",
             background=self.ui_data["ThemeModal"]["treeview"]["oddrow_background"],
-            font=eval(self.ui_data["ThemeModal"]["treeview"]["font"])
+            font=eval(self.ui_data["ThemeModal"]["treeview"]["font"]),
         )
         self.tree.tag_configure(
             "evenrow",
             background=self.ui_data["ThemeModal"]["treeview"]["evenrow_background"],
-            font=eval(self.ui_data["ThemeModal"]["treeview"]["font"])
+            font=eval(self.ui_data["ThemeModal"]["treeview"]["font"]),
         )
 
         self.tree.bind("<Double-1>", self.open_theme_detail)
@@ -129,7 +117,9 @@ class ThemeModal(Toplevel):
         self.select_button = CTkButton(
             navigation_frame,
             text=self.ui_data["ThemeModal"]["buttons"]["select_button"]["text"],
-            text_color=self.ui_data["ThemeModal"]["buttons"]["select_button"]["text_color"],
+            text_color=self.ui_data["ThemeModal"]["buttons"]["select_button"][
+                "text_color"
+            ],
             width=self.ui_data["ThemeModal"]["buttons"]["select_button"]["width"],
             font=eval(self.ui_data["ThemeModal"]["buttons"]["select_button"]["font"]),
             command=self.select_theme,
@@ -138,7 +128,8 @@ class ThemeModal(Toplevel):
         self.select_button.grid(row=0, column=0, padx=10, pady=10, sticky="")
 
         self.detail_info_text = CTkLabel(
-            navigation_frame, text=self.ui_data["ThemeModal"]["detail_info_text"]["text"],
+            navigation_frame,
+            text=self.ui_data["ThemeModal"]["detail_info_text"]["text"],
         )
         self.detail_info_text.grid(row=1, column=0, sticky="")
 
@@ -204,7 +195,7 @@ class ThemeModal(Toplevel):
         self.tag_info_label = CTkLabel(
             tags_frame, text=self.ui_data["ThemeModal"]["tags"]["text"]
         )
-        self.tag_info_label.grid(row=0, column=1, padx=(0,10), pady=10, sticky="W")
+        self.tag_info_label.grid(row=0, column=1, padx=(0, 10), pady=10, sticky="W")
 
     def populate_tags(self):
         tags = {
@@ -377,9 +368,7 @@ class ThemeModal(Toplevel):
             )
 
             if theme_data:
-                ThemeDetailModal(
-                    self, theme_data, base_dir=self.base_dir
-                )
+                ThemeDetailModal(self, theme_data, base_dir=self.base_dir)
 
     def next_page(self):
         if self.current_page < self.total_pages:
@@ -390,7 +379,6 @@ class ThemeModal(Toplevel):
         if self.current_page > 1:
             self.current_page -= 1
             self.update_treeview()
-
 
     def center_window(self):
         """Center the modal window on the screen."""

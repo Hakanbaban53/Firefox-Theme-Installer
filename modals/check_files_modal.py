@@ -1,7 +1,7 @@
 from os import path
-from tkinter import Toplevel, Label, Frame
+from tkinter import Toplevel, Label, Frame, BOTH
 from tkinter import ttk
-from customtkinter import CTkButton
+from customtkinter import CTkButton, CTkFrame
 
 from components.set_window_icon import SetWindowIcon
 from installer_core.component_tools.thread_managing import ThreadManager
@@ -28,25 +28,28 @@ class FileInstallerModal(Toplevel):
         self.theme_dir = theme_dir
 
         self.configure_layout(parent)
-        self.center_window()
         self.create_widgets()
 
     def configure_layout(self, parent):
         """Configure the layout of the modal."""
         self.transient(parent)
+        self.geometry("520x370") # Set the size of the modal for center_window function
         self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
+        self.files_modal_frame = CTkFrame(self, fg_color="#2B2631")
+        self.files_modal_frame.pack(
+            fill=BOTH, expand=True, padx=10, pady=10
+        )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
+
         icon_setter = SetWindowIcon(self.base_dir)
         icon_setter.set_window_icon(self)
+        self.center_window()
 
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""
         modal_config = self.ui_data["FileInstallerModal"]
-
-        self.files_modal_frame = Frame(self, bg="#2B2631")
-        self.files_modal_frame.pack(padx=20, pady=10)
 
         self.missing_files_label = Label(
             master=self.files_modal_frame,

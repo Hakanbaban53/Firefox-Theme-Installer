@@ -22,19 +22,22 @@ class MultiPageApp(CTk):
         with open(installer_data_path, "r", encoding="utf-8") as file:
             self.text_data = load(file)
 
+
+        self.configure_layout()
+        self.center_window()
+        self.create_widgets()
+
+    def configure_layout(self):
         self.title(self.text_data["common_values"]["installer_info"]["installer_title"])
         self.geometry("1115x666")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
+        self.configure(bg="#2B2631")
 
         icon_setter = SetWindowIcon(self.base_dir)
         icon_setter.set_window_icon(self)
-        
-        self.center_window()
 
-        # Set the main background color to match frames
-        self.configure(bg="#2B2631")  # Match the frame background color
-
+    def create_widgets(self):
         self.installer_img = CTkImage(
             light_image=Image.open(
                 os.path.join(
