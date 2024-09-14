@@ -1,6 +1,6 @@
 from itertools import cycle
 from os import path
-from tkinter import BooleanVar, PhotoImage, Label, TclError
+from tkinter import BooleanVar, PhotoImage, Label, TclError, Frame
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
 from components.create_header import CreateHeader
@@ -15,7 +15,7 @@ from modals.check_files_modal import FileInstallerModal
 from modals.info_modals import InfoModals
 from modals.theme_modal import ThemeModal
 
-class HomePage(CTkFrame):
+class HomePage(Frame):
 
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)

@@ -44,8 +44,7 @@ class InfoModals(Toplevel):
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        icon_setter = SetWindowIcon(self.base_dir)
-        icon_setter.set_window_icon(self)
+        SetWindowIcon(self.base_dir).set_window_icon(self)
         self.center_window()
 
     def create_modal(self):

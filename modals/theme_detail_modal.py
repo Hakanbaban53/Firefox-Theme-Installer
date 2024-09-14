@@ -58,8 +58,8 @@ class ThemeDetailModal(Toplevel):
         self.geometry(self.ui_data["ThemeDetailModal"]["window_geometry"])
         self.wait_visibility()
         self.grab_set()
-        icon_setter = SetWindowIcon(self.base_dir)
-        icon_setter.set_window_icon(self)
+        SetWindowIcon(self.base_dir).set_window_icon(self)
+        
         self.center_window()
 
     def create_detail_window(self, theme):

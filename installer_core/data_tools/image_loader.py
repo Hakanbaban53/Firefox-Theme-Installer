@@ -3,10 +3,13 @@ from customtkinter import CTkImage
 from PIL import Image
 from tkinter import PhotoImage
 
+
 class ImageLoader:
-    def __init__(self, assets_path, os_name):
+    def __init__(self, assets_path, os_name=None):
         self.assets_path = assets_path
-        self.os_name = os_name.lower()
+
+        if os_name:
+            self.os_name = os_name.lower()
 
     def load_image(self, icon_name, size):
         """General method to load an image with a specified size."""
@@ -15,6 +18,10 @@ class ImageLoader:
             dark_image=Image.open(path.join(self.assets_path, icon_name)),
             size=size,
         )
+
+    def load_installer_img(self, icons):
+        """Load Installer base image"""
+        return self.load_image(icons, (315, 666))
 
     def load_attention_icon(self, icons):
         """Load the attention icon."""
@@ -35,7 +42,7 @@ class ImageLoader:
     def load_line_top_img(self, icons):
         """Load the line top image."""
         return self.load_image(icons["line_top_img"], (650, 6))
-    
+
     def load_preview_icon(self, icons):
         """Load the preview icon."""
         return self.load_image(icons["preview_icon"], (24, 24))
@@ -67,7 +74,7 @@ class ImageLoader:
             height=32,
             width=24,
         )
-    
+
     def load_theme_detected_icon(self, icons):
         """Load the theme detected icon."""
         return self.load_image(icons["theme_detected_icon"], (24, 32))

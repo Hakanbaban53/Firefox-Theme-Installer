@@ -1,8 +1,14 @@
 {
-  "common_values": {
     "installer_info": {
       "installer_title": "Firefox Theme Installer",
-      "installer_version": " Theme Installer Version: V1.0.0"
+      "installer_version": "Theme Installer Version: V1.0.0"
+    },
+    "window_settings": {
+      "window_width": 1115,
+      "window_height": 666,
+      "bg_color": "#2B2631",
+      "image_label_x": 0,
+      "image_label_y": 0,
+      "default_padding_x": 315
     }
-  }
 }

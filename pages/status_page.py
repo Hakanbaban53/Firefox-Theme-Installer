@@ -7,6 +7,7 @@ from customtkinter import (
     CTkTextbox,
     CTkProgressBar,
 )
+from tkinter import Frame
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
@@ -17,7 +18,7 @@ from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.file_actions import FileActions
 from modals.info_modals import InfoModals
 
-class StatusPage(CTkFrame):
+class StatusPage(Frame):
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
@@ -169,7 +170,7 @@ class StatusPage(CTkFrame):
             command=lambda: self.controller.show_frame(
                 f"{self.come_from_which_page}_page"
             ),
-            # state="disabled",
+            state="disabled",
         )
         self.navigation_button.create_navigation_button(
             parent,

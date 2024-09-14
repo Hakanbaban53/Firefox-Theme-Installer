@@ -19,15 +19,17 @@ class FileInstallerModal(Toplevel):
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+
+        self.base_dir = base_dir
+        self.theme_dir = theme_dir
         self.thread_manager = ThreadManager()
+
+        self.configure_layout(parent)
 
         self.file_manager = FileManager(theme_data_path)
         self.title(self.ui_data["FileInstallerModal"]["title"])
 
-        self.base_dir = base_dir
-        self.theme_dir = theme_dir
 
-        self.configure_layout(parent)
         self.create_widgets()
 
     def configure_layout(self, parent):
@@ -42,10 +44,12 @@ class FileInstallerModal(Toplevel):
         self.files_modal_frame.pack(
             fill=BOTH, expand=True, padx=10, pady=10
         )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
+        # This also fix the blink the modal
+        
+        SetWindowIcon(self.base_dir).set_window_icon(self)
 
-        icon_setter = SetWindowIcon(self.base_dir)
-        icon_setter.set_window_icon(self)
-        self.center_window()
+        self.center_window() # After configure the basic layout center the window. 
+
 
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""

@@ -1,14 +1,11 @@
 from os import path
-from tkinter import BooleanVar
+from tkinter import BooleanVar, Frame
 from customtkinter import (
     CTkFrame,
     CTkLabel,
     CTkEntry,
     CTkCheckBox,
 )
-
-from tkinter import BooleanVar
-from customtkinter import CTkFrame
 
 from components.create_detect_installed_theme import DetectInstalledTheme
 from components.create_header import CreateHeader
@@ -20,7 +17,7 @@ from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
 
-class RemovePage(CTkFrame):
+class RemovePage(Frame):
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file

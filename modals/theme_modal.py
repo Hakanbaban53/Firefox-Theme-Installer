@@ -20,6 +20,7 @@ class ThemeModal(Toplevel):
         self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.configure_layout(parent)
+        self.center_window()
 
         self.thread_manager = ThreadManager()
         self.theme_manager = ThemeManager(
@@ -55,9 +56,9 @@ class ThemeModal(Toplevel):
         )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
         self.theme_modal_frame.columnconfigure(0, weight=1)
 
-        icon_setter = SetWindowIcon(self.base_dir)
-        icon_setter.set_window_icon(self)
-        self.center_window()
+        SetWindowIcon(self.base_dir).set_window_icon(self)
+
+
 
     def create_widgets(self):
         self.create_search_bar()
