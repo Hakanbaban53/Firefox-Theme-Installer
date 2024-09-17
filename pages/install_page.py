@@ -20,13 +20,18 @@ from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
 
+
 class InstallPage(Frame):
     def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(base_dir, "data", "pages", "install_page_data.json")
+        PATHS = path.join(base_dir, "data", "global", "paths.json")
+        ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+        self.paths = load_json_data.load_json_data(PATHS)
+        self.icons = load_json_data.load_json_data(ICONS)
 
         self.controller = controller
         self.base_dir = base_dir
@@ -34,12 +39,10 @@ class InstallPage(Frame):
         self.theme_data = None
 
         # Set the paths
-        self.ASSETS_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["ASSETS_PATH"]
-        )
+        self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
         # Get navigation button data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["NAVIGATION_BUTTON_DATA_PATH"]
+            base_dir, self.paths["NAVIGATION_BUTTON_DATA_PATH"]
         )
         self.navigation_button_data = load_json_data.load_json_data(
             NAVIGATION_BUTTON_DATA_PATH
@@ -47,9 +50,7 @@ class InstallPage(Frame):
         self.button_data = self.navigation_button_data["navigation_buttons"]
 
         # Get inputs data
-        INPUTS_DATA_PATH = path.join(
-            base_dir, self.ui_data["data_paths"]["INPUTS_DATA_PATH"]
-        )
+        INPUTS_DATA_PATH = path.join(base_dir, self.paths["INPUTS_DATA_PATH"])
         self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
 
         self.os_properties = OSProperties(base_dir)
@@ -64,11 +65,10 @@ class InstallPage(Frame):
         ).get_profile_folder()
         self.thread_manager = ThreadManager()
 
-
         self.chrome_folder = path.join(self.profile_folder_location, "chrome")
 
         # Initialize ImageLoader with the asset path and OS name
-        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         self.configure_layout()
         self.create_widgets()
@@ -93,14 +93,14 @@ class InstallPage(Frame):
 
     def create_images(self):
         # Load icons and images using the ImageLoader
-        icons = self.ui_data["icons"]
-        self.attention_icon = self.image_loader.load_attention_icon(icons)
-        self.header_title_bg = self.image_loader.load_header_title_bg(icons)
-        self.line_top_img = self.image_loader.load_line_top_img(icons)
+        self.attention_icon = self.image_loader.load_attention_icon(self.icons)
+        self.header_title_bg = self.image_loader.load_header_title_bg(self.icons)
+        self.line_top_img = self.image_loader.load_line_top_img(self.icons)
         self.os_icon_image = self.image_loader.load_os_icon_image()
-        self.preview_icon = self.image_loader.load_preview_icon(icons)
-        self.theme_detected_icon = self.image_loader.load_theme_detected_icon(icons)
-
+        self.preview_icon = self.image_loader.load_preview_icon(self.icons)
+        self.theme_detected_icon = self.image_loader.load_theme_detected_icon(
+            self.icons
+        )
 
     def create_header(self):
         header_data = self.ui_data["header_data"]
@@ -172,7 +172,6 @@ class InstallPage(Frame):
             padx=inputs_data["profile_folder_entry"]["grid_data"]["padx"],
             pady=inputs_data["profile_folder_entry"]["grid_data"]["pady"],
             sticky=inputs_data["profile_folder_entry"]["grid_data"]["sticky"],
-
         )
 
         # Application Folder
@@ -258,7 +257,6 @@ class InstallPage(Frame):
             sticky=inputs_data["edit_checkbox"]["grid_data"]["sticky"],
         )
 
-
     def create_preview_and_check_installed_theme(self):
         preview_and_check_installed_theme_frame = CTkFrame(
             self.install_page_frame,
@@ -272,14 +270,15 @@ class InstallPage(Frame):
             self,
             chrome_folder=self.chrome_folder,
             theme_detected_icon=self.theme_detected_icon,
-            base_dir=self.base_dir
+            base_dir=self.base_dir,
         )
-        self.detect_installed_theme_component.create_installed_themes(preview_and_check_installed_theme_frame)
+        self.detect_installed_theme_component.create_installed_themes(
+            preview_and_check_installed_theme_frame
+        )
 
         self.create_preview_theme(preview_and_check_installed_theme_frame)
 
         self.detect_installed_theme_component.detect_installed_theme()
-
 
     def create_preview_theme(self, preview_and_check_installed_theme_frame):
         preview_theme_data = self.ui_data["create_preview_theme"]
@@ -287,21 +286,15 @@ class InstallPage(Frame):
             preview_and_check_installed_theme_frame,
             width=preview_theme_data["preview_frame"]["width"],
             height=preview_theme_data["preview_frame"]["height"],
-            corner_radius=preview_theme_data["preview_frame"][
-                "corner_radius"
-            ],
+            corner_radius=preview_theme_data["preview_frame"]["corner_radius"],
             fg_color=preview_theme_data["preview_frame"]["fg_color"],
         )
         preview_frame.grid(
             row=preview_theme_data["preview_frame"]["grid_data"]["row"],
-            column=preview_theme_data["preview_frame"]["grid_data"][
-                "column"
-            ],
+            column=preview_theme_data["preview_frame"]["grid_data"]["column"],
             padx=preview_theme_data["preview_frame"]["grid_data"]["padx"],
             pady=preview_theme_data["preview_frame"]["grid_data"]["pady"],
-            sticky=preview_theme_data["preview_frame"]["grid_data"][
-                "sticky"
-            ],
+            sticky=preview_theme_data["preview_frame"]["grid_data"]["sticky"],
         )
 
         preview_label = CTkLabel(
@@ -314,10 +307,9 @@ class InstallPage(Frame):
             padx=preview_theme_data["preview_label"]["pack_data"]["padx"],
             pady=preview_theme_data["preview_label"]["pack_data"]["pady"],
             side=preview_theme_data["preview_label"]["pack_data"]["side"],
-
         )
 
-        preview_button =CTkButton(
+        self.preview_button = CTkButton(
             preview_frame,
             text=preview_theme_data["preview_button"]["text"],
             height=preview_theme_data["preview_button"]["height"],
@@ -329,29 +321,25 @@ class InstallPage(Frame):
             image=self.preview_icon,
             command=self.start_theme_preview_thread,
         )
-        preview_button.pack(
+        self.preview_button.pack(
             padx=preview_theme_data["preview_button"]["pack_data"]["padx"],
             pady=preview_theme_data["preview_button"]["pack_data"]["pady"],
         )
-    
+
     def create_invalid_entry_frame(self):
         invalid_entry_frame_data = self.ui_data["create_invalid_entry_frame"]
         self.invalid_entry_frame = CTkFrame(
             self.install_page_frame,
-            width=invalid_entry_frame_data["invalid_entry_frame"]["width"],
-            height=invalid_entry_frame_data["invalid_entry_frame"]["height"],
-            corner_radius=invalid_entry_frame_data["invalid_entry_frame"][
-                "corner_radius"
-            ],
-            fg_color=invalid_entry_frame_data["invalid_entry_frame"]["fg_color"],
+            width=440,
+            height=54,
+            corner_radius=12,
+            fg_color="white",
         )
         self.invalid_entry_frame.grid(
-            row=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"]["row"],
-            column=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"][
-                "column"
-            ],
-            padx=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"]["padx"],
-            pady=invalid_entry_frame_data["invalid_entry_frame"]["grid_data"]["pady"],
+            row=5,
+            column=0,
+            padx=(10, 4),
+            pady=10,
         )
 
         self.invalid_entries_text = CTkLabel(
@@ -363,11 +351,9 @@ class InstallPage(Frame):
             image=self.attention_icon,
         )
         self.invalid_entries_text.pack(
-            padx=invalid_entry_frame_data["invalid_entries_text"]["pack_data"]["padx"],
-            pady=invalid_entry_frame_data["invalid_entries_text"]["pack_data"]["pady"],
-
+            padx=10,
+            pady=10,
         )
-
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
@@ -445,8 +431,14 @@ class InstallPage(Frame):
         os_label.pack(padx=10, pady=10, side="right")
 
     def start_theme_preview_thread(self):
-        # Start the preview in a new thread
-        self.thread_manager.start_thread(target=self.preview_theme)
+        # Disable the install and preview buttons
+        self.install_button.configure(state="disabled")
+        self.preview_button.configure(state="disabled", text="Previewing...")
+
+        # Start the preview in a new thread and re-enable buttons when done
+        self.thread_manager.start_thread(
+            target=self.preview_theme, on_finish=self.on_preview_complete
+        )
 
     def preview_theme(self):
         profile_folder = SpecialInputFunc().get_variables(self.profile_folder_entry)
@@ -462,6 +454,15 @@ class InstallPage(Frame):
             application_folder,
         )
         self.preview.run_firefox()
+
+    def on_preview_complete(self):
+        # Re-enable the install and preview buttons when Firefox is closed
+        self.install_button.configure(state="normal")
+        self.preview_button.configure(
+            text="Preview Theme",
+            state="normal",
+            width=150,
+        )
 
     def key_bind(self, entry_widget, file_extension=None):
         entry_widget.bind(
@@ -481,13 +482,14 @@ class InstallPage(Frame):
         update_button_and_frame_data = self.ui_data["update_button_and_frame"]
         if SpecialInputFunc().update_invalid_entries_display():
             self.install_button.configure(state="normal")
-            self.invalid_entry_frame.grid_remove()
+            self.invalid_entry_frame.lower()
         else:
             self.install_button.configure(state="disabled")
             self.invalid_entries_text.configure(
-                text=f"  {len(SpecialInputFunc().return_invalid_entries())}" + update_button_and_frame_data["invalid_entries_text"]["text"]
+                text=f"  {len(SpecialInputFunc().return_invalid_entries())}"
+                + update_button_and_frame_data["invalid_entries_text"]["text"]
             )
-            self.invalid_entry_frame.grid()
+            self.invalid_entry_frame.lift()
 
     def checkbox_event(self):
         if self.check_var.get():

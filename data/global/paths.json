@@ -1,0 +1,8 @@
+{
+  "ASSETS_PATH": "assets",
+  "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
+  "THEME_PATH": "themes/",
+  "CUSTOM_SCRIPT_LOADER_URL": "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/files%20data/fx-autoconfig.json",
+  "CUSTOM_SCRIPT_LOADER_PATH": "data/fx-autoconfig.json",
+  "INPUTS_DATA_PATH": "data/components/inputs_data.json"
+}

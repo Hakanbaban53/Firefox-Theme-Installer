@@ -1,15 +1,4 @@
 {
-    "data_paths": {
-      "ASSETS_PATH": "assets",
-      "NAVIGATION_BUTTON_DATA_PATH": "data/components/navigation_button_data.json",
-      "INPUTS_DATA_PATH": "data/components/inputs_data.json"
-    },
-    "icons": {
-      "attention_icon": "icons/attention.png",
-      "header_title_bg": "backgrounds/header_title_background.png",
-      "line_top_img": "backgrounds/line_top.png",
-      "theme_detected_icon": "icons/theme-selected.png"
-    },
     "header_data": {
       "text":"Check the Remove Config"
     },

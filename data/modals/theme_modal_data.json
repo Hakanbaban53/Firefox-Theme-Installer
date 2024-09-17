@@ -1,8 +1,7 @@
 {
     "ThemeModal": {
       "window": {
-        "background_color": "#2B2631",
-        "icon_path": "assets/icons/firefox.ico"
+        "background_color": "#2B2631"
       },
       "themes": {
         "data_url": "https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/themes.json",

@@ -1,0 +1,14 @@
+{
+  "attention_icon": "icons/attention.png",
+  "check_icon": "icons/check.png",
+  "install_files_icon": "icons/install.png",
+  "preview_icon": "icons/preview_icon.png",
+  "theme_not_selected_icon": "icons/theme-not-selected.png",
+  "theme_selected_icon": "icons/theme-selected.png",
+  "header_title_bg": "backgrounds/header_title_background.png",
+  "line_top_img": "backgrounds/line_top.png",
+  "reload_icon": "icons/reload_icon.png",
+  "remove_icon": "icons/remove.png",
+  "exit_icon": "icons/exit.png",
+  "block_spin_gif": "icons/block_spin.gif"
+}

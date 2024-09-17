@@ -7,6 +7,7 @@ from components.set_window_icon import SetWindowIcon
 from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.detect_and_download_files import FileManager
+from installer_core.window_tools.center_window import CenterWindow
 from modals.info_modals import InfoModals
 
 
@@ -25,6 +26,7 @@ class FileInstallerModal(Toplevel):
         self.thread_manager = ThreadManager()
 
         self.configure_layout(parent)
+        CenterWindow(self).center_window()  # After configure the basic layout center the window. 
 
         self.file_manager = FileManager(theme_data_path)
         self.title(self.ui_data["FileInstallerModal"]["title"])
@@ -47,9 +49,6 @@ class FileInstallerModal(Toplevel):
         # This also fix the blink the modal
         
         SetWindowIcon(self.base_dir).set_window_icon(self)
-
-        self.center_window() # After configure the basic layout center the window. 
-
 
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""
@@ -137,14 +136,3 @@ class FileInstallerModal(Toplevel):
             self.destroy()
         else:
             InfoModals(self, self.base_dir, "check_files_not_installed")
-
-    def center_window(self):
-        """Center the modal window on the screen."""
-        self.update_idletasks()
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-        self.geometry("+{}+{}".format(x, y))

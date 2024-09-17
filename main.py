@@ -5,6 +5,7 @@ from customtkinter import CTkLabel
 from components.set_window_icon import SetWindowIcon
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.window_tools.center_window import CenterWindow
 from modals.info_modals import InfoModals
 from pages.home_page import HomePage
 from pages.install_page import InstallPage
@@ -31,27 +32,35 @@ class MultiPageApp(Tk):
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
         SetWindowIcon(self.base_dir).set_window_icon(self)
-        self.center_window()
+        CenterWindow(self).center_window()
 
     def create_widgets(self):
         """Create image label and container frame for page content."""
         self.create_image_label()
         self.create_page_container()
 
+
     def create_image_label(self):
-        """Create and place the image label at the top of the window."""
+        """Create and place the image label with a background image."""
+        self.image_frame = Frame(
+            master=self,
+            width=315,
+            height=666,
+        )
+        self.image_frame.place(x=0, y=0)
+
         image_loader = ImageLoader(path.join(self.base_dir, "assets", "backgrounds"))
         installer_img = image_loader.load_installer_img("installer_img.png")
+        
         installer_version = self.base_data["installer_info"]["installer_version"]
-
-        self.installer_img_label = CTkLabel(
-            self,
+        self.background_label = CTkLabel(
+            self.image_frame,
+            image=installer_img,
             text=installer_version,
             text_color="white",
-            image=installer_img,
             font=("Inter", 14)
         )
-        self.installer_img_label.place(x=self.base_data["window_settings"]["image_label_x"], y=self.base_data["window_settings"]["image_label_y"])
+        self.background_label.pack(fill="both", expand=True)
 
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
@@ -70,7 +79,7 @@ class MultiPageApp(Tk):
 
     def show_frame(self, page_name, **kwargs):
         """Display the frame associated with the given page name, sliding it into view."""
-        self.installer_img_label.lift()
+        self.image_frame.lift()
 
         # Map page name to its corresponding class
         page_class = {

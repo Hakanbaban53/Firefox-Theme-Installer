@@ -1,4 +1,4 @@
-import os
+from os import path, makedirs
 from requests import get, exceptions
 from concurrent.futures import ThreadPoolExecutor
 
@@ -23,7 +23,7 @@ class FileManager:
             try:
                 response = get(download_link, timeout=10)
                 response.raise_for_status()
-                os.makedirs(os.path.dirname(destination), exist_ok=True)
+                makedirs(path.dirname(destination), exist_ok=True)
                 with open(destination, "wb") as file:
                     file.write(response.content)
                 # info(f"Downloaded {destination}")
@@ -39,7 +39,7 @@ class FileManager:
         Creates a folder if it doesn't exist.
         """
         try:
-            os.makedirs(folder_path, exist_ok=True)
+            makedirs(folder_path, exist_ok=True)
             # info(f"Created folder: {folder_path}")
         except OSError as e:
             # error(f"Error creating folder {folder_path}: {e}")
@@ -51,7 +51,7 @@ class FileManager:
         """
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = [
-                executor.submit(self.download_from_github, file_info['url'], os.path.normpath(os.path.join(base_dir, folder_path, file_info['file'])))
+                executor.submit(self.download_from_github, file_info['url'], path.normpath(path.join(base_dir, folder_path, file_info['file'])))
                 for folder_path, files in missing_files.items()
                 for file_info in files
             ]
@@ -75,11 +75,11 @@ class FileManager:
             self.missing_files = {}
 
         for folder, contents in folder_file_data.items():
-            folder_path = os.path.normpath(os.path.join(root, folder))
+            folder_path = path.normpath(path.join(root, folder))
             if isinstance(contents, dict):
                 self.check_files_exist(contents, folder_path)
             else:
-                if not os.path.isfile(folder_path):
+                if not path.isfile(folder_path):
                     if root not in self.missing_files:
                         self.missing_files[root] = []
                     self.missing_files[root].append({'file': folder, 'url': contents})

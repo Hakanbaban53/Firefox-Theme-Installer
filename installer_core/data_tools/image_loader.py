@@ -77,5 +77,5 @@ class ImageLoader:
 
     def load_theme_detected_icon(self, icons):
         """Load the theme detected icon."""
-        return self.load_image(icons["theme_detected_icon"], (24, 32))
+        return self.load_image(icons["theme_selected_icon"], (24, 32))
         # Same icon load_theme_selected_icon but I want to CTKImage instead of PhotoImage.

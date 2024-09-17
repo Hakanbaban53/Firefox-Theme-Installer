@@ -1,5 +1,5 @@
 from os import path, makedirs, listdir
-from subprocess import run, CalledProcessError
+from subprocess import Popen, run, CalledProcessError
 # from logging import basicConfig, info, error, warning, INFO
 
 from installer_core.data_tools.get_os_properties import OSProperties
@@ -102,18 +102,25 @@ class PreviewTheme:
         # info(f"Starting Firefox with profile: {self.THEME_TEMP_PATH}")
         try:
             if self.current_os == "linux":
-                run(["firefox", "-no-remote", "-profile", self.THEME_TEMP_PATH], check=True)
+                process = Popen(["firefox", "-no-remote", "-profile", self.THEME_TEMP_PATH])
             elif self.current_os == "windows":
                 firefox_path = path.join(self.application_folder, "firefox.exe")
-                run([firefox_path, "-no-remote", "-profile", self.THEME_TEMP_PATH], check=True)
+                process = Popen([firefox_path, "-no-remote", "-profile", self.THEME_TEMP_PATH])
             elif self.current_os == "macos":
                 firefox_path = path.join(self.application_folder, "Firefox.app")
-                run(["open", "-n", firefox_path, "--args", "-no-remote", "-profile", self.THEME_TEMP_PATH], check=True)
+                process = Popen(["open", "-n", firefox_path, "--args", "-no-remote", "-profile", self.THEME_TEMP_PATH])
             else:
                 raise OSError(f"Unsupported OS: {self.current_os}")
+            
+            # Wait for Firefox to close
+            process.wait()
         except CalledProcessError as e:
             # error(f"Failed to run Firefox: {e}")
             return
+        finally:
+            # Cleanup after Firefox closes
+            self.cleanup()
+            # info("Cleaned up temporary profile folder after Firefox run.")
         
     def cleanup(self):
         # Ensure clean removal of the temporary profile folder

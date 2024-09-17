@@ -1,4 +1,4 @@
-from os import path, name
+from os import path
 from tkinter import ttk, Toplevel, DISABLED, LEFT, END, NORMAL, BOTH
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry
 
@@ -6,6 +6,7 @@ from components.set_window_icon import SetWindowIcon
 from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.get_theme_data import ThemeManager
 from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.window_tools.center_window import CenterWindow
 from modals.theme_detail_modal import ThemeDetailModal
 
 
@@ -20,7 +21,7 @@ class ThemeModal(Toplevel):
         self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.configure_layout(parent)
-        self.center_window()
+        CenterWindow(self).center_window()
 
         self.thread_manager = ThreadManager()
         self.theme_manager = ThemeManager(
@@ -380,14 +381,3 @@ class ThemeModal(Toplevel):
         if self.current_page > 1:
             self.current_page -= 1
             self.update_treeview()
-
-    def center_window(self):
-        """Center the modal window on the screen."""
-        self.update_idletasks()
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-        self.geometry("+{}+{}".format(x, y))

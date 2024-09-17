@@ -18,6 +18,7 @@ from components.set_window_icon import SetWindowIcon
 from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.window_tools.center_window import CenterWindow
 
 class ThemeDetailModal(Toplevel):
     def __init__(self, parent, theme, base_dir):
@@ -32,6 +33,8 @@ class ThemeDetailModal(Toplevel):
         self.base_dir = base_dir
         self.theme = theme
         self.configure_modal_window(parent)
+        CenterWindow(self).center_window()
+
 
         self.thread_manager = ThreadManager()
         self.os_properties = OSProperties(base_dir)
@@ -60,8 +63,6 @@ class ThemeDetailModal(Toplevel):
         self.grab_set()
         SetWindowIcon(self.base_dir).set_window_icon(self)
         
-        self.center_window()
-
     def create_detail_window(self, theme):
         """Creates and configures the theme detail window."""
         detail_modal_frame = CTkFrame(
@@ -243,14 +244,3 @@ class ThemeDetailModal(Toplevel):
             command=lambda: openweb(theme.link),
         )
         link_button.grid(row=0, column=0, padx=10)
-
-    def center_window(self):
-        """Center the modal window on the screen."""
-        self.update_idletasks()
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-        self.geometry("+{}+{}".format(x, y))

@@ -5,6 +5,7 @@ from os import path
 from components.set_window_icon import SetWindowIcon
 from installer_core.component_tools.thread_managing import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.window_tools.center_window import CenterWindow
 
 class InfoModals(Toplevel):
     MODAL_TYPES = {
@@ -24,6 +25,8 @@ class InfoModals(Toplevel):
         self.base_dir = base_dir
         self.modal_key = self.get_modal_key(modal_type)
         self.configure_window(parent)
+        CenterWindow(self).center_window()
+
 
         # Initialize ThreadManager
         self.thread_manager = ThreadManager()
@@ -45,7 +48,6 @@ class InfoModals(Toplevel):
         self.wait_visibility()
         self.grab_set()
         SetWindowIcon(self.base_dir).set_window_icon(self)
-        self.center_window()
 
     def create_modal(self):
         """Create the modal based on the type specified."""
@@ -112,14 +114,3 @@ class InfoModals(Toplevel):
     def cancel_action(self):
         """Action to be taken when Cancel button is pressed."""
         self.destroy()
-
-    def center_window(self):
-        """Center the modal window on the screen."""
-        self.update_idletasks()
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-        self.geometry("+{}+{}".format(x, y))
