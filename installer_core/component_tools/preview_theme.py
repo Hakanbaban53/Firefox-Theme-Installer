@@ -43,7 +43,7 @@ class PreviewTheme:
                 run(["firefox", "-CreateProfile", f"temp_theme_profile {self.THEME_TEMP_PATH}"], check=True)
             elif self.current_os == "windows":
                 firefox_path = path.join(self.application_folder, "firefox.exe")
-                run([firefox_path, "-CreateProfile", f"temp_theme_profile {self.THEME_TEMP_PATH}"], check=True)
+                run([firefox_path, "-CreateProfile", f"temp_theme_profile {self.THEME_TEMP_PATH}", "-wait-for-browser"], check=True)
             elif self.current_os == "macos":
                 firefox_path = path.join(self.application_folder, "Firefox.app")
                 run(["open", "-n", firefox_path, "--args", "-CreateProfile", f"temp_theme_profile {self.THEME_TEMP_PATH}"], check=True)

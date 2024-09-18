@@ -2,23 +2,6 @@
     "header_data": {
       "text":"Check the Remove Config"
     },
-    "create_inputs":{
-      "inputs_frame":{
-        "width":440,
-        "height":54,
-        "corner_radius":12,
-        "fg_color":"#2B2631",
-        "grid_data":{
-          "row":3,
-          "column":0,
-          "columnspan":2,
-          "padx":40,
-          "pady":[10,20],
-          "sticky":"NSEW"
-        }
-      }
-    },
-
       "create_invalid_entry_frame": {
         "invalid_entry_frame": {
           "width": 440,

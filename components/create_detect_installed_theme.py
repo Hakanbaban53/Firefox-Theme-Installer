@@ -2,7 +2,7 @@ from os import path
 from time import sleep
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_theme_data import Theme
 from installer_core.data_tools.load_json_data import LoadJsonData
 from modals.theme_detail_modal import ThemeDetailModal
@@ -74,17 +74,7 @@ class DetectInstalledTheme:
 
     def detect_installed_theme(self):
         # Start the detection in a separate thread
-        self.thread_manager.start_thread(target=self._detect_installed_theme)
-        self.check_thread()
-
-    def check_thread(self):
-        if self.thread_manager.are_threads_alive():
-            sleep(0.1)
-            self.check_thread()
-        else:
-            result = self._detect_installed_theme()  # Get the result
-            # Update the label based on the result
-            self.update_ui(result)
+        self.thread_manager.start_thread(target=self._detect_installed_theme, on_finish=self.update_ui)
 
     def _detect_installed_theme(self):
         # Check if the chrome folder exists
@@ -112,8 +102,9 @@ class DetectInstalledTheme:
         else:
             return False
 
-    def update_ui(self, result):
+    def update_ui(self):
         # Use the Tkinter `after` method to safely update the UI from the main thread
+        result = self._detect_installed_theme()  # Get the result
         def update_label():
             update_label_data = self.ui_data["update_ui"]
             if result is True:

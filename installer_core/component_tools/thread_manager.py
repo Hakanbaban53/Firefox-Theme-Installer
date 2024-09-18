@@ -5,15 +5,17 @@ class ThreadManager:
         self.exit_flag = False
         self.threads = []
 
-    def start_thread(self, target, on_finish=None, *args):
+    def start_thread(self, target, *args, on_finish=None):
         self.exit_flag = False
 
         def wrapper():
             try:
                 target(*args)
             finally:
-                if on_finish not in (None, False):
+                if on_finish not in (None, bool):
                     on_finish()  # Call on_finish when the thread is done
+                else:
+                    pass
 
         thread = Thread(target=wrapper)
         thread.daemon = True

@@ -4,7 +4,7 @@ from tkinter import ttk
 from customtkinter import CTkButton, CTkFrame
 
 from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.detect_and_download_files import FileManager
 from installer_core.window_tools.center_window import CenterWindow
@@ -109,15 +109,11 @@ class FileInstallerModal(Toplevel):
     def on_install_button_click(self):
         """Handle the install button click event."""
         self.install_files_button.configure(text="Installing", state="disabled")
-        self.thread_manager.start_thread(target=self.start_download_process)
-        self.check_thread()
+        self.thread_manager.start_thread(target=self.start_download_process, on_finish=self.update_install_files_button)
 
-    def check_thread(self):
-        """Check if the thread is finished and update the UI accordingly."""
-        if self.thread_manager.are_threads_alive():
-            self.after(100, self.check_thread)
-        else:
-            self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
+    def update_install_files_button(self):
+        """Update the install files button text and color."""
+        self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
 
     def start_download_process(self):
         """Download missing files."""

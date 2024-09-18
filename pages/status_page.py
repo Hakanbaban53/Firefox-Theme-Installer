@@ -11,12 +11,13 @@ from tkinter import Frame
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.file_actions import FileActions
 from modals.info_modals import InfoModals
+
 
 class StatusPage(Frame):
     def __init__(self, parent, controller, base_dir):
@@ -36,16 +37,13 @@ class StatusPage(Frame):
         self.base_dir = base_dir
 
         # Set the paths
-        self.ASSETS_PATH = path.join(
-            base_dir, self.paths["ASSETS_PATH"]
-        )
+        self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
 
         self.os_properties = OSProperties(base_dir)
         self.os_values = self.os_properties.get_values()
 
         self.CACHE_PATH = self.os_properties.get_cache_location()
 
-        
         # Get navigation button data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
             base_dir, self.paths["NAVIGATION_BUTTON_DATA_PATH"]
@@ -60,8 +58,7 @@ class StatusPage(Frame):
 
         self.navigation_button = NavigationButton(self.button_data)
         self.file_actions = FileActions(self.os_values["os_name"])
-        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
-
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         self.configure_layout()
         self.create_widgets()
@@ -89,7 +86,6 @@ class StatusPage(Frame):
             self.icons,
         )
         self.line_top_img = self.image_loader.load_line_top_img(self.icons)
-
 
     def create_header(self):
         header_data = self.ui_data["header_data"]
@@ -122,7 +118,9 @@ class StatusPage(Frame):
             fg_color="#666666",
             progress_color="#9747FF",
         )
-        self.progress_bar.grid(row=3, column=0, padx=80, pady=10, sticky="NSEW") # This widget centering the frame. :d
+        self.progress_bar.grid(
+            row=3, column=0, padx=80, pady=10, sticky="NSEW"
+        )  # This widget centering the frame. :d
         self.progress_bar.set(0)
 
     def create_output_entry(self):
@@ -211,7 +209,7 @@ class StatusPage(Frame):
                 text="Removed  ",
                 image=self.check_icon,
                 compound="right",
-            )        
+            )
 
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
@@ -229,22 +227,12 @@ class StatusPage(Frame):
         elif self.come_from_which_page == "remove":
             self.remove()
 
-        self.start_thread(
-            target=self.file_actions.execute_operations(self.progress_bar, self.output_entry)
+        self.thread_manager.start_thread(
+            self.file_actions.execute_operations,
+            self.progress_bar,
+            self.output_entry,
+            on_finish=self.update_text,
         )
-
-    def start_thread(self, target, *args):
-        """Start a new thread for the specified target function with args."""
-        self.thread_manager.start_thread(target=target, *args)
-        self.check_thread()
-
-    def check_thread(self):
-        """Check if the thread is finished and update the UI accordingly."""
-        if self.thread_manager.are_threads_alive():
-            self.after(100, self.check_thread)
-        else:
-            # Call a thread-safe method to update the UI
-            self.after(0, self.update_text)
 
     def install(self):
         # Handles the installation process
@@ -282,7 +270,7 @@ class StatusPage(Frame):
                 self.file_actions.copy_file(src_path, dest_path)
 
         theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
-        with open(theme_data_path, 'w') as json_file:
+        with open(theme_data_path, "w") as json_file:
             dump(self.selected_theme_data, json_file, indent=4)
 
     def remove(self):

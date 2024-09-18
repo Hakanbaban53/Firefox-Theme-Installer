@@ -2,45 +2,17 @@
   "header_data": {
     "text": "Check the Install Config"
   },
-  "create_inputs": {
-    "inputs_frame": {
-      "width": 440,
-      "height": 54,
-      "corner_radius": 12,
-      "fg_color": "#2B2631",
-      "grid_data": {
-        "row": 3,
-        "column": 0,
-        "columnspan": 2,
-        "padx": 40,
-        "pady": [10, 20],
-        "sticky": "NSEW"
-      }
-    }
-  },
   "create_preview_theme": {
     "preview_frame": {
       "width": 440,
       "height": 60,
       "corner_radius": 12,
-      "fg_color": "white",
-      "grid_data": {
-        "row": 0,
-        "column": 1,
-        "padx": 40,
-        "pady": [20, 30],
-        "sticky": ""
-      }
+      "fg_color": "white"
     },
     "preview_label": {
       "text": "Preview Theme in Firefox",
       "text_color": "black",
-      "font": "(\"Arial\", 18, \"bold\")",
-      "pack_data": {
-        "padx": 10,
-        "pady": 10,
-        "side": "top"
-      }
+      "font": "(\"Arial\", 18, \"bold\")"
     },
     "preview_button": {
       "text": "Preview Theme",
@@ -49,11 +21,7 @@
       "text_color": "#000000",
       "height": 42,
       "font": "(\"Arial\", 16, \"bold\")",
-      "corner_radius": 12,
-      "pack_data": {
-        "padx": 10,
-        "pady": 10
-      }
+      "corner_radius": 12
     }
   },
   "create_invalid_entry_frame": {

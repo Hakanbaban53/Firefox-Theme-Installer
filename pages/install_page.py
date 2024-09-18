@@ -13,7 +13,7 @@ from components.create_navigation_button import NavigationButton
 from components.create_detect_installed_theme import DetectInstalledTheme
 from installer_core.component_tools.preview_theme import PreviewTheme
 from installer_core.component_tools.special_input_functions import SpecialInputFunc
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -290,11 +290,11 @@ class InstallPage(Frame):
             fg_color=preview_theme_data["preview_frame"]["fg_color"],
         )
         preview_frame.grid(
-            row=preview_theme_data["preview_frame"]["grid_data"]["row"],
-            column=preview_theme_data["preview_frame"]["grid_data"]["column"],
-            padx=preview_theme_data["preview_frame"]["grid_data"]["padx"],
-            pady=preview_theme_data["preview_frame"]["grid_data"]["pady"],
-            sticky=preview_theme_data["preview_frame"]["grid_data"]["sticky"],
+            row=0,
+            column=1,
+            padx=40,
+            pady=(20,30),
+            sticky="",
         )
 
         preview_label = CTkLabel(
@@ -304,9 +304,9 @@ class InstallPage(Frame):
             font=eval(preview_theme_data["preview_label"]["font"]),
         )
         preview_label.pack(
-            padx=preview_theme_data["preview_label"]["pack_data"]["padx"],
-            pady=preview_theme_data["preview_label"]["pack_data"]["pady"],
-            side=preview_theme_data["preview_label"]["pack_data"]["side"],
+            padx=10,
+            pady=10,
+            side="top",
         )
 
         self.preview_button = CTkButton(
@@ -322,8 +322,8 @@ class InstallPage(Frame):
             command=self.start_theme_preview_thread,
         )
         self.preview_button.pack(
-            padx=preview_theme_data["preview_button"]["pack_data"]["padx"],
-            pady=preview_theme_data["preview_button"]["pack_data"]["pady"],
+            padx=10,
+            pady=10,
         )
 
     def create_invalid_entry_frame(self):

@@ -3,7 +3,7 @@ from tkinter import ttk, Toplevel, DISABLED, LEFT, END, NORMAL, BOTH
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry
 
 from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_theme_data import ThemeManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.window_tools.center_window import CenterWindow
@@ -248,16 +248,7 @@ class ThemeModal(Toplevel):
 
     def load_themes(self):
         self.disable_buttons()
-        self.thread_manager.start_thread(target=self.retry_loading_themes)
-
-        self.check_loading_thread()
-
-    def check_loading_thread(self):
-        if self.thread_manager.are_threads_alive():
-            self.after(100, self.check_loading_thread)
-        else:
-            # Re-enable buttons after loading is done
-            self.enable_buttons()
+        self.thread_manager.start_thread(target=self.retry_loading_themes, on_finish=self.enable_buttons)
 
     def disable_buttons(self):
         self.select_button.configure(state=DISABLED)

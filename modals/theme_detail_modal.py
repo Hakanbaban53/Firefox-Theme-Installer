@@ -15,7 +15,7 @@ from webbrowser import open as openweb
 from requests import get, RequestException
 
 from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.window_tools.center_window import CenterWindow

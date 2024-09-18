@@ -5,7 +5,7 @@ from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
 from components.create_header import CreateHeader
 from components.create_navigation_button import NavigationButton
-from installer_core.component_tools.thread_managing import ThreadManager
+from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -153,9 +153,9 @@ class HomePage(Frame):
             compound=os_info["os_info_label"]["compound"],
         )
         os_info_label.pack(
-            padx=os_info["os_info_label"]["pack_data"]["padx"],
-            pady=os_info["os_info_label"]["pack_data"]["pady"],
-            side=os_info["os_info_label"]["pack_data"]["side"],
+            padx=10,
+            pady=10,
+            side="left",
         )
 
     def theme_select(self):
@@ -169,12 +169,12 @@ class HomePage(Frame):
             border_width=int(theme_select["theme_frame"]["border_width"]),
         )
         theme_frame.grid(
-            row=theme_select["theme_frame"]["grid_data"]["row"],
-            column=theme_select["theme_frame"]["grid_data"]["column"],
-            columnspan=theme_select["theme_frame"]["grid_data"]["columnspan"],
-            padx=theme_select["theme_frame"]["grid_data"]["padx"],
-            pady=theme_select["theme_frame"]["grid_data"]["pady"],
-            sticky=theme_select["theme_frame"]["grid_data"]["sticky"],
+            row=3,
+            column=0,
+            columnspan=2,
+            padx=0,
+            pady=(10,35),
+            sticky="",
         )
 
         self.theme_label = CTkLabel(
@@ -184,9 +184,9 @@ class HomePage(Frame):
             text_color=theme_select["theme_label"]["fg_color"],
         )
         self.theme_label.pack(
-            padx=theme_select["theme_label"]["pack_data"]["padx"],
-            pady=theme_select["theme_label"]["pack_data"]["pady"],
-            side=theme_select["theme_label"]["pack_data"]["side"],
+            padx=10,
+            pady=10,
+            side="left",
         )
 
         theme_select_button = CTkButton(
@@ -203,9 +203,9 @@ class HomePage(Frame):
             font=(self.button_data["font_family"], int(self.button_data["font_size"])),
         )
         theme_select_button.pack(
-            padx=theme_select["theme_select_button"]["pack_data"]["padx"],
-            pady=theme_select["theme_select_button"]["pack_data"]["pady"],
-            side=theme_select["theme_select_button"]["pack_data"]["side"],
+            padx=10,
+            pady=10,
+            side="right",
         )
 
     def create_navigation_buttons(self):
@@ -220,14 +220,12 @@ class HomePage(Frame):
             font=eval(navigation_buttons["select_action_label"]["font"]),
         )
         select_action_label.grid(
-            row=navigation_buttons["select_action_label"]["grid_data"]["row"],
-            column=navigation_buttons["select_action_label"]["grid_data"]["column"],
-            columnspan=navigation_buttons["select_action_label"]["grid_data"][
-                "columnspan"
-            ],
-            padx=navigation_buttons["select_action_label"]["grid_data"]["padx"],
-            pady=navigation_buttons["select_action_label"]["grid_data"]["pady"],
-            sticky=navigation_buttons["select_action_label"]["grid_data"]["sticky"],
+            row=4,
+            column=0,
+            columnspan=2,
+            padx=60,
+            pady=(0,15),
+            sticky="ew",
         )
         navigation_frame = CTkFrame(
             self.home_page_frame,
@@ -239,14 +237,12 @@ class HomePage(Frame):
             height=navigation_buttons["navigation_frame"]["height"],
         )
         navigation_frame.grid(
-            row=navigation_buttons["navigation_frame"]["grid_data"]["row"],
-            column=navigation_buttons["navigation_frame"]["grid_data"]["column"],
-            columnspan=navigation_buttons["navigation_frame"]["grid_data"][
-                "columnspan"
-            ],
-            padx=navigation_buttons["navigation_frame"]["grid_data"]["padx"],
-            pady=navigation_buttons["navigation_frame"]["grid_data"]["pady"],
-            sticky=navigation_buttons["navigation_frame"]["grid_data"]["sticky"],
+            row=5,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=(0,15),
+            sticky="",
         )
 
         self.navigation_button.create_navigation_button(
@@ -295,12 +291,12 @@ class HomePage(Frame):
             border_width=int(file_detection["detect_files_frame"]["border_width"]),
         )
         self.detect_files_frame.grid(
-            row=file_detection["detect_files_frame"]["grid_data"]["row"],
-            column=file_detection["detect_files_frame"]["grid_data"]["column"],
-            columnspan=file_detection["detect_files_frame"]["grid_data"]["columnspan"],
-            padx=file_detection["detect_files_frame"]["grid_data"]["padx"],
-            pady=file_detection["detect_files_frame"]["grid_data"]["pady"],
-            sticky=file_detection["detect_files_frame"]["grid_data"]["sticky"],
+            row=6,
+            column=0,
+            columnspan=2,
+            padx=0,
+            pady=0,
+            sticky="",
         )
         self.detect_files_text = Label(
             self.detect_files_frame,
@@ -312,11 +308,11 @@ class HomePage(Frame):
             image=self.theme_not_selected_icon,
         )
         self.detect_files_text.grid(
-            row=file_detection["detect_files_text"]["grid_data"]["row"],
-            column=file_detection["detect_files_text"]["grid_data"]["column"],
-            padx=file_detection["detect_files_text"]["grid_data"]["padx"],
-            pady=file_detection["detect_files_text"]["grid_data"]["pady"],
-            sticky=file_detection["detect_files_text"]["grid_data"]["sticky"],
+            row=0,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="",
         )
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
@@ -340,12 +336,12 @@ class HomePage(Frame):
             fg_color=create_section["recheck_skip_frame"]["fg_color"],
         )
         self.recheck_skip_frame.grid(
-            row=create_section["recheck_skip_frame"]["grid_data"]["row"],
-            column=create_section["recheck_skip_frame"]["grid_data"]["column"],
-            columnspan=create_section["recheck_skip_frame"]["grid_data"]["columnspan"],
-            padx=create_section["recheck_skip_frame"]["grid_data"]["padx"],
-            pady=create_section["recheck_skip_frame"]["grid_data"]["pady"],
-            sticky=create_section["recheck_skip_frame"]["grid_data"]["sticky"],
+            row=7,
+            column=0,
+            columnspan=2,
+            padx=0,
+            pady=0,
+            sticky="",
         )
 
         self.check_var = BooleanVar(value=False)
@@ -358,6 +354,14 @@ class HomePage(Frame):
             variable=self.check_var,
             font=eval(create_section["clean_install_checkbox"]["font"]),
         )
+        self.clean_install.grid(
+            row=7,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="", 
+        )
+        self.clean_install.lower()
 
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
@@ -374,13 +378,6 @@ class HomePage(Frame):
         self.update_gif(self.frames)
 
     def stop_loading_animation(self):
-        """Stop loading animation, ensuring it's done after threads finish."""
-        if self.thread_manager.are_threads_alive():
-            self.after(100, self.stop_loading_animation)
-        else:
-            self._stop_loading_animation()
-
-    def _stop_loading_animation(self):
         """Stop the loading GIF animation."""
         if hasattr(self, "animation_id"):
             self.after_cancel(self.animation_id)
@@ -454,14 +451,8 @@ class HomePage(Frame):
             image=None,
             state=updated_ui_data["install_files_button"]["state"],
         )
-        self.clean_install.grid(
-            row=updated_ui_data["clean_install"]["grid_data"]["row"],
-            column=updated_ui_data["clean_install"]["grid_data"]["column"],
-            padx=updated_ui_data["clean_install"]["grid_data"]["padx"],
-            pady=updated_ui_data["clean_install"]["grid_data"]["pady"],
-            sticky=updated_ui_data["clean_install"]["grid_data"]["sticky"], 
-        )
-        self.install_files_button.grid(pady=updated_ui_data["install_files_button"]["grid_data"]["pady"])
+        self.clean_install.lift()
+        self.install_files_button.grid(pady=10)
 
     def run_theme_process(self):
         """Run the theme processing logic."""
@@ -471,8 +462,6 @@ class HomePage(Frame):
             self.check_var.get(),
             self.base_dir,
         ).process_theme()
-
-        self.stop_loading_animation()
         if isinstance(self.theme_data, dict):
             theme_type = self.theme_data.get("type")
             self.handle_theme_type(theme_type)
@@ -496,7 +485,7 @@ class HomePage(Frame):
             fg=handle_data_json_theme["detect_files_text"]["fg"],
         )
         self.data_json_path = path.join(self.theme_data.get("path"), "data", "installer_files_data.json")
-        self.thread_manager.start_thread(self.fetch_files)
+        self.thread_manager.start_thread(target=self.fetch_files)
         self.clean_install.lower()
 
     def handle_userChrome_theme(self):
@@ -507,10 +496,10 @@ class HomePage(Frame):
             fg=handle_userChrome_theme["detect_files_text"]["fg"],
         )
         self.install_button.configure(
-            state=handle_userChrome_theme["install_button"]["state"]
+            state="Normal"
         )
         self.recheck_button.configure(
-            state=handle_userChrome_theme["recheck_button"]["state"],
+            state="normal",
             command=self.get_theme)
         self.install_files_button.configure(
             image=self.check_icon,
@@ -522,11 +511,11 @@ class HomePage(Frame):
         )       
         self.check_var = BooleanVar(value=False)
         self.recheck_button.grid(
-            row=handle_userChrome_theme["recheck_button"]["grid_data"]["row"],
-            column=handle_userChrome_theme["recheck_button"]["grid_data"]["column"],
-            padx=handle_userChrome_theme["recheck_button"]["grid_data"]["padx"],
-            pady=handle_userChrome_theme["recheck_button"]["grid_data"]["pady"],
-            sticky=handle_userChrome_theme["recheck_button"]["grid_data"]["sticky"],
+            row=1,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="",
         )
         self.clean_install.lower()
 
@@ -555,7 +544,6 @@ class HomePage(Frame):
         file_check_result = FileManager(self.data_json_path).check_files_exist(
             root=self.theme_data.get("path")
         )
-        self.stop_loading_animation()
         if file_check_result:
             self.handle_missing_files()
         else:
@@ -573,11 +561,11 @@ class HomePage(Frame):
         )
         self.install_button.configure(state=handle_all_files_installed["install_button"]["state"])
         self.recheck_button.grid(
-            row=handle_all_files_installed["recheck_button"]["grid_data"]["row"],
-            column=handle_all_files_installed["recheck_button"]["grid_data"]["column"],
-            padx=handle_all_files_installed["recheck_button"]["grid_data"]["padx"],
-            pady=handle_all_files_installed["recheck_button"]["grid_data"]["pady"],
-            sticky=handle_all_files_installed["recheck_button"]["grid_data"]["sticky"],
+            row=7,
+            column=1,
+            padx=10,
+            pady=10,
+            sticky="",
         )
         self.clean_install.lower()
 
@@ -592,18 +580,18 @@ class HomePage(Frame):
             image=self.attention_icon, command=self.install_files
         )
         self.install_files_button.grid(
-            row=handle_missing_files["install_files_button"]["grid_data"]["row"],
-            column=handle_missing_files["install_files_button"]["grid_data"]["column"],
-            padx=handle_missing_files["install_files_button"]["grid_data"]["padx"],
-            pady=handle_missing_files["install_files_button"]["grid_data"]["pady"],
-            sticky=handle_missing_files["install_files_button"]["grid_data"]["sticky"],
+            row=2,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="",
         )
         self.recheck_button.grid(
-            row=handle_missing_files["recheck_button"]["grid_data"]["row"],
-            column=handle_missing_files["recheck_button"]["grid_data"]["column"],
-            padx=handle_missing_files["recheck_button"]["grid_data"]["padx"],
-            pady=handle_missing_files["recheck_button"]["grid_data"]["pady"],
-            sticky=handle_missing_files["recheck_button"]["grid_data"]["sticky"],
+            row=7,
+            column=1,
+            padx=10,
+            pady=10,
+            sticky="",
         )
 
     def install_files(self):
@@ -638,7 +626,7 @@ class HomePage(Frame):
         self.detect_files_text.config(
             text=get_theme["detect_files_text"]["text"], fg=get_theme["detect_files_text"]["fg"]
         )
-        self.thread_manager.start_thread(self.run_theme_process)
+        self.thread_manager.start_thread(target=self.run_theme_process, on_finish=self.stop_loading_animation)
 
     def get_neccessary_files(self):
         """Fetch and check necessary files for the theme."""
@@ -660,18 +648,18 @@ class HomePage(Frame):
         self.start_loading_animation()
         file_manager = FileManager(self.data_json_path)
         self.recheck_button.configure(
-            state=fetch_files["recheck_button"]["state"],
+            state="normal",
             command=self.refetch_files)
         self.recheck_button.grid(
-            row=fetch_files["recheck_button"]["grid_data"]["row"],
-            column=fetch_files["recheck_button"]["grid_data"]["column"],
-            padx=fetch_files["recheck_button"]["grid_data"]["padx"],
-            pady=fetch_files["recheck_button"]["grid_data"]["pady"],
-            sticky=fetch_files["recheck_button"]["grid_data"]["sticky"],
+            row=7,
+            column=1,
+            padx=10,
+            pady=10,
+            sticky="",
         )
 
         if file_manager.json_data:
-            self.thread_manager.start_thread(self.locate_files)
+            self.thread_manager.start_thread(self.locate_files, on_finish=self.stop_loading_animation)
         else:
             self.handle_fetch_files_failure()
 
@@ -686,7 +674,7 @@ class HomePage(Frame):
         )
         self.install_button.configure(state="disabled")
         self.clean_install.lower()
-        self.thread_manager.start_thread(self.locate_files)
+        self.thread_manager.start_thread(self.locate_files, on_finish=self.stop_loading_animation)
 
     def handle_fetch_files_failure(self):
         """Handle the failure to fetch files."""
@@ -698,11 +686,11 @@ class HomePage(Frame):
             state=handle_fetch_files_failure["install_files_button"]["state"],
         )
         self.clean_install.grid(
-            row=handle_fetch_files_failure["clean_install"]["grid_data"]["row"],
-            column=handle_fetch_files_failure["clean_install"]["grid_data"]["column"],
-            padx=handle_fetch_files_failure["clean_install"]["grid_data"]["padx"],
-            pady=handle_fetch_files_failure["clean_install"]["grid_data"]["pady"],
-            sticky=handle_fetch_files_failure["clean_install"]["grid_data"]["sticky"],
+            row=7,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="",
         )
 
     def update_parameters(self, **kwargs):
