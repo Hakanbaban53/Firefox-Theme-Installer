@@ -644,7 +644,6 @@ class HomePage(Frame):
 
     def fetch_files(self):
         """Fetch files based on data JSON path."""
-        fetch_files = self.ui_data["fetch_files"]
         self.start_loading_animation()
         file_manager = FileManager(self.data_json_path)
         self.recheck_button.configure(

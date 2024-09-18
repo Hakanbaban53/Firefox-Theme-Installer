@@ -105,7 +105,7 @@ class PreviewTheme:
                 process = Popen(["firefox", "-no-remote", "-profile", self.THEME_TEMP_PATH])
             elif self.current_os == "windows":
                 firefox_path = path.join(self.application_folder, "firefox.exe")
-                process = Popen([firefox_path, "-no-remote", "-profile", self.THEME_TEMP_PATH])
+                process = Popen([firefox_path, "-no-remote", "-profile", self.THEME_TEMP_PATH, "-wait-for-browser"])
             elif self.current_os == "macos":
                 firefox_path = path.join(self.application_folder, "Firefox.app")
                 process = Popen(["open", "-n", firefox_path, "--args", "-no-remote", "-profile", self.THEME_TEMP_PATH])
