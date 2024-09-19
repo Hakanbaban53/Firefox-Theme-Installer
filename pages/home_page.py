@@ -16,11 +16,11 @@ from modals.info_modals import InfoModals
 from modals.theme_modal import ThemeModal
 
 class HomePage(Frame):
-
-    def __init__(self, parent, controller, base_dir):
+    def __init__(self, parent, controller, base_dir, language="EN"):
         super().__init__(parent)
-        # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "home_page_data.json")
+        self.language = language
+        # Load the UI data from the JSON file based on the selected language
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "Home Page", language, "home_page_data.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()

@@ -22,10 +22,9 @@ from modals.info_modals import InfoModals
 
 
 class InstallPage(Frame):
-    def __init__(self, parent, controller, base_dir):
+    def __init__(self, parent, controller, base_dir, language="EN"):
         super().__init__(parent)
-        # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "install_page_data.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "Install Page", language, "install_page_data.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()

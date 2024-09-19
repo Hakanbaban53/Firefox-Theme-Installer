@@ -18,10 +18,10 @@ from installer_core.file_utils.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
 
 class RemovePage(Frame):
-    def __init__(self, parent, controller, base_dir):
+    def __init__(self, parent, controller, base_dir, language="EN"):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "remove_page_data.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "Remove Page", language, "remove_page_data.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()

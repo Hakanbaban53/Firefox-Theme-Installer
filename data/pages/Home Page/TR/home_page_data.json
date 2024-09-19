@@ -1,0 +1,224 @@
+{
+    "additional_settings": {
+      "animation_speed": 100,
+      "default_language": "tr"
+    },
+  
+    "header_data": {
+      "text": "Tema Yükleyiciye Hoş Geldiniz"
+    },
+  
+    "create_os_info": {
+      "os_label": {
+        "text": "Algılanan İşletim Sistemi: ",
+        "text_color": "white",
+        "font": "(\"Inter\", 20, \"bold\")"
+      },
+      "os_frame": {
+        "fg_color": "white",
+        "corner_radius": "12",
+        "border_width": 0,
+        "border_color": "None"
+      },
+      "os_info_label": {
+        "font": "(\"Arial\", 20, \"bold\")",
+        "compound": "right"
+      }
+    },
+  
+    "theme_select": {
+      "theme_frame": {
+        "fg_color": "white",
+        "corner_radius": "12",
+        "border_width": 4,
+        "border_color": "#771D76"
+      },
+      "theme_label": {
+        "text": "Tema Seç: Yok",
+        "font": "(\"Inter\", 18)",
+        "fg_color": "Black"
+      },
+      "theme_select_button": {
+        "text": "Tema Seç"
+      }
+    },
+  
+    "create_navigation_buttons": {
+      "select_action_label": {
+        "text": "Lütfen İşlemi Seçiniz",
+        "text_color": "white",
+        "font": "(\"Inter\", 20, \"bold\")"
+      },
+      "navigation_frame": {
+        "width": 460,
+        "height": 54,
+        "corner_radius": 12,
+        "border_width": 4,
+        "fg_color": "white",
+        "border_color": "#F89F24"
+      }
+    },
+  
+    "create_file_detection": {
+      "detect_files_frame": {
+        "corner_radius": 12,
+        "fg_color": "white",
+        "border_width": 0,
+        "border_color": "None"
+      },
+      "detect_files_text": {
+        "parent": "detect_files_frame",
+        "text": "Lütfen temayı seçin",
+        "fg": "#000000",
+        "bg": "#FFFFFF",
+        "font": "(\"Arial\", 16, \"bold\")",
+        "compound": "right"
+      },
+      "install_files_button": {
+        "text": "Dosyaları Göster",
+        "width": 120,
+        "height": 40,
+        "corner_radius": 14,
+        "fg_color": "#E0E0E0",
+        "hover_color": "#D0D0D0",
+        "text_color": "#000000",
+        "font": "(\"Arial\", 18, \"bold\")"
+      }
+    },
+  
+    "create_recheck_skip_section": {
+      "recheck_skip_frame": {
+        "fg_color": "#2B2631"
+      },
+      "clean_install_checkbox": {
+        "text": "Temiz Kurulum",
+        "text_color": "#FFFFFF",
+        "font": "(\"Arial\", 16, \"bold\")",
+        "onvalue": true,
+        "offvalue": false
+      },
+      "recheck_button": {
+        "width": 40,
+        "height": 40,
+        "text": "",
+        "fg_color": "#FFFFFF",
+        "image": "reload_icon"
+      }
+    },
+    "update_ui_for_selected_theme": {
+      "detect_files_text": {
+        "text": "Tema Seçildi",
+        "fg": "#000000"
+      },
+      "theme_label": {
+        "text": "Seçilen Tema: "
+      },
+      "install_files_button": {
+        "text": "Temayı Yükle",
+        "state": "normal",
+        "text_color": "#000000"
+      },
+      "install_button": {
+        "state": "disabled"
+      }
+    },
+    "handle_data_json_theme": {
+      "detect_files_text": {
+        "text": "Tema kendi veri JSON'una sahip",
+        "fg": "#00FF00"
+      }
+    },
+    "handle_userChrome_theme": {
+      "detect_files_text": {
+        "text": "Tema userChrome.css dosyasına sahip",
+        "fg": "#00FF00"
+      },
+      "install_button": {
+        "state": "normal"
+      },
+      "install_files_button": {
+        "text": "Yüklendi",
+        "state": "disabled",
+        "fg_color": "#D9D9D9",
+        "width": 150,
+        "text_color": "#000000"
+      }
+    },
+    "no_theme_data_found": {
+      "detect_files_text": {
+        "text": "Tema verisi veya chrome/userChrome.css bulunamadı",
+        "fg": "#FF0000"
+      },
+      "install_button": {
+        "state": "disabled"
+      },
+      "install_files_button": {
+        "text": "Yüklendi",
+        "state": "disabled",
+        "fg_color": "#D9D9D9",
+        "width": 150,
+        "text_color": "#000000"
+      }
+    },
+    "handle_all_files_installed": {
+      "install_files_button": {
+        "text": "Tüm Dosyalar Yüklendi",
+        "text_color": "#10dc60",
+        "state": "disabled",
+        "width": 200
+      },
+      "install_button": {
+        "state": "normal"
+      }
+    },
+    "handle_missing_files": {
+      "install_files_button": {
+        "text": "Bazı Dosyalar Eksik",
+        "text_color": "#f04141",
+        "width": 200,
+        "state": "normal"
+      }
+    },
+    "refetch_files": {
+      "install_files_button": {
+        "text": "Dosyalar Alınıyor",
+        "text_color": "#000000",
+        "state": "disabled"
+      },
+      "install_button": {
+        "state": "disabled"
+      }
+    },
+    "get_theme": {
+      "install_files_button": {
+        "text": "Dosyalar Yükleniyor",
+        "text_color": "#000000",
+        "state": "disabled"
+      },
+      "detect_files_text": {
+        "text": "Tema Dosyaları Yükleniyor",
+        "fg": "#000000"
+      }
+    },
+    "get_neccessary_files": {
+      "detect_files_text": {
+        "text": "Gerekli Dosyalar Alınıyor",
+        "fg": "#000000"
+      }
+    },
+    "recheck_files": {
+      "install_files_button": {
+        "text": "Dosyalar Kontrol Ediliyor",
+        "text_color": "#000000",
+        "state": "disabled"
+      }
+    },
+    "handle_fetch_files_failure": {
+      "install_files_button": {
+        "text": "Dosyalar alınamadı",
+        "text_color": "#f04141",
+        "state": "disabled"
+      }
+    }
+  }
+  

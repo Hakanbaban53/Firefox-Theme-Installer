@@ -1,7 +1,8 @@
 import sys
 from os import path
-from tkinter import Frame, Tk
+from tkinter import Frame, Menu, Tk, Menubutton
 from customtkinter import CTkLabel
+
 from components.set_window_icon import SetWindowIcon
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
@@ -23,6 +24,7 @@ class MultiPageApp(Tk):
 
         self.configure_layout()
         self.create_widgets()
+        self.show_frame("home_page")
 
     def configure_layout(self):
         """Set window title, geometry, and icon."""
@@ -62,6 +64,14 @@ class MultiPageApp(Tk):
         )
         self.background_label.pack(fill="both", expand=True)
 
+        self.language_button = Menubutton(
+            self.image_frame,
+            text="Language",
+            font=("Inter", 14)
+        )
+        self.language_menu = Menu(self.language_button, tearoff=0)
+        self.language_button.place(relx=0.5, rely=0.95, anchor="center")
+        
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
         self.container = Frame(self, bg=self.base_data["window_settings"]["bg_color"])
@@ -71,8 +81,8 @@ class MultiPageApp(Tk):
         self.frames = {}
 
     def create_frame(self, page_class):
-        """Create and return a new frame for the specified page class."""
-        frame = page_class(self.container, self, self.base_dir)
+        """Create and return a new frame for the specified page class, passing the current language."""
+        frame = page_class(self.container, self, self.base_dir, language="EN")
         frame.configure(bg=self.base_data["window_settings"]["bg_color"])
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
@@ -168,21 +178,6 @@ class MultiPageApp(Tk):
         """Display exit confirmation modal."""
         InfoModals(self, self.base_dir, "Exit")
 
-    def center_window(self):
-        """Center the application window on the screen."""
-        self.update_idletasks()
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-        self.geometry(f"+{x}+{y}")
-
-
 if __name__ == "__main__":
     app = MultiPageApp()
-    app.center_window()
-    app.show_frame("home_page")
     app.mainloop()

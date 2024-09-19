@@ -1,0 +1,26 @@
+{
+  "header_data": {
+    "text": "Yükleme Durumu"
+  },
+  "create_navigation_buttons": {
+    "finish_button": {
+      "text": "Bitir"
+    },
+    "back_button": {
+      "text": "Geri"
+    },
+    "exit_button": {
+      "text": "Çıkış"
+    }
+  },
+  "update_text": {
+    "install": "Yükleme başarılı",
+    "remove": "Kaldırma başarılı"
+  },
+  "install": {
+    "text": "Yükleniyor"
+  },
+  "remove": {
+    "text": "Kaldırılıyor"
+  }
+}
