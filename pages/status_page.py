@@ -20,12 +20,12 @@ from modals.info_modals import InfoModals
 
 
 class StatusPage(Frame):
-    def __init__(self, parent, controller, base_dir, language="EN"):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
         self.controller = controller
         self.base_dir = base_dir
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "Status Page", language, "status_page_data.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "status_page", "language", "en.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()

@@ -22,9 +22,9 @@ from modals.info_modals import InfoModals
 
 
 class InstallPage(Frame):
-    def __init__(self, parent, controller, base_dir, language="EN"):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "Install Page", language, "install_page_data.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "install_page", "language", "tr.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
@@ -283,10 +283,10 @@ class InstallPage(Frame):
         preview_theme_data = self.ui_data["create_preview_theme"]
         preview_frame = CTkFrame(
             preview_and_check_installed_theme_frame,
-            width=preview_theme_data["preview_frame"]["width"],
-            height=preview_theme_data["preview_frame"]["height"],
-            corner_radius=preview_theme_data["preview_frame"]["corner_radius"],
-            fg_color=preview_theme_data["preview_frame"]["fg_color"],
+            width=440,
+            height=60,
+            corner_radius=12,
+            fg_color="#FFFFFF"
         )
         preview_frame.grid(
             row=0,
@@ -299,8 +299,8 @@ class InstallPage(Frame):
         preview_label = CTkLabel(
             preview_frame,
             text=preview_theme_data["preview_label"]["text"],
-            text_color=preview_theme_data["preview_label"]["text_color"],
-            font=eval(preview_theme_data["preview_label"]["font"]),
+            text_color="#000000",
+            font=("Inter", 18, "bold"),
         )
         preview_label.pack(
             padx=10,
@@ -311,12 +311,12 @@ class InstallPage(Frame):
         self.preview_button = CTkButton(
             preview_frame,
             text=preview_theme_data["preview_button"]["text"],
-            height=preview_theme_data["preview_button"]["height"],
-            fg_color=preview_theme_data["preview_button"]["fg_color"],
-            hover_color=preview_theme_data["preview_button"]["hover_color"],
-            corner_radius=preview_theme_data["preview_button"]["corner_radius"],
-            font=eval(preview_theme_data["preview_button"]["font"]),
-            text_color=preview_theme_data["preview_button"]["text_color"],
+            height=42,
+            fg_color="#D9D9D9",
+            hover_color="#EEEEEE",
+            corner_radius=12,
+            font=("Inter", 16, "bold"),
+            text_color="#000000",
             image=self.preview_icon,
             command=self.start_theme_preview_thread,
         )
@@ -344,9 +344,9 @@ class InstallPage(Frame):
         self.invalid_entries_text = CTkLabel(
             self.invalid_entry_frame,
             text=invalid_entry_frame_data["invalid_entries_text"]["text"],
-            text_color=invalid_entry_frame_data["invalid_entries_text"]["text_color"],
-            font=eval(invalid_entry_frame_data["invalid_entries_text"]["font"]),
-            compound=invalid_entry_frame_data["invalid_entries_text"]["compound"],
+            text_color="#F04141",
+            font=("Inter", 16, "bold"),
+            compound="left",
             image=self.attention_icon,
         )
         self.invalid_entries_text.pack(
@@ -431,8 +431,9 @@ class InstallPage(Frame):
 
     def start_theme_preview_thread(self):
         # Disable the install and preview buttons
+        start_theme_preview_thread_data = self.ui_data["start_theme_preview_thread"]
         self.install_button.configure(state="disabled")
-        self.preview_button.configure(state="disabled", text="Previewing...")
+        self.preview_button.configure(state="disabled", text=start_theme_preview_thread_data["preview_button"]["text"], width=150)
 
         # Start the preview in a new thread and re-enable buttons when done
         self.thread_manager.start_thread(
@@ -456,9 +457,10 @@ class InstallPage(Frame):
 
     def on_preview_complete(self):
         # Re-enable the install and preview buttons when Firefox is closed
+        on_preview_complete_data = self.ui_data["on_preview_complete"]
         self.install_button.configure(state="normal")
         self.preview_button.configure(
-            text="Preview Theme",
+            text=on_preview_complete_data["preview_button"]["text"],
             state="normal",
             width=150,
         )

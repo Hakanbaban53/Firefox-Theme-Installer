@@ -1,7 +1,7 @@
 import sys
 from os import path
-from tkinter import Frame, Menu, Tk, Menubutton
-from customtkinter import CTkLabel
+from tkinter import Frame, Tk
+from customtkinter import CTkLabel, CTkOptionMenu
 
 from components.set_window_icon import SetWindowIcon
 from installer_core.data_tools.image_loader import ImageLoader
@@ -21,6 +21,8 @@ class MultiPageApp(Tk):
 
         base_data_path = path.join(self.base_dir, "data", "installer_data.json")
         self.base_data = LoadJsonData().load_json_data(base_data_path)
+
+        self.current_frame = None
 
         self.configure_layout()
         self.create_widgets()
@@ -64,13 +66,16 @@ class MultiPageApp(Tk):
         )
         self.background_label.pack(fill="both", expand=True)
 
-        self.language_button = Menubutton(
+        self.language_button = CTkOptionMenu(
             self.image_frame,
-            text="Language",
-            font=("Inter", 14)
+            font=("Inter", 14),
+            values=["EN", "TR"],
+            bg_color="#000000",
+            corner_radius=12
         )
-        self.language_menu = Menu(self.language_button, tearoff=0)
+        self.language_button.set("TR")
         self.language_button.place(relx=0.5, rely=0.95, anchor="center")
+
         
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
@@ -82,7 +87,7 @@ class MultiPageApp(Tk):
 
     def create_frame(self, page_class):
         """Create and return a new frame for the specified page class, passing the current language."""
-        frame = page_class(self.container, self, self.base_dir, language="EN")
+        frame = page_class(self.container, self, self.base_dir)
         frame.configure(bg=self.base_data["window_settings"]["bg_color"])
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
@@ -118,6 +123,8 @@ class MultiPageApp(Tk):
 
         next_frame.update_parameters(**kwargs)
         next_frame.tkraise()
+
+        self.current_frame = next_frame
 
     def get_current_frame(self):
         """Return the currently visible frame."""

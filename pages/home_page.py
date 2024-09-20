@@ -16,11 +16,10 @@ from modals.info_modals import InfoModals
 from modals.theme_modal import ThemeModal
 
 class HomePage(Frame):
-    def __init__(self, parent, controller, base_dir, language="EN"):
+    def __init__(self, parent, controller, base_dir):
         super().__init__(parent)
-        self.language = language
         # Load the UI data from the JSON file based on the selected language
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "Home Page", language, "home_page_data.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "home_page", "language", "en.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
@@ -119,8 +118,8 @@ class HomePage(Frame):
         os_label = CTkLabel(
             self.home_page_frame,
             text=os_info["os_label"]["text"],
-            text_color=os_info["os_label"]["text_color"],
-            font=eval(os_info["os_label"]["font"]),  # Convert the string to a tuple
+            text_color="#FFFFFF",
+            font=("Inter", 20, "bold"),  # Convert the string to a tuple
         )
         os_label.grid(
             row=2,
@@ -131,10 +130,9 @@ class HomePage(Frame):
         )
         os_frame = CTkFrame(
             self.home_page_frame,
-            fg_color=os_info["os_frame"]["fg_color"],
-            corner_radius=int(os_info["os_frame"]["corner_radius"]),
-            border_color=os_info["os_frame"]["border_color"],
-            border_width=int(os_info["os_frame"]["border_width"]),
+            fg_color="#FFFFFF",
+            corner_radius=12,
+            border_width=0,
         )
         os_frame.grid(
             row=2,
@@ -148,9 +146,9 @@ class HomePage(Frame):
             os_frame,
             text=f"{self.os_values['os_name']} ",
             text_color=self.os_values["os_color"],
-            font=eval(os_info["os_info_label"]["font"]),
+            font=("Inter", 18),
             image=self.os_icon_image,
-            compound=os_info["os_info_label"]["compound"],
+            compound="right",
         )
         os_info_label.pack(
             padx=10,
@@ -163,10 +161,10 @@ class HomePage(Frame):
 
         theme_frame = CTkFrame(
             self.home_page_frame,
-            fg_color=theme_select["theme_frame"]["fg_color"],
-            corner_radius=int(theme_select["theme_frame"]["corner_radius"]),
-            border_color=theme_select["theme_frame"]["border_color"],
-            border_width=int(theme_select["theme_frame"]["border_width"]),
+            fg_color="#FFFFFF",
+            corner_radius=12,
+            border_color="#771D76",
+            border_width=4,
         )
         theme_frame.grid(
             row=3,
@@ -180,8 +178,8 @@ class HomePage(Frame):
         self.theme_label = CTkLabel(
             theme_frame,
             text=theme_select["theme_label"]["text"],
-            font=eval(theme_select["theme_label"]["font"]),
-            text_color=theme_select["theme_label"]["fg_color"],
+            font=("Inter", 18),
+            text_color="#000000"
         )
         self.theme_label.pack(
             padx=10,
@@ -216,8 +214,8 @@ class HomePage(Frame):
             self.home_page_frame,
             text=navigation_buttons["select_action_label"]["text"],
             image=self.select_action_img,
-            text_color=navigation_buttons["select_action_label"]["text_color"],
-            font=eval(navigation_buttons["select_action_label"]["font"]),
+            text_color="#FFFFFF",
+            font=("Inter", 20),
         )
         select_action_label.grid(
             row=4,
@@ -229,12 +227,12 @@ class HomePage(Frame):
         )
         navigation_frame = CTkFrame(
             self.home_page_frame,
-            fg_color=navigation_buttons["navigation_frame"]["fg_color"],
-            corner_radius=int(navigation_buttons["navigation_frame"]["corner_radius"]),
-            border_color=navigation_buttons["navigation_frame"]["border_color"],
-            border_width=int(navigation_buttons["navigation_frame"]["border_width"]),
-            width=navigation_buttons["navigation_frame"]["width"],
-            height=navigation_buttons["navigation_frame"]["height"],
+            fg_color="#FFFFFF",
+            corner_radius=10,
+            border_color="#F89F24",
+            border_width=4,
+            width=440,
+            height=54,
         )
         navigation_frame.grid(
             row=5,
@@ -285,10 +283,9 @@ class HomePage(Frame):
 
         self.detect_files_frame = CTkFrame(
             self.home_page_frame,
-            fg_color=file_detection["detect_files_frame"]["fg_color"],
-            corner_radius=int(file_detection["detect_files_frame"]["corner_radius"]),
-            border_color=file_detection["detect_files_frame"]["border_color"],
-            border_width=int(file_detection["detect_files_frame"]["border_width"]),
+            fg_color="#FFFFFF",
+            corner_radius=12,
+            border_width=0,
         )
         self.detect_files_frame.grid(
             row=6,
@@ -301,10 +298,10 @@ class HomePage(Frame):
         self.detect_files_text = Label(
             self.detect_files_frame,
             text=file_detection["detect_files_text"]["text"],
-            font=eval(file_detection["detect_files_text"]["font"]),
-            fg=file_detection["detect_files_text"]["fg"],
-            bg=file_detection["detect_files_text"]["bg"],
-            compound=file_detection["detect_files_text"]["compound"],
+            font=("Inter", 18),
+            fg="#000000",
+            bg="#FFFFFF",
+            compound="right",
             image=self.theme_not_selected_icon,
         )
         self.detect_files_text.grid(
@@ -317,15 +314,13 @@ class HomePage(Frame):
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
             text=file_detection["install_files_button"]["text"],
-            width=float(file_detection["install_files_button"]["width"]),
-            height=float(file_detection["install_files_button"]["height"]),
-            corner_radius=float(
-                file_detection["install_files_button"]["corner_radius"]
-            ),
-            fg_color=file_detection["install_files_button"]["fg_color"],
-            hover_color=file_detection["install_files_button"]["hover_color"],
-            text_color=file_detection["install_files_button"]["text_color"],
-            font=eval(file_detection["install_files_button"]["font"]),
+            width=120,
+            height=40,
+            corner_radius=12,
+            fg_color="#E0E0E0",
+            hover_color="#D0D0D0",
+            text_color="#000000",
+            font=("Inter", 18, "bold")
         )
 
     def create_recheck_skip_section(self):
@@ -333,7 +328,7 @@ class HomePage(Frame):
 
         self.recheck_skip_frame = CTkFrame(
             self.home_page_frame,
-            fg_color=create_section["recheck_skip_frame"]["fg_color"],
+            fg_color="#2B2631",
         )
         self.recheck_skip_frame.grid(
             row=7,
@@ -348,11 +343,11 @@ class HomePage(Frame):
         self.clean_install = CTkCheckBox(
             self.recheck_skip_frame,
             text=create_section["clean_install_checkbox"]["text"],
-            text_color=create_section["clean_install_checkbox"]["text_color"],
-            onvalue=bool(create_section["clean_install_checkbox"]["onvalue"]),
-            offvalue=bool(create_section["clean_install_checkbox"]["offvalue"]),
+            text_color="#FFFFFF",
+            onvalue=True,
+            offvalue=False,
             variable=self.check_var,
-            font=eval(create_section["clean_install_checkbox"]["font"]),
+            font=("Inter", 16, "bold"),
         )
         self.clean_install.grid(
             row=7,
@@ -365,10 +360,10 @@ class HomePage(Frame):
 
         self.recheck_button = CTkButton(
             self.recheck_skip_frame,
-            width=float(create_section["recheck_button"]["width"]),
-            height=float(create_section["recheck_button"]["height"]),
-            text=create_section["recheck_button"]["text"],
-            fg_color=create_section["recheck_button"]["fg_color"],
+            width=40,
+            height=40,
+            text="",
+            fg_color="#FFFFFF",
             image=self.reload_icon,
         )
 
@@ -438,7 +433,7 @@ class HomePage(Frame):
         self.detect_files_text.configure(
         image=self.theme_selected_icon,
         text=updated_ui_data["detect_files_text"]["text"],
-        fg=updated_ui_data["detect_files_text"]["fg"],
+        fg="#000000",
         )
 
         self.theme_label.configure(
@@ -447,9 +442,9 @@ class HomePage(Frame):
         self.install_files_button.configure(
             command=self.get_theme,
             text=updated_ui_data["install_files_button"]["text"],
-            text_color=updated_ui_data["install_files_button"]["text_color"],
+            text_color="#000000",
             image=None,
-            state=updated_ui_data["install_files_button"]["state"],
+            state="normal", 
         )
         self.clean_install.lift()
         self.install_files_button.grid(pady=10)
@@ -482,7 +477,7 @@ class HomePage(Frame):
         handle_data_json_theme = self.ui_data["handle_data_json_theme"]
         self.detect_files_text.configure(
             text=handle_data_json_theme["detect_files_text"]["text"],
-            fg=handle_data_json_theme["detect_files_text"]["fg"],
+            fg="#00FF00",
         )
         self.data_json_path = path.join(self.theme_data.get("path"), "data", "installer_files_data.json")
         self.thread_manager.start_thread(target=self.fetch_files)
@@ -493,7 +488,7 @@ class HomePage(Frame):
         handle_userChrome_theme = self.ui_data["handle_userChrome_theme"]
         self.detect_files_text.configure(
             text=handle_userChrome_theme["detect_files_text"]["text"],
-            fg=handle_userChrome_theme["detect_files_text"]["fg"],
+            fg="#00FF00",
         )
         self.install_button.configure(
             state="Normal"
@@ -504,10 +499,10 @@ class HomePage(Frame):
         self.install_files_button.configure(
             image=self.check_icon,
             text=handle_userChrome_theme["install_files_button"]["text"],
-            text_color=handle_userChrome_theme["install_files_button"]["text_color"],
-            state=handle_userChrome_theme["install_files_button"]["state"],
-            fg_color=handle_userChrome_theme["install_files_button"]["fg_color"],
-            width=handle_userChrome_theme["install_files_button"]["width"],
+            text_color="#000000",
+            state="disabled",
+            fg_color="#D9D9D9",
+            width=150,
         )       
         self.check_var = BooleanVar(value=False)
         self.recheck_button.grid(
@@ -524,18 +519,18 @@ class HomePage(Frame):
         no_theme_data_found = self.ui_data["no_theme_data_found"]
         self.detect_files_text.configure(
             text=no_theme_data_found["detect_files_text"]["text"],
-            fg=no_theme_data_found["detect_files_text"]["fg"],
+            fg= "#FF0000",
         )
         self.install_files_button.configure(
             image=self.check_icon,
             text=no_theme_data_found["install_files_button"]["text"],
-            text_color=no_theme_data_found["install_files_button"]["text_color"],
-            state=no_theme_data_found["install_files_button"]["state"],
-            fg_color=no_theme_data_found["install_files_button"]["fg_color"],
-            width=no_theme_data_found["install_files_button"]["width"],
+            text_color="#000000",
+            state="disabled",
+            fg_color="#D9D9D9",
+            width=150,
         )  
         self.install_button.configure(
-            state=no_theme_data_found["install_button"]["state"]
+            state="disabled"
         )
 
     # File handling and animations
@@ -553,13 +548,13 @@ class HomePage(Frame):
         """Update UI when all theme files are installed."""
         handle_all_files_installed = self.ui_data["handle_all_files_installed"]
         self.install_files_button.configure(
-            width=handle_all_files_installed["install_files_button"]["width"],
+            width=200,
             text=handle_all_files_installed["install_files_button"]["text"],
-            text_color=handle_all_files_installed["install_files_button"]["text_color"],
-            state=handle_all_files_installed["install_files_button"]["state"],
+            text_color="#10dc60",
+            state="disabled",
             image=self.check_icon,
         )
-        self.install_button.configure(state=handle_all_files_installed["install_button"]["state"])
+        self.install_button.configure(state="normal")
         self.recheck_button.grid(
             row=7,
             column=1,
@@ -574,9 +569,9 @@ class HomePage(Frame):
         handle_missing_files = self.ui_data["handle_missing_files"]
         self.install_files_button.configure(
             text=handle_missing_files["install_files_button"]["text"],
-            text_color=handle_missing_files["install_files_button"]["text_color"],
-            state=handle_missing_files["install_files_button"]["state"],
-            width=handle_missing_files["install_files_button"]["width"],
+            text_color="#f04141",
+            state="normal",
+            width=200,
             image=self.attention_icon, command=self.install_files
         )
         self.install_files_button.grid(
@@ -605,10 +600,10 @@ class HomePage(Frame):
         refetch_files = self.ui_data["refetch_files"]
         self.install_files_button.configure(
             text=refetch_files["install_files_button"]["text"],
-            text_color=refetch_files["install_files_button"]["text_color"],
-            state=refetch_files["install_files_button"]["state"],
+            text_color="#000000",
+            state="disabled",
         )
-        self.install_button.configure(state=refetch_files["install_button"]["state"])
+        self.install_button.configure(state="disabled")
         self.clean_install.lower()
         self.thread_manager.start_thread(self.fetch_files)
 
@@ -620,11 +615,11 @@ class HomePage(Frame):
         self.get_neccessary_files()
         self.install_files_button.configure(
             text=get_theme["install_files_button"]["text"],
-            text_color=get_theme["install_files_button"]["text_color"],
-            state=get_theme["install_files_button"]["state"],
+            text_color="#000000",
+            state="disabled",
         )
         self.detect_files_text.config(
-            text=get_theme["detect_files_text"]["text"], fg=get_theme["detect_files_text"]["fg"]
+            text=get_theme["detect_files_text"]["text"], fg="#000000"
         )
         self.thread_manager.start_thread(target=self.run_theme_process, on_finish=self.stop_loading_animation)
 
@@ -633,7 +628,7 @@ class HomePage(Frame):
         get_neccessary_files = self.ui_data["get_neccessary_files"]
         self.detect_files_text.config(
             text=get_neccessary_files["detect_files_text"]["text"],
-            fg=get_neccessary_files["detect_files_text"]["fg"],
+            fg="#000000",
         )
         file_manager = FileManager(json_file_path=self.CUSTOM_SCRIPT_LOADER_PATH, json_file_url=self.paths["CUSTOM_SCRIPT_LOADER_URL"])
         if file_manager.json_data:
@@ -668,8 +663,8 @@ class HomePage(Frame):
         self.start_loading_animation()
         self.install_files_button.configure(
             text=recheck_files["install_files_button"]["text"],
-            text_color=recheck_files["install_files_button"]["text_color"],
-            state=recheck_files["install_files_button"]["state"],
+            text_color="#000000",
+            state="disabled",
         )
         self.install_button.configure(state="disabled")
         self.clean_install.lower()
@@ -681,8 +676,8 @@ class HomePage(Frame):
         self.install_files_button.configure(
             image=self.attention_icon,
             text=handle_fetch_files_failure["install_files_button"]["text"],
-            text_color=handle_fetch_files_failure["install_files_button"]["text_color"],
-            state=handle_fetch_files_failure["install_files_button"]["state"],
+            text_color="#f04141",
+            state="disabled",
         )
         self.clean_install.grid(
             row=7,

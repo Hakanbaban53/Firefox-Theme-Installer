@@ -1,0 +1,40 @@
+{
+  "search_bar": {
+    "placeholder_text": "Search theme..."
+  },
+  "treeview": {
+    "columns": ["Title", "Description"]
+  },
+  "buttons": {
+    "select_button": {
+      "text": "Select Theme"
+    },
+    "error_button": {
+      "text": "Retry"
+    },
+    "pagination": {
+      "prev_button": {
+        "text": "Previous"
+      },
+      "next_button": {
+        "text": "Next"
+      }
+    }
+  },
+  "retrying": {
+    "text": "Retrying..."
+  },
+  "detail_info_text": {
+    "text": "Double-click to see theme details"
+  },
+  "tags": {
+    "text": "Filter"
+  },
+  "error_messages": {
+    "no_themes": "No themes available. Please check your theme source or internet connection.",
+    "retry_failed": "Retry failed:"
+  },
+  "pagination": {
+    "label_template": "Page"
+  }
+}

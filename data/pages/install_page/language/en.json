@@ -1,0 +1,33 @@
+{
+  "header_data": {
+    "text": "Check the Install Config"
+  },
+  "create_preview_theme": {
+    "preview_label": {
+      "text": "Preview Theme in Firefox"
+    },
+    "preview_button": {
+      "text": "Preview Theme"
+    }
+  },
+  "create_invalid_entry_frame": {
+    "invalid_entries_text": {
+      "text": ""
+    }
+  },
+  "update_button_and_frame": {
+    "invalid_entries_text": {
+      "text": " entries is invalid"
+    }
+  },
+  "on_preview_complete":{
+    "preview_button": {
+      "text": "Preview Theme"
+    }
+  },
+  "start_theme_preview_thread": {
+    "preview_button": {
+      "text": "Previewing..."
+    }
+  }
+}
