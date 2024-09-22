@@ -16,7 +16,6 @@
     },
     "create_input_and_checkbox_widgets": {
       "profile_folder_label": {
-        "text": "Profile folder",
         "text_color": "white",
         "font": "(\"Arial\", 16, \"bold\")",
         "grid_data": {
@@ -28,7 +27,6 @@
         }
       },
       "application_folder_label": {
-        "text": "Application Folder",
         "text_color": "white",
         "font": "(\"Arial\", 16, \"bold\")",
         "grid_data": {
@@ -74,7 +72,6 @@
         }
       },
       "CSL_checkbox": {
-        "text": "Enable Custom Script Loader",
         "fg_color": "#771D76",
         "hover_color": "#771D76",
         "border_color": "#771D76",
@@ -90,7 +87,6 @@
         }
       },
       "edit_checkbox": {
-        "text": "Edit Inputs",
         "fg_color": "#F08D27",
         "hover_color": "#F08D27",
         "border_color": "#F08D27",

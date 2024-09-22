@@ -12,15 +12,16 @@ from modals.info_modals import InfoModals
 
 
 class FileInstallerModal(Toplevel):
-    def __init__(self, parent, base_dir, theme_data_path, theme_dir):
+    def __init__(self, parent, base_dir, theme_data_path, theme_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "data", "modals", "check_files_modal_data.json"
+            base_dir, "data", "modals", "check_files_modal", "language", f"{app_language}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-
+        
+        self.app_language = app_language
         self.base_dir = base_dir
         self.theme_dir = theme_dir
         self.thread_manager = ThreadManager()
@@ -29,7 +30,7 @@ class FileInstallerModal(Toplevel):
         CenterWindow(self).center_window()  # After configure the basic layout center the window. 
 
         self.file_manager = FileManager(theme_data_path)
-        self.title(self.ui_data["FileInstallerModal"]["title"])
+        self.title(self.ui_data["title"])
 
 
         self.create_widgets()
@@ -52,7 +53,7 @@ class FileInstallerModal(Toplevel):
 
     def create_widgets(self):
         """Create and arrange the widgets in the modal."""
-        modal_config = self.ui_data["FileInstallerModal"]
+        modal_config = self.ui_data
 
         self.missing_files_label = Label(
             master=self.files_modal_frame,
@@ -108,12 +109,12 @@ class FileInstallerModal(Toplevel):
 
     def on_install_button_click(self):
         """Handle the install button click event."""
-        self.install_files_button.configure(text="Installing", state="disabled")
+        self.install_files_button.configure(text=self.ui_data["buttons"]["installing_button"], state="disabled")
         self.thread_manager.start_thread(target=self.start_download_process, on_finish=self.update_install_files_button)
 
     def update_install_files_button(self):
         """Update the install files button text and color."""
-        self.install_files_button.configure(text="Installed", fg_color="#D9D9D9")
+        self.install_files_button.configure(text=self.ui_data["buttons"]["installed_button"], fg_color="#D9D9D9")
 
     def start_download_process(self):
         """Download missing files."""
@@ -127,8 +128,8 @@ class FileInstallerModal(Toplevel):
         """Handle the check button click event."""
         all_files_installed = len(self.check_all_files_installed())
         if all_files_installed == 0:
-            modal = InfoModals(self, self.base_dir, "check_files_installed")
+            modal = InfoModals(self, self.base_dir, "check_files_installed", app_language=self.app_language)
             self.wait_window(modal)
             self.destroy()
         else:
-            InfoModals(self, self.base_dir, "check_files_not_installed")
+            InfoModals(self, self.base_dir, "check_files_not_installed", app_language=self.app_language)

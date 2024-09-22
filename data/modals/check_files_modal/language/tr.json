@@ -1,0 +1,20 @@
+{
+  "title": "Eksik Dosyaları Yükle",
+  "missing_files_label": "Bazı Dosyalar Eksik. Yüklemek İster misiniz?",
+  "tree_view_columns": [
+    {
+      "header": "Dosya(lar) Adı",
+      "width": 250
+    },
+    {
+      "header": "Klasör(ler) Yolu",
+      "width": 200
+    }
+  ],
+  "buttons": {
+    "check_button": "Kontrol Et",
+    "install_button": "Yükle",
+    "installing_button": "Yükleniyor",
+    "installed_button": "Yüklendi"
+  }
+}

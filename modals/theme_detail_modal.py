@@ -21,11 +21,11 @@ from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.window_tools.center_window import CenterWindow
 
 class ThemeDetailModal(Toplevel):
-    def __init__(self, parent, theme, base_dir):
+    def __init__(self, parent, theme, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "data", "modals", "theme_detail_modal_data.json"
+            base_dir, "data", "modals", "theme_detail_modal", "language", f"{app_language}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
@@ -45,10 +45,10 @@ class ThemeDetailModal(Toplevel):
 
         self.image_cache_dir = path.join(self.CACHE_PATH, "image_cache")
 
-        self.cache_expiration = self.ui_data["ThemeDetailModal"]["cache_expiration"]
+        self.cache_expiration = 86400  # 1 day in seconds
 
         self.title(
-            f"{self.ui_data['ThemeDetailModal']['title_prefix']}{self.theme.title}"
+            f"{self.ui_data['title_prefix']}{self.theme.title}"
         )
 
         self.create_detail_window(self.theme)
@@ -56,9 +56,9 @@ class ThemeDetailModal(Toplevel):
     def configure_modal_window(self, parent):
         """Configures the modal window's basic properties."""
         self.transient(parent)
-        self.configure(bg=self.ui_data["ThemeDetailModal"]["background_color"])
+        self.configure(bg="#2B2631")
         self.resizable(False, False)
-        self.geometry(self.ui_data["ThemeDetailModal"]["window_geometry"])
+        self.geometry("700x700")
         self.wait_visibility()
         self.grab_set()
         SetWindowIcon(self.base_dir).set_window_icon(self)
@@ -66,7 +66,7 @@ class ThemeDetailModal(Toplevel):
     def create_detail_window(self, theme):
         """Creates and configures the theme detail window."""
         detail_modal_frame = CTkFrame(
-            self, fg_color=self.ui_data["ThemeDetailModal"]["background_color"]
+            self, fg_color="#2B2631",
         )
         detail_modal_frame.pack(fill=BOTH, expand=True, padx=10, pady=10)
         detail_modal_frame.columnconfigure(0, weight=1)
@@ -83,13 +83,13 @@ class ThemeDetailModal(Toplevel):
 
         text_widget = CTkTextbox(
             text_frame,
-            font=tuple(self.ui_data["ThemeDetailModal"]["text_frame"]["font"]),
-            height=self.ui_data["ThemeDetailModal"]["text_frame"]["height"],
+            font=("Inter", 16),
+            height=100,
         )
         text_widget.insert(END, description)
         text_widget.configure(
             state=DISABLED,
-            bg_color=self.ui_data["ThemeDetailModal"]["text_frame"]["background_color"],
+            bg_color="#3B3B3B",
         )
         text_widget.pack(side=LEFT, fill=BOTH, expand=True)
 
@@ -100,9 +100,9 @@ class ThemeDetailModal(Toplevel):
 
         image_label = CTkLabel(
             image_frame,
-            text=self.ui_data["ThemeDetailModal"]["loading_image_text"],
-            width=self.ui_data["ThemeDetailModal"]["image_size"][0],
-            height=self.ui_data["ThemeDetailModal"]["image_size"][1],
+            text=self.ui_data["loading_image_text"],
+            width=500,
+            height=400,
         )
         image_label.pack()
 
@@ -169,7 +169,7 @@ class ThemeDetailModal(Toplevel):
             image = CTkImage(
                 light_image=Image.open(BytesIO(image_data)),
                 dark_image=Image.open(BytesIO(image_data)),
-                size=tuple(self.ui_data["ThemeDetailModal"]["image_size"]),
+                size=(550,400),
             )
             image_label.configure(text="", image=image)
             image_label.image = image
@@ -179,7 +179,7 @@ class ThemeDetailModal(Toplevel):
     def display_image_error(self, image_label, error_message=None):
         """Displays an error message if image loading fails."""
         error_message = (
-            error_message or self.ui_data["ThemeDetailModal"]["failed_image_text"]
+            error_message or self.ui_data["failed_image_text"]
         )
         image_label.configure(text=error_message, image=None)
 
@@ -187,24 +187,20 @@ class ThemeDetailModal(Toplevel):
         """Adds a section to display tags associated with the theme."""
         tags_frame = CTkFrame(
             parent,
-            fg_color=self.ui_data["ThemeDetailModal"]["add_tags_widget"][
-                "fg_color"
-            ],
+            fg_color="#F0F0F0"
         )
         tags_frame.grid(row=2, column=0, sticky="NSEW", pady=(0, 10))
 
         tags_label = CTkLabel(
-            tags_frame, text=self.ui_data["ThemeDetailModal"]["add_tags_widget"]["text"]
+            tags_frame, text=self.ui_data["add_tags_widget"]["text"]
         )
         tags_label.pack(anchor="w", padx=10)
 
         tags_container = CTkScrollableFrame(
             tags_frame,
-            height=self.ui_data["ThemeDetailModal"]["add_tags_widget"]["height"],
-            fg_color=self.ui_data["ThemeDetailModal"]["background_color"],
-            orientation=self.ui_data["ThemeDetailModal"]["add_tags_widget"][
-                "orientation"
-            ],
+            height=40,
+            fg_color="#2B2631",
+            orientation="horizontal",
         )
         tags_container.pack(fill=X, expand=True, padx=4, pady=(0, 4))
 
@@ -212,35 +208,25 @@ class ThemeDetailModal(Toplevel):
             tag_label = CTkLabel(
                 tags_container,
                 text=f" #{tag} ",
-                fg_color=self.ui_data["ThemeDetailModal"]["add_tags_widget"][
-                    "fg_color"
-                ],
-                corner_radius=self.ui_data["ThemeDetailModal"]["add_tags_widget"][
-                    "corner_radius"
-                ],
+                fg_color="#F0F0F0",
+                corner_radius=5,
             )
             tag_label.pack(side=LEFT, padx=5, pady=5)
 
     def add_buttons(self, parent, theme):
         """Adds the Open Theme Page and Provide Feedback buttons."""
         buttons_frame = CTkFrame(
-            parent, fg_color=self.ui_data["ThemeDetailModal"]["background_color"]
+            parent, fg_color="#2B2631"
         )
         buttons_frame.grid(row=3, column=0, pady=10)
 
         link_button = CTkButton(
             buttons_frame,
-            text=self.ui_data["ThemeDetailModal"]["open_theme_page_button"]["text"],
-            text_color=self.ui_data["ThemeDetailModal"]["open_theme_page_button"]["text_color"],
-            fg_color=self.ui_data["ThemeDetailModal"]["open_theme_page_button"][
-                "fg_color"
-            ],
-            hover_color=self.ui_data["ThemeDetailModal"]["open_theme_page_button"][
-                "hover_color"
-            ],
-            font=eval(
-                self.ui_data["ThemeDetailModal"]["open_theme_page_button"]["font"]
-            ),
+            text=self.ui_data["open_theme_page_button"]["text"],
+            text_color="#FFFFFF",
+            fg_color="#7D31DF",
+            hover_color="#9747FF",
+            font=("Arial", 16, "bold"),
             command=lambda: openweb(theme.link),
         )
         link_button.grid(row=0, column=0, padx=10)

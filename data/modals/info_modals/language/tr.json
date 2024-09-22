@@ -1,0 +1,29 @@
+{
+  "modals": {
+    "exit_modal": {
+      "modal_title": "Çıkış Onayı",
+      "modal_label": "Çıkmak istediğinizden emin misiniz?"
+    },
+    "attention_modal": {
+      "modal_title": "Dikkat!",
+      "modal_label": "RealFire başarıyla yüklendi.\n Lütfen firefox'u iki kez yeniden başlatın!"
+    },
+    "check_files_installed_modal": {
+      "modal_title": "Tüm Dosyalar Yüklendi",
+      "modal_label": "Şimdi devam edebilirsiniz."
+    },
+    "check_files_not_installed_modal": {
+      "modal_title": "Tüm Dosyalar Yüklenmedi!",
+      "modal_label": "Bazı dosyalar eksik."
+    },
+    "language_change_modal": {
+      "modal_title": "Dil Değişikliği",
+      "modal_label": "Dil değişikliği, yeniden başlatıldıktan sonra uygulanacaktır."
+    }
+  },
+  "buttons": {
+    "ok_button": "Tamam",
+    "yes_button": "Evet",
+    "no_button": "Hayır"
+  }
+}

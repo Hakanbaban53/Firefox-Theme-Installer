@@ -5,6 +5,7 @@ from customtkinter import CTkLabel, CTkOptionMenu
 
 from components.set_window_icon import SetWindowIcon
 from installer_core.data_tools.image_loader import ImageLoader
+from installer_core.data_tools.language_manager import LanguageManager
 from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.window_tools.center_window import CenterWindow
 from modals.info_modals import InfoModals
@@ -15,9 +16,14 @@ from pages.status_page import StatusPage
 
 
 class MultiPageApp(Tk):
+    SUPPORTED_LANGUAGES = ["en", "tr"]
+    LANGUAGE_NAMES = {"en": "English", "tr": "Türkçe"}
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
+        self.language_manager = LanguageManager(self.base_dir ,self.SUPPORTED_LANGUAGES, self.LANGUAGE_NAMES, fallback_language='en')
+        self.app_language = self.language_manager.get_language()
 
         base_data_path = path.join(self.base_dir, "data", "installer_data.json")
         self.base_data = LoadJsonData().load_json_data(base_data_path)
@@ -66,16 +72,27 @@ class MultiPageApp(Tk):
         )
         self.background_label.pack(fill="both", expand=True)
 
+        language_names = [self.LANGUAGE_NAMES[lang] for lang in self.SUPPORTED_LANGUAGES]
         self.language_button = CTkOptionMenu(
             self.image_frame,
-            font=("Inter", 14),
-            values=["EN", "TR"],
-            bg_color="#000000",
-            corner_radius=12
+            values=language_names,  # Display user-friendly names
+            command=self.change_language,  # Call the change_language method when a language is selected
+            bg_color=self.base_data["window_settings"]["bg_color"],
+            font=("Inter", 12),
         )
-        self.language_button.set("TR")
+        self.language_button.set(self.LANGUAGE_NAMES[self.app_language])
         self.language_button.place(relx=0.5, rely=0.95, anchor="center")
 
+    def change_language(self, selected_language):
+        """
+        Change the application language based on the selected language.
+        
+        :param selected_language: The user-friendly language name selected from the OptionMenu.
+        """
+        language_code = [lang for lang, name in self.LANGUAGE_NAMES.items() if name == selected_language][0]
+        self.language_manager.save_language(language_code)
+        self.app_language = language_code
+        InfoModals(self, self.base_dir, "language_change", app_language=self.app_language)
         
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
@@ -87,7 +104,7 @@ class MultiPageApp(Tk):
 
     def create_frame(self, page_class):
         """Create and return a new frame for the specified page class, passing the current language."""
-        frame = page_class(self.container, self, self.base_dir)
+        frame = page_class(self.container, self, self.base_dir, self.app_language)
         frame.configure(bg=self.base_data["window_settings"]["bg_color"])
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
@@ -183,7 +200,7 @@ class MultiPageApp(Tk):
 
     def exit_confirmation(self):
         """Display exit confirmation modal."""
-        InfoModals(self, self.base_dir, "Exit")
+        InfoModals(self, self.base_dir, "Exit", app_language=self.app_language)
 
 if __name__ == "__main__":
     app = MultiPageApp()

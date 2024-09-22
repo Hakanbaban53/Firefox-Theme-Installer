@@ -16,10 +16,10 @@ from modals.info_modals import InfoModals
 from modals.theme_modal import ThemeModal
 
 class HomePage(Frame):
-    def __init__(self, parent, controller, base_dir):
+    def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file based on the selected language
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "home_page", "language", "en.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "home_page", "language", f"{app_language}.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
@@ -27,6 +27,7 @@ class HomePage(Frame):
         self.paths = load_json_data.load_json_data(PATHS)
         self.icons = load_json_data.load_json_data(ICONS)
 
+        self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
 
@@ -36,9 +37,6 @@ class HomePage(Frame):
         # Set the paths
         self.ASSETS_PATH = path.join(
             base_dir, self.paths["ASSETS_PATH"]
-        )
-        NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, self.paths["NAVIGATION_BUTTON_DATA_PATH"]
         )
         
         self.os_properties = OSProperties(base_dir)
@@ -53,15 +51,25 @@ class HomePage(Frame):
 
 
         # Load additional data
+        NAVIGATION_BUTTON_DATA_PATH = path.join(
+            base_dir, "data", "components", "navigation_buttons", "data","navigation_button_data.json"
+        )
         self.navigation_button_data = load_json_data.load_json_data(
             NAVIGATION_BUTTON_DATA_PATH
         )
-        self.button_data = self.navigation_button_data["navigation_buttons"]
+
+        NAVIGATION_BUTTON_TEXT = path.join(
+            base_dir, "data", "components", "navigation_buttons", "language", f"{app_language}.json"
+        )
+        self.navigation_button_text = load_json_data.load_json_data(
+            NAVIGATION_BUTTON_TEXT
+        )
+
 
         self.thread_manager = ThreadManager()
 
 
-        self.navigation_button = NavigationButton(self.button_data)
+        self.navigation_button = NavigationButton(self.navigation_button_data)
         self.header = CreateHeader()
 
         # Initialize ImageLoader with the asset path and OS name
@@ -119,7 +127,7 @@ class HomePage(Frame):
             self.home_page_frame,
             text=os_info["os_label"]["text"],
             text_color="#FFFFFF",
-            font=("Inter", 20, "bold"),  # Convert the string to a tuple
+            font=("Arial", 20, "bold"),  # Convert the string to a tuple
         )
         os_label.grid(
             row=2,
@@ -146,7 +154,7 @@ class HomePage(Frame):
             os_frame,
             text=f"{self.os_values['os_name']} ",
             text_color=self.os_values["os_color"],
-            font=("Inter", 18),
+            font=("Arial", 18),
             image=self.os_icon_image,
             compound="right",
         )
@@ -178,7 +186,7 @@ class HomePage(Frame):
         self.theme_label = CTkLabel(
             theme_frame,
             text=theme_select["theme_label"]["text"],
-            font=("Inter", 18),
+            font=("Arial", 18),
             text_color="#000000"
         )
         self.theme_label.pack(
@@ -190,15 +198,15 @@ class HomePage(Frame):
         theme_select_button = CTkButton(
             theme_frame,
             text=theme_select["theme_select_button"]["text"],
-            width=float(self.button_data["width"]),
-            height=float(self.button_data["height"]),
-            corner_radius=float(self.button_data["corner_radius"]),
-            bg_color=self.button_data["bg_color"],
-            fg_color=self.button_data["fg_color"],
-            hover_color=self.button_data["hover_color"],
-            text_color=self.button_data["text_color"],
+            width=float(self.navigation_button_data["width"]),
+            height=float(self.navigation_button_data["height"]),
+            corner_radius=float(self.navigation_button_data["corner_radius"]),
+            bg_color=self.navigation_button_data["bg_color"],
+            fg_color=self.navigation_button_data["fg_color"],
+            hover_color=self.navigation_button_data["hover_color"],
+            text_color=self.navigation_button_data["text_color"],
             command=self.select_theme,
-            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
+            font=(self.navigation_button_data["font_family"], int(self.navigation_button_data["font_size"])),
         )
         theme_select_button.pack(
             padx=10,
@@ -215,7 +223,7 @@ class HomePage(Frame):
             text=navigation_buttons["select_action_label"]["text"],
             image=self.select_action_img,
             text_color="#FFFFFF",
-            font=("Inter", 20),
+            font=("Arial", 20),
         )
         select_action_label.grid(
             row=4,
@@ -245,7 +253,7 @@ class HomePage(Frame):
 
         self.navigation_button.create_navigation_button(
             navigation_frame,
-            "Remove",
+            self.navigation_button_text["remove_button"],
             path.join(self.ASSETS_PATH, "icons/remove.png"),
             lambda: self.controller.show_frame("remove_page"),
             padding_x=(10, 20),
@@ -253,7 +261,7 @@ class HomePage(Frame):
         )
         self.install_button = self.navigation_button.create_navigation_button(
             navigation_frame,
-            "Install",
+            self.navigation_button_text["install_button"],
             path.join(self.ASSETS_PATH, "icons/install.png"),
             lambda: self.controller.show_frame(
                 "install_page",
@@ -270,9 +278,9 @@ class HomePage(Frame):
         )
         self.navigation_button.create_navigation_button(
             navigation_frame,
-            "Exit",
+            self.navigation_button_text["exit_button"],
             path.join(self.ASSETS_PATH, "icons/exit.png"),
-            lambda: InfoModals(self, self.base_dir, "Exit"),
+            lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
             side="left",
         )
@@ -298,7 +306,7 @@ class HomePage(Frame):
         self.detect_files_text = Label(
             self.detect_files_frame,
             text=file_detection["detect_files_text"]["text"],
-            font=("Inter", 18),
+            font=("Arial", 18),
             fg="#000000",
             bg="#FFFFFF",
             compound="right",
@@ -320,7 +328,7 @@ class HomePage(Frame):
             fg_color="#E0E0E0",
             hover_color="#D0D0D0",
             text_color="#000000",
-            font=("Inter", 18, "bold")
+            font=("Arial", 18, "bold")
         )
 
     def create_recheck_skip_section(self):
@@ -347,7 +355,7 @@ class HomePage(Frame):
             onvalue=True,
             offvalue=False,
             variable=self.check_var,
-            font=("Inter", 16, "bold"),
+            font=("Arial", 16, "bold"),
         )
         self.clean_install.grid(
             row=7,
@@ -403,7 +411,7 @@ class HomePage(Frame):
     # Theme selection and processing
     def select_theme(self):
         """Open the theme selection modal and configure UI elements based on selection."""
-        self.modal_theme = ThemeModal(self, self.base_dir, self.CACHE_PATH)
+        self.modal_theme = ThemeModal(self, self.base_dir, self.CACHE_PATH, app_language=self.app_language)
         self.wait_window(self.modal_theme)
         self.recheck_button.lower()
 
@@ -591,7 +599,7 @@ class HomePage(Frame):
 
     def install_files(self):
         """Open modal to install missing files and recheck afterward."""
-        modal = FileInstallerModal(self, self.base_dir, self.data_json_path, self.theme_data.get("path"))
+        modal = FileInstallerModal(self, self.base_dir, self.data_json_path, self.theme_data.get("path"), app_language=self.app_language)
         self.wait_window(modal)
         self.recheck_files()
 

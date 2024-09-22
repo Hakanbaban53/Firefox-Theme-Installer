@@ -20,12 +20,13 @@ from modals.info_modals import InfoModals
 
 
 class StatusPage(Frame):
-    def __init__(self, parent, controller, base_dir):
+    def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
+        self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "status_page", "language", "en.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "pages", "status_page", "language", f"{app_language}.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
@@ -44,17 +45,24 @@ class StatusPage(Frame):
 
         self.CACHE_PATH = self.os_properties.get_cache_location()
 
-        # Get navigation button data
+        # Load additional data
         NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, self.paths["NAVIGATION_BUTTON_DATA_PATH"]
+            base_dir, "data", "components", "navigation_buttons", "data","navigation_button_data.json"
         )
         self.navigation_button_data = load_json_data.load_json_data(
             NAVIGATION_BUTTON_DATA_PATH
         )
-        self.button_data = self.navigation_button_data["navigation_buttons"]
+
+        NAVIGATION_BUTTON_TEXT = path.join(
+            base_dir, "data", "components", "navigation_buttons", "language", f"{app_language}.json"
+        )
+        self.navigation_button_text = load_json_data.load_json_data(
+            NAVIGATION_BUTTON_TEXT
+        )
+        self.navigation_button = NavigationButton(self.navigation_button_data)
+
         self.come_from_which_page = None
 
-        self.navigation_button = NavigationButton(self.button_data)
         self.file_actions = FileActions(self.os_values["os_name"])
         self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
@@ -145,7 +153,7 @@ class StatusPage(Frame):
             text="",
             image=None,
             compound="right",
-            font=CTkFont(family="Inter", size=18, weight="bold"),
+            font=CTkFont(family="Arial", size=18, weight="bold"),
         )
         self.action_label.grid(row=2, column=0, padx=60, pady=(14, 2), sticky="NSEW")
 
@@ -193,12 +201,11 @@ class StatusPage(Frame):
         self.create_os_info(bottom_frame)
 
     def create_navigation_buttons(self, parent):
-        button_text = self.ui_data["create_navigation_buttons"]
         self.finish_button=self.navigation_button.create_navigation_button(
             parent,
-            button_text["finish_button"]["text"],
+            self.navigation_button_text["finish_button"],
             path.join(self.ASSETS_PATH, "icons/finish.png"),
-            lambda: InfoModals(self, self.base_dir, "Attention"),
+            lambda: InfoModals(self, self.base_dir, "Attention", app_language=self.app_language),
             padding_x=(10, 20),
             side="right",
             img_side="right",
@@ -206,7 +213,7 @@ class StatusPage(Frame):
 
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
-            button_text["back_button"]["text"],
+            self.navigation_button_text["back_button"],
             path.join(self.ASSETS_PATH, "icons/back.png"),
             padding_x=(5, 5),
             side="right",
@@ -217,9 +224,9 @@ class StatusPage(Frame):
         )
         self.exit_button=self.navigation_button.create_navigation_button(
             parent,
-            button_text["exit_button"]["text"],
+            self.navigation_button_text["exit_button"],
             path.join(self.ASSETS_PATH, "icons/exit.png"),
-            lambda: InfoModals(self, self.base_dir, "Exit"),
+            lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
             side="left",
         )

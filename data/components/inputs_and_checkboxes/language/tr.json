@@ -1,0 +1,14 @@
+{
+  "profile_folder_label": {
+    "text": "Profil Klasörü"
+  },
+  "application_folder_label": {
+    "text": "Uygulama Klasörü"
+  },
+  "CSL_checkbox": {
+    "text": "Özel Komut Yükleyiciyi Etkinleştir"
+  },
+  "edit_checkbox": {
+    "text": "Girişleri Düzenle"
+  }
+}

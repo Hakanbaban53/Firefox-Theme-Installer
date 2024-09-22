@@ -11,10 +11,10 @@ from modals.theme_detail_modal import ThemeDetailModal
 
 
 class ThemeModal(Toplevel):
-    def __init__(self, parent, base_dir, cache_dir):
+    def __init__(self, parent, base_dir, cache_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "modals", "theme_modal", "language", "en.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "modals", "theme_modal", "language", f"{app_language}.json")
         THEME_DATA_PATH = path.join(
             base_dir, "data", "modals", "theme_modal", "data", "theme_data.json"
         )
@@ -28,6 +28,7 @@ class ThemeModal(Toplevel):
             self.ui_data["treeview"]["columns"][1]: "description"  # "Açıklama" -> "description"
         }
 
+        self.app_language = app_language
         self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.configure_layout(parent)
@@ -109,12 +110,12 @@ class ThemeModal(Toplevel):
         self.tree.tag_configure(
             "oddrow",
             background="#F1F1F1",
-            font=("Inter", 11),
+            font=("Arial", 11),
         )
         self.tree.tag_configure(
             "evenrow",
             background="#FFFFFF",
-            font=("Inter", 11),
+            font=("Arial", 11),
         )
 
         self.tree.bind("<Double-1>", self.open_theme_detail)
@@ -128,7 +129,7 @@ class ThemeModal(Toplevel):
             text=self.ui_data["buttons"]["select_button"]["text"],
             text_color="#ffffff",
             width=75,
-            font=("Inter", 16, "bold"),
+            font=("Arial", 16, "bold"),
             command=self.select_theme,
             state=DISABLED,
         )
@@ -344,7 +345,7 @@ class ThemeModal(Toplevel):
             )
 
             if theme_data:
-                ThemeDetailModal(self, theme_data, base_dir=self.base_dir)
+                ThemeDetailModal(self, theme_data, base_dir=self.base_dir, app_language=self.app_language)
 
     def next_page(self):
         if self.current_page < self.total_pages:

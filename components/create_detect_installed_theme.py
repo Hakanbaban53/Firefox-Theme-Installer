@@ -1,5 +1,4 @@
 from os import path
-from time import sleep
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 
 from installer_core.component_tools.thread_manager import ThreadManager
@@ -7,12 +6,16 @@ from installer_core.data_tools.get_theme_data import Theme
 from installer_core.data_tools.load_json_data import LoadJsonData
 from modals.theme_detail_modal import ThemeDetailModal
 
+
 class DetectInstalledTheme:
-    def __init__(self, parent, chrome_folder, theme_detected_icon, base_dir):
+    def __init__(self, parent, chrome_folder, theme_detected_icon, base_dir, app_language):
         self.json_loader = LoadJsonData(json_file_url=None)
-        UI_DATA_PATH = path.join(base_dir, "data", "components", "detect_installed_themes_data.json")
+        UI_DATA_PATH = path.join(
+            base_dir, "data", "components", "detect_installed_theme", "language", "tr.json"
+        )
         self.ui_data = self.json_loader.load_json_data(UI_DATA_PATH)
 
+        self.app_language = app_language
         self.thread_manager = ThreadManager()
         self.parent = parent
         self.chrome_folder = chrome_folder
@@ -22,59 +25,61 @@ class DetectInstalledTheme:
         self.theme_data = None
         self.installed_themes_label = None
 
-
     def create_installed_themes(self, preview_and_check_installed_theme_frame):
-        installed_themes_data = self.ui_data["create_installed_themes"]
+        installed_themes_data = self.ui_data
 
         installed_themes_frame = CTkFrame(
             preview_and_check_installed_theme_frame,
-            width=installed_themes_data["installed_themes_frame"]["width"],
-            height=installed_themes_data["installed_themes_frame"]["height"],
-            corner_radius=installed_themes_data["installed_themes_frame"]["corner_radius"],
-            fg_color=installed_themes_data["installed_themes_frame"]["fg_color"],
+            width=440,
+            height=60,
+            corner_radius=12,
+            fg_color="#FFFFFF",
         )
         installed_themes_frame.grid(
-            row=installed_themes_data["installed_themes_frame"]["grid_data"]["row"],
-            column=installed_themes_data["installed_themes_frame"]["grid_data"]["column"],
-            padx=installed_themes_data["installed_themes_frame"]["grid_data"]["padx"],
-            pady=installed_themes_data["installed_themes_frame"]["grid_data"]["pady"],
-            sticky=installed_themes_data["installed_themes_frame"]["grid_data"]["sticky"],
+            row=0,
+            column=0,
+            padx=10,
+            pady=0,
+            sticky="",
         )
 
         self.installed_themes_label = CTkLabel(
             installed_themes_frame,
             text=installed_themes_data["installed_themes_label"]["text"],
-            text_color=installed_themes_data["installed_themes_label"]["text_color"],
-            font=eval(installed_themes_data["installed_themes_label"]["font"]),
-            compound=installed_themes_data["installed_themes_label"]["compound"],
+            text_color="#000000",
+            font=("Arial", 18, "bold"),
+            compound="right",
         )
         self.installed_themes_label.pack(
-            padx=installed_themes_data["installed_themes_label"]["pack_data"]["padx"],
-            pady=installed_themes_data["installed_themes_label"]["pack_data"]["pady"],
-            side=installed_themes_data["installed_themes_label"]["pack_data"]["side"],
+            padx=(10, 4),
+            pady=10,
+            side="top",
         )
 
         self.theme_details_button = CTkButton(
             installed_themes_frame,
             text=installed_themes_data["theme_details_button"]["text"],
-            height=installed_themes_data["theme_details_button"]["height"],
-            fg_color=installed_themes_data["theme_details_button"]["fg_color"],
-            hover_color=installed_themes_data["theme_details_button"]["hover_color"],
-            corner_radius=installed_themes_data["theme_details_button"]["corner_radius"],
-            text_color=installed_themes_data["theme_details_button"]["text_color"],
-            compound=installed_themes_data["theme_details_button"]["compound"],
-            font=eval(installed_themes_data["theme_details_button"]["font"]),
+            height=42,
+            fg_color="#D9D9D9",
+            hover_color="#EEEEEE",
+            corner_radius=10,
+            text_color="#000000",
+            compound="right",
+            font=("Arial", 16, "bold"),
             image=self.theme_detected_icon,
             command=lambda: ThemeDetailModal(
                 self.parent,
                 theme=self.theme_data,
                 base_dir=self.base_dir,
+                app_language=self.app_language
             ),
         )
 
     def detect_installed_theme(self):
         # Start the detection in a separate thread
-        self.thread_manager.start_thread(target=self._detect_installed_theme, on_finish=self.update_ui)
+        self.thread_manager.start_thread(
+            target=self._detect_installed_theme, on_finish=self.update_ui
+        )
 
     def _detect_installed_theme(self):
         # Check if the chrome folder exists
@@ -89,8 +94,7 @@ class DetectInstalledTheme:
                             return self.theme_data.title
                         else:
                             return False
-                except Exception as e:
-                    print(f"Error reading theme data file: {e}")
+                except Exception:
                     return False
             else:
                 # Check if userChrome.css exists
@@ -105,15 +109,21 @@ class DetectInstalledTheme:
     def update_ui(self):
         # Use the Tkinter `after` method to safely update the UI from the main thread
         result = self._detect_installed_theme()  # Get the result
+
         def update_label():
             update_label_data = self.ui_data["update_ui"]
             if result is True:
-                self.installed_themes_label.configure(text=update_label_data["installed_themes_label_unkown"])
+                self.installed_themes_label.configure(
+                    text=update_label_data["installed_themes_label_unkown"]
+                )
             elif result is False:
-                self.installed_themes_label.configure(text=update_label_data["installed_themes_label_no_theme"])
+                self.installed_themes_label.configure(
+                    text=update_label_data["installed_themes_label_no_theme"]
+                )
             else:
                 self.installed_themes_label.configure(
-                    text=update_label_data["installed_themes_label_theme"] + f"{result} "
+                    text=update_label_data["installed_themes_label_theme"]
+                    + f"{result} "
                 )
                 self.theme_details_button.pack(padx=10, pady=10, side="bottom")
 

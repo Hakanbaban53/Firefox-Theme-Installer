@@ -1,0 +1,14 @@
+{
+    "installed_themes_label": {
+      "text": ""
+    },
+    "theme_details_button": {
+      "text": "Temayı Görüntüle"
+    },
+
+  "update_ui": {
+    "installed_themes_label_unkown":"Bilinmeyen Yüklü Tema Algılandı ",
+    "installed_themes_label_no_theme":"Yüklü Tema Bulunamadı ",
+    "installed_themes_label_theme":"Yüklü Tema Algılandı: "
+  }
+}

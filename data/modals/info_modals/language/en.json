@@ -15,6 +15,15 @@
     "check_files_not_installed_modal": {
       "modal_title": "All Files Not Installed!",
       "modal_label": "Some Files Are Missing."
+    },
+    "language_change_modal": {
+      "modal_title": "Language Change",
+      "modal_label": "Language change will be applied after restart."
     }
+  },
+  "buttons": {
+    "ok_button": "Ok",
+    "yes_button": "Yes",
+    "no_button": "No"
   }
 }

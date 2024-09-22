@@ -1,0 +1,14 @@
+{
+    "installed_themes_label": {
+      "text": ""
+    },
+    "theme_details_button": {
+      "text": "Theme Details"
+    },
+
+  "update_ui": {
+    "installed_themes_label_unkown":"Unknow Installed Theme Detected ",
+    "installed_themes_label_no_theme":"No Installed Theme Detected ",
+    "installed_themes_label_theme":"Installed Theme Detected: "
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "title_prefix": "Tema Detayları: ",
+    "loading_image_text": "Resim yükleniyor...",
+    "failed_image_text": "Resim yüklenemedi.",
+    "add_tags_widget": {
+      "text": "Etiketler:"
+    },
+    "open_theme_page_button": {
+      "text": "Tema Sayfasını Aç"
+    }
+}

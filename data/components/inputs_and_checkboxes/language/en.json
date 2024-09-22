@@ -1,0 +1,14 @@
+{
+  "profile_folder_label": {
+    "text": "Profile folder"
+  },
+  "application_folder_label": {
+    "text": "Application Folder"
+  },
+  "CSL_checkbox": {
+    "text": "Enable Custom Script Loader"
+  },
+  "edit_checkbox": {
+    "text": "Edit Inputs"
+  }
+}
