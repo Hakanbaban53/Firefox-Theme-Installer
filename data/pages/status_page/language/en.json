@@ -1,26 +1,9 @@
 {
-  "header_data": {
-    "text": "Installation Status"
-  },
-  "create_navigation_buttons": {
-    "finish_button": {
-      "text": "Finish"
-    },
-    "back_button": {
-      "text": "Back"
-    },
-    "exit_button": {
-      "text": "Exit"
-    }
-  },
+  "header_label": "Installation Status",
   "update_text": {
     "install": "Installation is successful",
     "remove": "Removal is successful"
   },
-  "install":{
-    "text": "Installing"
-  },
-  "remove":{
-    "text": "Removing"
-  }
+  "install": "Installing",
+  "remove": "Removing"
 }

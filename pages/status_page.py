@@ -36,7 +36,6 @@ class StatusPage(Frame):
 
         self.thread_manager = ThreadManager()
 
-
         # Set the paths
         self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
 
@@ -45,21 +44,7 @@ class StatusPage(Frame):
 
         self.CACHE_PATH = self.os_properties.get_cache_location()
 
-        # Load additional data
-        NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, "data", "components", "navigation_buttons", "data","navigation_button_data.json"
-        )
-        self.navigation_button_data = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_DATA_PATH
-        )
-
-        NAVIGATION_BUTTON_TEXT = path.join(
-            base_dir, "data", "components", "navigation_buttons", "language", f"{app_language}.json"
-        )
-        self.navigation_button_text = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_TEXT
-        )
-        self.navigation_button = NavigationButton(self.navigation_button_data)
+        self.navigation_button = NavigationButton(base_dir=base_dir, app_language=app_language)
 
         self.come_from_which_page = None
 
@@ -68,47 +53,6 @@ class StatusPage(Frame):
 
         self.configure_layout()
         self.create_widgets()
-
-    def set_language(self, language):
-        """Set the language and update the UI text accordingly."""
-        self.language = language  # Update the current language
-
-        # Load new UI data based on the language
-        UI_DATA_PATH = path.join(self.base_dir, "data", "pages", "Status Page", language, "status_page_data.json")
-        load_json_data = LoadJsonData()
-        self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        
-        # Update the text on the UI
-        self.update_text()
-
-    def update_text(self):
-        """Update the text on the page based on the current language."""
-        header = CreateHeader()
-        header_data = self.ui_data["header_data"]
-
-        self.header_label.configure(text=header_data["text"])
-
-        # Update action label based on the current page
-        update_text = self.ui_data["update_text"]
-        if self.come_from_which_page == "install":
-            self.action_label.configure(
-                text=f"{update_text['install']}  ",
-                image=self.check_icon,
-                compound="right",
-            )
-        elif self.come_from_which_page == "remove":
-            self.action_label.configure(
-                text=f"{update_text['remove']}  ",
-                image=self.check_icon,
-                compound="right",
-            )
-
-        # Update navigation buttons text
-        button_text = self.ui_data["create_navigation_buttons"]
-        self.back_button.configure(text=button_text["back_button"]["text"])
-        self.finish_button.configure(text=button_text["finish_button"]["text"])
-        self.exit_button.configure(text=button_text["exit_button"]["text"])
-        # Update other buttons similarly
 
     def configure_layout(self):
         self.status_page_frame = CTkFrame(
@@ -136,13 +80,12 @@ class StatusPage(Frame):
 
     def create_header(self):
         header = CreateHeader()
-        header_data = self.ui_data["header_data"]
 
         self.header_label, self.line_top_label = header.create_header(
             self.status_page_frame,
             header_title_bg=self.header_title_bg,
             line_top_img=self.line_top_img,
-            text=header_data["text"],
+            text=self.ui_data["header_label"],
         )
 
     def create_action_status(self):
@@ -203,7 +146,7 @@ class StatusPage(Frame):
     def create_navigation_buttons(self, parent):
         self.finish_button=self.navigation_button.create_navigation_button(
             parent,
-            self.navigation_button_text["finish_button"],
+            "finish_button",
             path.join(self.ASSETS_PATH, "icons/finish.png"),
             lambda: InfoModals(self, self.base_dir, "Attention", app_language=self.app_language),
             padding_x=(10, 20),
@@ -213,7 +156,7 @@ class StatusPage(Frame):
 
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
-            self.navigation_button_text["back_button"],
+            "back_button",
             path.join(self.ASSETS_PATH, "icons/back.png"),
             padding_x=(5, 5),
             side="right",
@@ -224,7 +167,7 @@ class StatusPage(Frame):
         )
         self.exit_button=self.navigation_button.create_navigation_button(
             parent,
-            self.navigation_button_text["exit_button"],
+            "exit_button",
             path.join(self.ASSETS_PATH, "icons/exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
@@ -286,7 +229,7 @@ class StatusPage(Frame):
     def install(self):
         # Handles the installation process
         install = self.ui_data["install"]
-        self.action_label.configure(text=f"{install['text']}  ")
+        self.action_label.configure(text=f"{install}  ")
         user_js_src = path.join(self.CACHE_PATH, "fx-autoconfig", "user.js")
         if path.exists(user_js_src):
             self.file_actions.copy_file(user_js_src, self.profile_folder)
@@ -326,7 +269,7 @@ class StatusPage(Frame):
     def remove(self):
         remove = self.ui_data["remove"]
         # Handles the removal process
-        self.action_label.configure(text=f"{remove['text']}  ")
+        self.action_label.configure(text=f"{remove}  ")
 
         self.file_actions.remove_file(path.join(self.application_folder, "config.js"))
         self.file_actions.remove_file(path.join(self.application_folder, "mozilla.cfg"))

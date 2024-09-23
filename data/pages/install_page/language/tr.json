@@ -1,34 +1,19 @@
 {
-    "header_data": {
-      "text": "Kurulum Yapılandırmasını Kontrol Edin"
-    },
-    "create_preview_theme": {
-      "preview_label": {
-        "text": "Firefox'ta Temayı Önizle"
-      },
-      "preview_button": {
-        "text": "Temayı Önizle"
-      }
-    },
-    "create_invalid_entry_frame": {
-      "invalid_entries_text": {
-        "text": ""
-      }
-    },
-    "update_button_and_frame": {
-      "invalid_entries_text": {
-        "text": " girdi geçersiz"
-      }
-    },
-  "on_preview_complete":{
-    "preview_button": {
-      "text": "Temayı Önizle"
-    }
+  "header_label": "Kurulum Yapılandırmasını Kontrol Edin",
+  "create_preview_theme": {
+    "preview_label": "Firefox'ta Temayı Önizle",
+    "preview_button": "Temayı Önizle"
+  },
+  "create_invalid_entry_frame": {
+    "invalid_entries_text": ""
+  },
+  "update_button_and_frame": {
+    "invalid_entries_text": " girdi geçersiz"
+  },
+  "on_preview_complete": {
+    "preview_button": "Temayı Önizle"
   },
   "start_theme_preview_thread": {
-    "preview_button": {
-      "text": "Önizleniyor..."
-    }
+    "preview_button": "Önizleniyor..."
   }
-  }
-  
+}

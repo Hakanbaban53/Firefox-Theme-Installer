@@ -89,10 +89,11 @@ class MultiPageApp(Tk):
         
         :param selected_language: The user-friendly language name selected from the OptionMenu.
         """
-        language_code = [lang for lang, name in self.LANGUAGE_NAMES.items() if name == selected_language][0]
-        self.language_manager.save_language(language_code)
-        self.app_language = language_code
-        InfoModals(self, self.base_dir, "language_change", app_language=self.app_language)
+        if selected_language in self.LANGUAGE_NAMES.values() and selected_language != self.LANGUAGE_NAMES[self.app_language]:
+            language_code = [lang for lang, name in self.LANGUAGE_NAMES.items() if name == selected_language][0]
+            self.language_manager.save_language(language_code)
+            self.app_language = language_code
+            InfoModals(self, self.base_dir, "language_change", app_language=self.app_language)
         
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""

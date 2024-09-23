@@ -1,14 +1,13 @@
 from os import path
-from tkinter import BooleanVar, Frame
+from tkinter import Frame
 from customtkinter import (
     CTkFrame,
     CTkLabel,
-    CTkEntry,
-    CTkCheckBox,
 )
 
 from components.create_detect_installed_theme import DetectInstalledTheme
 from components.create_header import CreateHeader
+from components.create_inputs_and_checkboxes import InputsAndCheckboxes
 from components.create_navigation_button import NavigationButton
 from installer_core.component_tools.special_input_functions import SpecialInputFunc
 from installer_core.data_tools.get_os_properties import OSProperties
@@ -17,11 +16,14 @@ from installer_core.data_tools.load_json_data import LoadJsonData
 from installer_core.file_utils.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
 
+
 class RemovePage(Frame):
     def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "remove_page", "language", f"{app_language}.json")
+        UI_DATA_PATH = path.join(
+            base_dir, "data", "pages", "remove_page", "language", f"{app_language}.json"
+        )
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
@@ -34,42 +36,17 @@ class RemovePage(Frame):
         self.base_dir = base_dir
 
         # Set the paths
-        self.ASSETS_PATH = path.join(
-            base_dir, self.paths["ASSETS_PATH"]
-        )
+        self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
 
         self.os_properties = OSProperties(base_dir)
         self.input_values = self.os_properties.get_locations()
         self.os_values = self.os_properties.get_values()
 
-        # Get inputs data
-        INPUTS_DATA_PATH = path.join(
-            base_dir, "data", "components", "inputs_and_checkboxes", "data", "inputs_data.json"
-        )
-        self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
-
-        INPUTS_LABELS_DATA_PATH = path.join(
-            base_dir, "data", "components", "inputs_and_checkboxes", "language", f"{app_language}.json"
-        )
-        self.inputs_labels_data = load_json_data.load_json_data(INPUTS_LABELS_DATA_PATH)
-
         self.header = CreateHeader()
 
-                # Load additional data
-        NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, "data", "components", "navigation_buttons", "data","navigation_button_data.json"
+        self.navigation_button = NavigationButton(
+            base_dir=base_dir, app_language=app_language
         )
-        self.navigation_button_data = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_DATA_PATH
-        )
-
-        NAVIGATION_BUTTON_TEXT = path.join(
-            base_dir, "data", "components", "navigation_buttons", "language", f"{app_language}.json"
-        )
-        self.navigation_button_text = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_TEXT
-        )
-        self.navigation_button = NavigationButton(self.navigation_button_data)
 
         self.profile_folder_location = GetFolderLocations(
             self.os_values
@@ -78,7 +55,7 @@ class RemovePage(Frame):
         self.chrome_folder = path.join(self.profile_folder_location, "chrome")
 
         # Initialize ImageLoader with the asset path and OS name
-        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         self.configure_layout()
         self.create_widgets()
@@ -108,144 +85,46 @@ class RemovePage(Frame):
         self.header_title_bg = self.image_loader.load_header_title_bg(
             self.icons, size=(320, 80)  # Different size specified here
         )
-        
+
         self.line_top_img = self.image_loader.load_line_top_img(self.icons)
         self.os_icon_image = self.image_loader.load_os_icon_image()
-        self.theme_detected_icon = self.image_loader.load_theme_detected_icon(self.icons)
-
+        self.theme_detected_icon = self.image_loader.load_theme_detected_icon(
+            self.icons
+        )
 
     def create_header(self):
-        header_data = self.ui_data["header_data"]
-
         self.header.create_header(
             self.remove_page_frame,
             header_title_bg=self.header_title_bg,
             line_top_img=self.line_top_img,
-            text=header_data["text"],
+            text=self.ui_data["header_label"],
         )
 
     def create_inputs_and_checkboxes(self):
-        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]
-
-        inputs_checkboxes_frame = CTkFrame(
-            self.remove_page_frame,
-            width=inputs_data["inputs_checkboxes_frame"]["width"],
-            height=inputs_data["inputs_checkboxes_frame"]["height"],
-            corner_radius=inputs_data["inputs_checkboxes_frame"]["corner_radius"],
-            fg_color=inputs_data["inputs_checkboxes_frame"]["fg_color"],
-        )
-        inputs_checkboxes_frame.grid(
-            row=inputs_data["inputs_checkboxes_frame"]["grid_data"]["row"],
-            column=inputs_data["inputs_checkboxes_frame"]["grid_data"]["column"],
-            columnspan=inputs_data["inputs_checkboxes_frame"]["grid_data"][
-                "columnspan"
-            ],
-            padx=inputs_data["inputs_checkboxes_frame"]["grid_data"]["padx"],
-            pady=inputs_data["inputs_checkboxes_frame"]["grid_data"]["pady"],
-            sticky=inputs_data["inputs_checkboxes_frame"]["grid_data"]["sticky"],
+        self.inputs_and_checkboxes = InputsAndCheckboxes(
+            base_dir=self.base_dir,
+            app_language=self.app_language,
+            frame=self.remove_page_frame,
         )
 
-        self.create_input_and_checkbox_widgets(
-            inputs_checkboxes_frame, inputs_data["create_input_and_checkbox_widgets"]
+        self.profile_folder_entry = (
+            self.inputs_and_checkboxes.create_profile_folder_widget(
+                self.profile_folder_location
+            )
+        )
+        self.application_folder_entry = (
+            self.inputs_and_checkboxes.create_application_folder_widget(
+                self.input_values["application_folder"]
+            )
         )
 
-    def create_input_and_checkbox_widgets(self, frame, inputs_data):
-        # Profile Name
-        self.profile_folder_label = CTkLabel(
-            master=frame,
-            text=self.inputs_labels_data["profile_folder_label"]["text"],
-            text_color=inputs_data["profile_folder_label"]["text_color"],
-            font=eval(inputs_data["profile_folder_label"]["font"]),
-        )
-        self.profile_folder_label.grid(
-            row=inputs_data["profile_folder_label"]["grid_data"]["row"],
-            column=inputs_data["profile_folder_label"]["grid_data"]["column"],
-            padx=inputs_data["profile_folder_label"]["grid_data"]["padx"],
-            pady=inputs_data["profile_folder_label"]["grid_data"]["pady"],
-            sticky=inputs_data["profile_folder_label"]["grid_data"]["sticky"],
+        self.check_var = self.inputs_and_checkboxes.create_edit_checkbox(
+            self.checkbox_event
         )
 
-        self.profile_folder_entry = CTkEntry(
-            master=frame,
-            width=inputs_data["profile_folder_entry"]["width"],
-            height=inputs_data["profile_folder_entry"]["height"],
-            fg_color=inputs_data["profile_folder_entry"]["fg_color"],
-            text_color=inputs_data["profile_folder_entry"]["text_color"],
-            corner_radius=inputs_data["profile_folder_entry"]["corner_radius"],
-            border_width=inputs_data["profile_folder_entry"]["border_width"],
-            bg_color=inputs_data["profile_folder_entry"]["bg_color"],
-            border_color=inputs_data["profile_folder_entry"]["border_color"],
-            placeholder_text=self.profile_folder_location,
-        )
-        self.profile_folder_entry.grid(
-            row=inputs_data["profile_folder_entry"]["grid_data"]["row"],
-            column=inputs_data["profile_folder_entry"]["grid_data"]["column"],
-            padx=inputs_data["profile_folder_entry"]["grid_data"]["padx"],
-            pady=inputs_data["profile_folder_entry"]["grid_data"]["pady"],
-            sticky=inputs_data["profile_folder_entry"]["grid_data"]["sticky"],
-
-        )
-
-        # Application Folder
-        self.application_folder_label = CTkLabel(
-            master=frame,
-            text=self.inputs_labels_data["application_folder_label"]["text"],
-            text_color=inputs_data["application_folder_label"]["text_color"],
-            font=eval(inputs_data["application_folder_label"]["font"]),
-        )
-        self.application_folder_label.grid(
-            row=inputs_data["application_folder_label"]["grid_data"]["row"],
-            column=inputs_data["application_folder_label"]["grid_data"]["column"],
-            padx=inputs_data["application_folder_label"]["grid_data"]["padx"],
-            pady=inputs_data["application_folder_label"]["grid_data"]["pady"],
-            sticky=inputs_data["application_folder_label"]["grid_data"]["sticky"],
-        )
-
-        self.application_folder_entry = CTkEntry(
-            master=frame,
-            width=inputs_data["application_folder_entry"]["width"],
-            height=inputs_data["application_folder_entry"]["height"],
-            fg_color=inputs_data["application_folder_entry"]["fg_color"],
-            text_color=inputs_data["application_folder_entry"]["text_color"],
-            corner_radius=inputs_data["application_folder_entry"]["corner_radius"],
-            border_width=inputs_data["application_folder_entry"]["border_width"],
-            bg_color=inputs_data["application_folder_entry"]["bg_color"],
-            border_color=inputs_data["application_folder_entry"]["border_color"],
-            placeholder_text=self.input_values["application_folder"],
-        )
-        self.application_folder_entry.grid(
-            row=inputs_data["application_folder_entry"]["grid_data"]["row"],
-            column=inputs_data["application_folder_entry"]["grid_data"]["column"],
-            padx=inputs_data["application_folder_entry"]["grid_data"]["padx"],
-            pady=inputs_data["application_folder_entry"]["grid_data"]["pady"],
-            sticky=inputs_data["application_folder_entry"]["grid_data"]["sticky"],
-        )
-
+        self.key_bind(self.application_folder_entry)  # Bind keys to the entry
         self.key_bind(self.profile_folder_entry)
-        self.key_bind(self.application_folder_entry)
 
-        self.check_var = BooleanVar(value=False)
-        edit_checkbox = CTkCheckBox(
-            master=frame,
-            text=self.inputs_labels_data["edit_checkbox"]["text"],
-            fg_color=inputs_data["edit_checkbox"]["fg_color"],
-            hover_color=inputs_data["edit_checkbox"]["hover_color"],
-            text_color=inputs_data["edit_checkbox"]["text_color"],
-            bg_color=inputs_data["edit_checkbox"]["bg_color"],
-            font=eval(inputs_data["edit_checkbox"]["font"]),
-            border_color=inputs_data["edit_checkbox"]["border_color"],
-            command=self.checkbox_event,
-            variable=self.check_var,
-            onvalue=True,
-            offvalue=False,
-        )
-        edit_checkbox.grid(
-            row=inputs_data["edit_checkbox"]["grid_data"]["row"],
-            column=inputs_data["edit_checkbox"]["grid_data"]["column"],
-            padx=inputs_data["edit_checkbox"]["grid_data"]["padx"],
-            pady=inputs_data["edit_checkbox"]["grid_data"]["pady"],
-            sticky=inputs_data["edit_checkbox"]["grid_data"]["sticky"],
-        )
     def create_invalid_entry_frame(self):
         self.invalid_entry_frame = CTkFrame(
             self.remove_page_frame,
@@ -283,12 +162,13 @@ class RemovePage(Frame):
             chrome_folder=self.chrome_folder,
             theme_detected_icon=self.theme_detected_icon,
             base_dir=self.base_dir,
-            app_language=self.app_language
+            app_language=self.app_language,
         )
-        self.detect_installed_theme_component.create_installed_themes(preview_and_check_installed_theme_frame)
-        
-        self.detect_installed_theme_component.detect_installed_theme()
+        self.detect_installed_theme_component.create_installed_themes(
+            preview_and_check_installed_theme_frame
+        )
 
+        self.detect_installed_theme_component.detect_installed_theme()
 
     def create_bottom_widgets(self):
         bottom_frame = CTkFrame(self, fg_color="#2B2631")
@@ -312,7 +192,7 @@ class RemovePage(Frame):
     def create_navigation_buttons(self, parent):
         self.remove_button = self.navigation_button.create_navigation_button(
             parent,
-            self.navigation_button_text["remove_button"],
+            "remove_button",
             path.join(self.ASSETS_PATH, "icons/remove.png"),
             lambda: self.controller.show_frame(
                 "status_page",
@@ -332,7 +212,7 @@ class RemovePage(Frame):
 
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
-            self.navigation_button_text["back_button"],
+            "back_button",
             path.join(self.ASSETS_PATH, "icons/back.png"),
             padding_x=(5, 5),
             side="right",
@@ -340,9 +220,11 @@ class RemovePage(Frame):
         )
         self.navigation_button.create_navigation_button(
             parent,
-            self.navigation_button_text["exit_button"],
+            "exit_button",
             path.join(self.ASSETS_PATH, "icons/exit.png"),
-            lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
+            lambda: InfoModals(
+                self, self.base_dir, "Exit", app_language=self.app_language
+            ),
             padding_x=(20, 10),
             side="left",
         )
@@ -383,7 +265,8 @@ class RemovePage(Frame):
         else:
             self.remove_button.configure(state="disabled")
             self.invalid_entries_text.configure(
-                text=f"  {len(SpecialInputFunc().return_invalid_entries())}" + update_button_and_frame_data["invalid_entries_text"]["text"]
+                text=f"  {len(SpecialInputFunc().return_invalid_entries())}"
+                + update_button_and_frame_data["invalid_entries_text"]
             )
             self.invalid_entry_frame.lift()
 

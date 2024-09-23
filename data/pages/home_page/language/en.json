@@ -1,116 +1,63 @@
 {
-  "additional_settings": {
-    "animation_speed": 100,
-    "default_language": "en"
-  },
-
-  "header_data": {
-    "text":"Welcome to the Theme Installer"
-  },
+  "header_label": "Welcome to the Theme Installer",
 
   "create_os_info": {
-    "os_label": {
-      "text": "Detected Operating System: "
-    }
+    "os_label": "Detected Operating System:"
   },
-
   "theme_select": {
-    "theme_label": {
-      "text": "Select Theme: None"
-    },
-    "theme_select_button": {
-      "text": "Select Theme"
-    }
+    "theme_label": "Select Theme: None",
+    "theme_select_button": "Select Theme"
   },
-
   "create_navigation_buttons": {
-    "select_action_label": {
-      "text": "Please Select the Action"
-    }
+    "select_action_label": "Please Select the Action"
   },
-
   "create_file_detection": {
-    "detect_files_text": {
-      "text": "Please Select theme "
-    },
-    "install_files_button": {
-      "text": "Show Files"
-    }
+    "detect_files_text": "Please Select theme",
+    "install_files_button": "Show Files"
   },
-
   "create_recheck_skip_section": {
-    "clean_install_checkbox": {
-      "text": "Clean Install"
-    }
+    "clean_install_checkbox": "Clean Install"
+  },
+  "clear_selection": {
+    "detect_files_text": "Please Select theme",
+    "theme_label": "Selected Theme:"
   },
   "update_ui_for_selected_theme": {
-    "detect_files_text": {
-      "text": "Theme Selected "
-        },
-    "theme_label": {
-      "text": "Selected Theme: "
-    },
-    "install_files_button": {
-      "text": "Install Theme"
-    }
+    "detect_files_text": "Theme Selected",
+    "theme_label": "Selected Theme:",
+    "install_files_button": "Install Theme"
   },
   "handle_data_json_theme": {
-    "detect_files_text": {
-      "text": "Theme has its own data JSON"
-    }
+    "detect_files_text": "Theme has its own data JSON"
   },
   "handle_userChrome_theme": {
-    "detect_files_text": {
-      "text": "Theme has userChrome.css file"
-    },
-    "install_files_button": {
-      "text": "Installed"
-    }
+    "detect_files_text": "Theme has userChrome.css file",
+    "install_files_button": "Installed"
   },
   "no_theme_data_found": {
-    "detect_files_text": {
-      "text": "No theme data or chrome/userChrome.css found"
-        },
-    "install_files_button": {
-      "text": "Installed"
-    }
+    "detect_files_text": "No theme data or chrome/userChrome.css found",
+    "install_files_button": "Installed"
   },
   "handle_all_files_installed": {
-    "install_files_button": {
-      "text": "All Files Installed"
-    }
+    "install_files_button": "All Files Installed"
   },
   "handle_missing_files": {
-    "install_files_button": {
-      "text": "Some Files Are Missing"
-    }
+    "install_files_button": "Some Files Are Missing"
   },
   "refetch_files": {
-    "install_files_button": {
-      "text": "Fetching The Files"
-    }
+    "install_files_button": "Fetching The Files"
   },
   "get_theme": {
-    "install_files_button": {
-      "text": "Installing Files"
-    },
-    "detect_files_text": {
-      "text": "Installing Theme Files"
-        }
+    "install_files_button": "Installing Files",
+    "detect_files_text": "Installing Theme Files"
   },
   "get_neccessary_files": {
-    "detect_files_text": {
-      "text": "Getting Necessary Files"
-    }
+    "detect_files_text": "Getting Necessary Files"
   },
   "recheck_files": {
-    "install_files_button": {
-      "text": "Checking Files"
-    }
+    "install_files_button": "Checking Files"
   },
   "handle_fetch_files_failure": {
-    "install_files_button": {
-      "text": "Failed to fetch files"
-    }
+    "install_files_button": "Failed to fetch files"
   }
 }

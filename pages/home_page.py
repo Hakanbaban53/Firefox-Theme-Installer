@@ -32,7 +32,7 @@ class HomePage(Frame):
         self.base_dir = base_dir
 
         # Set the animation speed
-        self.ANIMATION_SPEED = self.ui_data["additional_settings"]["animation_speed"]
+        self.ANIMATION_SPEED = 100
 
         # Set the paths
         self.ASSETS_PATH = path.join(
@@ -49,27 +49,9 @@ class HomePage(Frame):
             self.CACHE_PATH, self.paths["THEME_PATH"]
         )
 
-
-        # Load additional data
-        NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, "data", "components", "navigation_buttons", "data","navigation_button_data.json"
-        )
-        self.navigation_button_data = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_DATA_PATH
-        )
-
-        NAVIGATION_BUTTON_TEXT = path.join(
-            base_dir, "data", "components", "navigation_buttons", "language", f"{app_language}.json"
-        )
-        self.navigation_button_text = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_TEXT
-        )
-
-
         self.thread_manager = ThreadManager()
 
-
-        self.navigation_button = NavigationButton(self.navigation_button_data)
+        self.navigation_button = NavigationButton(base_dir=base_dir, app_language=app_language)
         self.header = CreateHeader()
 
         # Initialize ImageLoader with the asset path and OS name
@@ -115,9 +97,8 @@ class HomePage(Frame):
         self.reload_icon = self.image_loader.load_reload_icon(self.icons)
         
     def create_header(self):
-        header_data = self.ui_data["header_data"]
         self.header.create_header(
-            self.home_page_frame, header_title_bg=self.header_title_bg, line_top_img=self.line_top_img, text=header_data["text"]
+            self.home_page_frame, header_title_bg=self.header_title_bg, line_top_img=self.line_top_img, text=self.ui_data["header_label"]
         )
 
     def create_os_info(self):
@@ -125,7 +106,7 @@ class HomePage(Frame):
 
         os_label = CTkLabel(
             self.home_page_frame,
-            text=os_info["os_label"]["text"],
+            text=os_info["os_label"],
             text_color="#FFFFFF",
             font=("Arial", 20, "bold"),  # Convert the string to a tuple
         )
@@ -185,7 +166,7 @@ class HomePage(Frame):
 
         self.theme_label = CTkLabel(
             theme_frame,
-            text=theme_select["theme_label"]["text"],
+            text=theme_select["theme_label"],
             font=("Arial", 18),
             text_color="#000000"
         )
@@ -195,18 +176,13 @@ class HomePage(Frame):
             side="left",
         )
 
-        theme_select_button = CTkButton(
+        theme_select_button = self.navigation_button.create_navigation_button(
             theme_frame,
-            text=theme_select["theme_select_button"]["text"],
-            width=float(self.navigation_button_data["width"]),
-            height=float(self.navigation_button_data["height"]),
-            corner_radius=float(self.navigation_button_data["corner_radius"]),
-            bg_color=self.navigation_button_data["bg_color"],
-            fg_color=self.navigation_button_data["fg_color"],
-            hover_color=self.navigation_button_data["hover_color"],
-            text_color=self.navigation_button_data["text_color"],
-            command=self.select_theme,
-            font=(self.navigation_button_data["font_family"], int(self.navigation_button_data["font_size"])),
+            theme_select["theme_select_button"],
+            None,
+            self.select_theme,
+            padding_x=(10, 10),
+            side="right",
         )
         theme_select_button.pack(
             padx=10,
@@ -220,7 +196,7 @@ class HomePage(Frame):
 
         select_action_label = CTkLabel(
             self.home_page_frame,
-            text=navigation_buttons["select_action_label"]["text"],
+            text=navigation_buttons["select_action_label"],
             image=self.select_action_img,
             text_color="#FFFFFF",
             font=("Arial", 20),
@@ -253,7 +229,7 @@ class HomePage(Frame):
 
         self.navigation_button.create_navigation_button(
             navigation_frame,
-            self.navigation_button_text["remove_button"],
+            "remove_button",
             path.join(self.ASSETS_PATH, "icons/remove.png"),
             lambda: self.controller.show_frame("remove_page"),
             padding_x=(10, 20),
@@ -261,7 +237,7 @@ class HomePage(Frame):
         )
         self.install_button = self.navigation_button.create_navigation_button(
             navigation_frame,
-            self.navigation_button_text["install_button"],
+            "install_button",
             path.join(self.ASSETS_PATH, "icons/install.png"),
             lambda: self.controller.show_frame(
                 "install_page",
@@ -278,7 +254,7 @@ class HomePage(Frame):
         )
         self.navigation_button.create_navigation_button(
             navigation_frame,
-            self.navigation_button_text["exit_button"],
+            "exit_button",
             path.join(self.ASSETS_PATH, "icons/exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
@@ -305,7 +281,7 @@ class HomePage(Frame):
         )
         self.detect_files_text = Label(
             self.detect_files_frame,
-            text=file_detection["detect_files_text"]["text"],
+            text=f"{file_detection["detect_files_text"]} ",
             font=("Arial", 18),
             fg="#000000",
             bg="#FFFFFF",
@@ -321,7 +297,7 @@ class HomePage(Frame):
         )
         self.install_files_button = CTkButton(
             master=self.detect_files_frame,
-            text=file_detection["install_files_button"]["text"],
+            text=file_detection["install_files_button"],
             width=120,
             height=40,
             corner_radius=12,
@@ -350,7 +326,7 @@ class HomePage(Frame):
         self.check_var = BooleanVar(value=False)
         self.clean_install = CTkCheckBox(
             self.recheck_skip_frame,
-            text=create_section["clean_install_checkbox"]["text"],
+            text=create_section["clean_install_checkbox"],
             text_color="#FFFFFF",
             onvalue=True,
             offvalue=False,
@@ -421,10 +397,11 @@ class HomePage(Frame):
             self.clear_selection()
 
     def clear_selection(self):
+        clear_selection = self.ui_data["clear_selection"]
         self.modal_theme = None
-        self.theme_label.configure(text="Select Theme: None")
-        self.detect_files_text.configure(
-            text="Please Select a Theme",
+        self.theme_label.configure(text=clear_selection["theme_label"])
+        self.detect_files_text.config(
+            text=f"{clear_selection["detect_files_text"]} ",
             fg="#000000",
             image=self.theme_not_selected_icon,
         )
@@ -438,18 +415,18 @@ class HomePage(Frame):
 
         self.install_button.configure(state="disabled")
         
-        self.detect_files_text.configure(
+        self.detect_files_text.config(
         image=self.theme_selected_icon,
-        text=updated_ui_data["detect_files_text"]["text"],
+        text=f"{updated_ui_data["detect_files_text"]} ",
         fg="#000000",
         )
 
         self.theme_label.configure(
-            text=f"{updated_ui_data["theme_label"]["text"]} {self.modal_theme.theme_selected.title}"
+            text=f"{updated_ui_data["theme_label"]} {self.modal_theme.theme_selected.title}"
         )
         self.install_files_button.configure(
             command=self.get_theme,
-            text=updated_ui_data["install_files_button"]["text"],
+            text=updated_ui_data["install_files_button"],
             text_color="#000000",
             image=None,
             state="normal", 
@@ -483,8 +460,8 @@ class HomePage(Frame):
     def handle_data_json_theme(self):
         """Handle themes that have their own data JSON file."""
         handle_data_json_theme = self.ui_data["handle_data_json_theme"]
-        self.detect_files_text.configure(
-            text=handle_data_json_theme["detect_files_text"]["text"],
+        self.detect_files_text.config(
+            text=handle_data_json_theme["detect_files_text"],
             fg="#00FF00",
         )
         self.data_json_path = path.join(self.theme_data.get("path"), "data", "installer_files_data.json")
@@ -494,8 +471,8 @@ class HomePage(Frame):
     def handle_userChrome_theme(self):
         """Handle themes that include a userChrome.css file."""
         handle_userChrome_theme = self.ui_data["handle_userChrome_theme"]
-        self.detect_files_text.configure(
-            text=handle_userChrome_theme["detect_files_text"]["text"],
+        self.detect_files_text.config(
+            text=handle_userChrome_theme["detect_files_text"],
             fg="#00FF00",
         )
         self.install_button.configure(
@@ -506,7 +483,7 @@ class HomePage(Frame):
             command=self.get_theme)
         self.install_files_button.configure(
             image=self.check_icon,
-            text=handle_userChrome_theme["install_files_button"]["text"],
+            text=handle_userChrome_theme["install_files_button"],
             text_color="#000000",
             state="disabled",
             fg_color="#D9D9D9",
@@ -525,13 +502,13 @@ class HomePage(Frame):
     def no_theme_data_found(self):
         """Handle cases where no valid theme data is found."""
         no_theme_data_found = self.ui_data["no_theme_data_found"]
-        self.detect_files_text.configure(
-            text=no_theme_data_found["detect_files_text"]["text"],
+        self.detect_files_text.config(
+            text=no_theme_data_found["detect_files_text"],
             fg= "#FF0000",
         )
         self.install_files_button.configure(
             image=self.check_icon,
-            text=no_theme_data_found["install_files_button"]["text"],
+            text=no_theme_data_found["install_files_button"],
             text_color="#000000",
             state="disabled",
             fg_color="#D9D9D9",
@@ -557,7 +534,7 @@ class HomePage(Frame):
         handle_all_files_installed = self.ui_data["handle_all_files_installed"]
         self.install_files_button.configure(
             width=200,
-            text=handle_all_files_installed["install_files_button"]["text"],
+            text=handle_all_files_installed["install_files_button"],
             text_color="#10dc60",
             state="disabled",
             image=self.check_icon,
@@ -576,7 +553,7 @@ class HomePage(Frame):
         """Update UI when some theme files are missing."""
         handle_missing_files = self.ui_data["handle_missing_files"]
         self.install_files_button.configure(
-            text=handle_missing_files["install_files_button"]["text"],
+            text=handle_missing_files["install_files_button"],
             text_color="#f04141",
             state="normal",
             width=200,
@@ -607,7 +584,7 @@ class HomePage(Frame):
         """Refetch necessary files and update UI."""
         refetch_files = self.ui_data["refetch_files"]
         self.install_files_button.configure(
-            text=refetch_files["install_files_button"]["text"],
+            text=refetch_files["install_files_button"],
             text_color="#000000",
             state="disabled",
         )
@@ -622,12 +599,12 @@ class HomePage(Frame):
         self.start_loading_animation()
         self.get_neccessary_files()
         self.install_files_button.configure(
-            text=get_theme["install_files_button"]["text"],
+            text=get_theme["install_files_button"],
             text_color="#000000",
             state="disabled",
         )
         self.detect_files_text.config(
-            text=get_theme["detect_files_text"]["text"], fg="#000000"
+            text=f"{get_theme["detect_files_text"]} ", fg="#000000"
         )
         self.thread_manager.start_thread(target=self.run_theme_process, on_finish=self.stop_loading_animation)
 
@@ -635,7 +612,7 @@ class HomePage(Frame):
         """Fetch and check necessary files for the theme."""
         get_neccessary_files = self.ui_data["get_neccessary_files"]
         self.detect_files_text.config(
-            text=get_neccessary_files["detect_files_text"]["text"],
+            text=f"{get_neccessary_files["detect_files_text"]} ",
             fg="#000000",
         )
         file_manager = FileManager(json_file_path=self.CUSTOM_SCRIPT_LOADER_PATH, json_file_url=self.paths["CUSTOM_SCRIPT_LOADER_URL"])
@@ -670,7 +647,7 @@ class HomePage(Frame):
         recheck_files = self.ui_data["recheck_files"]
         self.start_loading_animation()
         self.install_files_button.configure(
-            text=recheck_files["install_files_button"]["text"],
+            text=recheck_files["install_files_button"],
             text_color="#000000",
             state="disabled",
         )
@@ -683,7 +660,7 @@ class HomePage(Frame):
         handle_fetch_files_failure = self.ui_data["handle_fetch_files_failure"]
         self.install_files_button.configure(
             image=self.attention_icon,
-            text=handle_fetch_files_failure["install_files_button"]["text"],
+            text=handle_fetch_files_failure["install_files_button"],
             text_color="#f04141",
             state="disabled",
         )

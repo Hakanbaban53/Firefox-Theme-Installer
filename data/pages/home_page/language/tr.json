@@ -1,122 +1,63 @@
 {
-    "additional_settings": {
-      "animation_speed": 100
-    },
-  
-    "header_data": {
-      "text": "Tema Yükleyiciye Hoş Geldiniz"
-    },
-  
-    "create_os_info": {
-      "os_label": {
-        "text": "Algılanan İşletim Sistemi: "
-      }
-    },
-  
-    "theme_select": {
-      "theme_label": {
-        "text": "Tema Seç: Yok"
-      },
-      "theme_select_button": {
-        "text": "Tema Seç"
-      }
-    },
-  
-    "create_navigation_buttons": {
-      "select_action_label": {
-        "text": "Lütfen İşlemi Seçiniz"
-      }
-    },
-  
-    "create_file_detection": {
-      "detect_files_text": {
-        "text": "Lütfen temayı seçin"
-      },
-      "install_files_button": {
-        "text": "Dosyaları Göster"
-      }
-    },
-  
-    "create_recheck_skip_section": {
-      "clean_install_checkbox": {
-        "text": "Temiz Kurulum"
-      }
-    },
+  "header_label": "Tema Yükleyiciye Hoş Geldiniz",
 
-    "update_ui_for_selected_theme": {
-      "detect_files_text": {
-        "text": "Tema Seçildi"
-      },
-      "theme_label": {
-        "text": "Seçilen Tema: "
-      },
-      "install_files_button": {
-        "text": "Temayı Yükle"
-      }
-    },
-
-    "handle_data_json_theme": {
-      "detect_files_text": {
-        "text": "Tema kendi veri JSON'una sahip"
-      }
-    },
-
-    "handle_userChrome_theme": {
-      "detect_files_text": {
-        "text": "Tema userChrome.css dosyasına sahip"
-      },
-      "install_files_button": {
-        "text": "Yüklendi"
-      }
-    },
-
-    "no_theme_data_found": {
-      "detect_files_text": {
-        "text": "Tema verisi veya chrome/userChrome.css bulunamadı"
-      },
-      "install_files_button": {
-        "text": "Yüklendi"
-      }
-    },
-
-    "handle_all_files_installed": {
-      "install_files_button": {
-        "text": "Tüm Dosyalar Yüklendi"
-      }
-    },
-    "handle_missing_files": {
-      "install_files_button": {
-        "text": "Bazı Dosyalar Eksik"
-      }
-    },
-    "refetch_files": {
-      "install_files_button": {
-        "text": "Dosyalar Alınıyor"
-      }
-    },
-    "get_theme": {
-      "install_files_button": {
-        "text": "Dosyalar Yükleniyor"
-      },
-      "detect_files_text": {
-        "text": "Tema Dosyaları Yükleniyor"
-      }
-    },
-    "get_neccessary_files": {
-      "detect_files_text": {
-        "text": "Gerekli Dosyalar Alınıyor"
-      }
-    },
-    "recheck_files": {
-      "install_files_button": {
-        "text": "Dosyalar Kontrol Ediliyor"
-      }
-    },
-    "handle_fetch_files_failure": {
-      "install_files_button": {
-        "text": "Dosyalar alınamadı"
-      }
-    }
+  "create_os_info": {
+    "os_label": "Algılanan İşletim Sistemi:"
+  },
+  "theme_select": {
+    "theme_label": "Tema Seç: Yok",
+    "theme_select_button": "Tema Seç"
+  },
+  "create_navigation_buttons": {
+    "select_action_label": "Lütfen İşlemi Seçiniz"
+  },
+  "create_file_detection": {
+    "detect_files_text": "Lütfen temayı seçin",
+    "install_files_button": "Dosyaları Göster"
+  },
+  "create_recheck_skip_section": {
+    "clean_install_checkbox": "Temiz Kurulum"
+  },
+  "clear_selection": {
+    "detect_files_text": "Lütfen temayı seçin",
+    "theme_label": "Seçilen Tema: Yok"
+  },
+  "update_ui_for_selected_theme": {
+    "detect_files_text": "Tema Seçildi",
+    "theme_label": "Seçilen Tema: ",
+    "install_files_button": "Temayı Yükle"
+  },
+  "handle_data_json_theme": {
+    "detect_files_text": "Tema kendi veri JSON'una sahip"
+  },
+  "handle_userChrome_theme": {
+    "detect_files_text": "Tema userChrome.css dosyasına sahip",
+    "install_files_button": "Yüklendi"
+  },
+  "no_theme_data_found": {
+    "detect_files_text": "Tema verisi veya chrome/userChrome.css bulunamadı",
+    "install_files_button": "Yüklendi"
+  },
+  "handle_all_files_installed": {
+    "install_files_button": "Tüm Dosyalar Yüklendi"
+  },
+  "handle_missing_files": {
+    "install_files_button": "Bazı Dosyalar Eksik"
+  },
+  "refetch_files": {
+    "install_files_button": "Dosyalar Alınıyor"
+  },
+  "get_theme": {
+    "install_files_button": "Dosyalar Yükleniyor",
+    "detect_files_text": "Tema Dosyaları Yükleniyor"
+  },
+  "get_neccessary_files": {
+    "detect_files_text": "Gerekli Dosyalar Alınıyor"
+  },
+  "recheck_files": {
+    "install_files_button": "Dosyalar Kontrol Ediliyor"
+  },
+  "handle_fetch_files_failure": {
+    "install_files_button": "Dosyalar alınamadı"
   }
-
-  
+}
