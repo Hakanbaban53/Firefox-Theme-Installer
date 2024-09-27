@@ -51,7 +51,7 @@ class LoadJsonData:
         except Exception as e:
             error(f"Failed to delete {file_path}: {e}")
 
-    def _download_json_file(self, download_link, destination, max_retries=6):
+    def _download_json_file(self, download_link, destination, max_retries=4):
         """
         Download a JSON file from a URL with retries and save it to the specified destination.
         """
@@ -69,7 +69,7 @@ class LoadJsonData:
                 error(f"OS error while handling file {destination}: {e}")
                 self._ensure_directory_exists(destination)
             retries += 1
-            time.sleep(2 ** retries)  # Exponential backoff
+            time.sleep(2)
 
         error(f"Failed to download {download_link} after {max_retries} attempts.")
         return self._show_error_message()

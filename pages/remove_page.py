@@ -13,7 +13,7 @@ from installer_core.component_tools.special_input_functions import SpecialInputF
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.file_utils.get_folder_locations import GetFolderLocations
+from installer_core.data_tools.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
 
 
@@ -22,7 +22,7 @@ class RemovePage(Frame):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "data", "pages", "remove_page", "language", f"{app_language}.json"
+            base_dir, "language", "pages", "remove_page", f"{app_language}.json"
         )
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")

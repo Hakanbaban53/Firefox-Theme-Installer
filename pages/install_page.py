@@ -16,7 +16,7 @@ from installer_core.component_tools.thread_manager import ThreadManager
 from installer_core.data_tools.get_os_properties import OSProperties
 from installer_core.data_tools.image_loader import ImageLoader
 from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.file_utils.get_folder_locations import GetFolderLocations
+from installer_core.data_tools.get_folder_locations import GetFolderLocations
 from modals.info_modals import InfoModals
 
 
@@ -25,10 +25,9 @@ class InstallPage(Frame):
         super().__init__(parent)
         UI_DATA_PATH = path.join(
             base_dir,
-            "data",
+            "language",
             "pages",
             "install_page",
-            "language",
             f"{app_language}.json",
         )
         PATHS = path.join(base_dir, "data", "global", "paths.json")

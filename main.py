@@ -25,7 +25,7 @@ class MultiPageApp(Tk):
         self.language_manager = LanguageManager(self.base_dir ,self.SUPPORTED_LANGUAGES, self.LANGUAGE_NAMES, fallback_language='en')
         self.app_language = self.language_manager.get_language()
 
-        base_data_path = path.join(self.base_dir, "data", "app", "language", f"{self.app_language}.json")
+        base_data_path = path.join(self.base_dir, "language", "app", f"{self.app_language}.json")
         self.base_data = LoadJsonData().load_json_data(base_data_path)
 
         self.current_frame = None

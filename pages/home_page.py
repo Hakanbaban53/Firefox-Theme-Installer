@@ -19,7 +19,7 @@ class HomePage(Frame):
     def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file based on the selected language
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "home_page", "language", f"{app_language}.json")
+        UI_DATA_PATH = path.join(base_dir, "language", "pages", "home_page", f"{app_language}.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()

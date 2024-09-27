@@ -25,7 +25,7 @@ class ThemeDetailModal(Toplevel):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "data", "modals", "theme_detail_modal", "language", f"{app_language}.json"
+            base_dir, "language", "modals", "theme_detail_modal", f"{app_language}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)

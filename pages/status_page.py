@@ -3,7 +3,6 @@ from json import dump
 from customtkinter import (
     CTkFrame,
     CTkLabel,
-    CTkFont,
     CTkTextbox,
     CTkProgressBar,
 )
@@ -26,7 +25,7 @@ class StatusPage(Frame):
         self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
-        UI_DATA_PATH = path.join(base_dir, "data", "pages", "status_page", "language", f"{app_language}.json")
+        UI_DATA_PATH = path.join(base_dir, "language", "pages", "status_page", f"{app_language}.json")
         PATHS = path.join(base_dir, "data", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "global", "icons.json")
         load_json_data = LoadJsonData()
@@ -96,7 +95,7 @@ class StatusPage(Frame):
             text="",
             image=None,
             compound="right",
-            font=CTkFont(family="Arial", size=18, weight="bold"),
+            font=("Arial", 18, "bold"),
         )
         self.action_label.grid(row=2, column=0, padx=60, pady=(14, 2), sticky="NSEW")
 

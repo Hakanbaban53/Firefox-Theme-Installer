@@ -21,10 +21,9 @@ class InfoModals(Toplevel):
         super().__init__(parent)
         INFO_MODALS_DATA_PATH = path.join(
             base_dir,
-            "data",
+            "language",
             "modals",
             "info_modals",
-            "language",
             f"{app_language}.json",
         )
         load_json_data = LoadJsonData()

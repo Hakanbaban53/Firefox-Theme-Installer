@@ -13,17 +13,15 @@ class InputsAndCheckboxes:
             "data",
             "components",
             "inputs_and_checkboxes",
-            "data",
-            "inputs_data.json",
+            "data.json",
         )
         self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
 
         INPUTS_LABELS_DATA_PATH = path.join(
             base_dir,
-            "data",
+            "language",
             "components",
             "inputs_and_checkboxes",
-            "language",
             f"{app_language}.json",
         )
         self.inputs_labels_data = load_json_data.load_json_data(INPUTS_LABELS_DATA_PATH)

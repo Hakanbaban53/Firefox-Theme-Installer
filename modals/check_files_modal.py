@@ -16,29 +16,30 @@ class FileInstallerModal(Toplevel):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "data", "modals", "check_files_modal", "language", f"{app_language}.json"
+            base_dir, "language", "modals", "check_files_modal", f"{app_language}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        
+
         self.app_language = app_language
         self.base_dir = base_dir
         self.theme_dir = theme_dir
         self.thread_manager = ThreadManager()
 
         self.configure_layout(parent)
-        CenterWindow(self).center_window()  # After configure the basic layout center the window. 
+        CenterWindow(
+            self
+        ).center_window()  # After configure the basic layout center the window.
 
         self.file_manager = FileManager(theme_data_path)
         self.title(self.ui_data["title"])
-
 
         self.create_widgets()
 
     def configure_layout(self, parent):
         """Configure the layout of the modal."""
         self.transient(parent)
-        self.geometry("520x370") # Set the size of the modal for center_window function
+        self.geometry("520x370")  # Set the size of the modal for center_window function
         self.configure(bg="#2B2631")
         self.resizable(False, False)
         self.wait_visibility()
@@ -48,7 +49,7 @@ class FileInstallerModal(Toplevel):
             fill=BOTH, expand=True, padx=10, pady=10
         )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
         # This also fix the blink the modal
-        
+
         SetWindowIcon(self.base_dir).set_window_icon(self)
 
     def create_widgets(self):
@@ -104,17 +105,26 @@ class FileInstallerModal(Toplevel):
 
     def check_all_files_installed(self):
         """Check if all files are installed and return the missing files."""
-        self.file_check_result = self.file_manager.check_files_exist(root=self.theme_dir)
+        self.file_check_result = self.file_manager.check_files_exist(
+            root=self.theme_dir
+        )
         return self.file_check_result
 
     def on_install_button_click(self):
         """Handle the install button click event."""
-        self.install_files_button.configure(text=self.ui_data["buttons"]["installing_button"], state="disabled")
-        self.thread_manager.start_thread(target=self.start_download_process, on_finish=self.update_install_files_button)
+        self.install_files_button.configure(
+            text=self.ui_data["buttons"]["installing_button"], state="disabled"
+        )
+        self.thread_manager.start_thread(
+            target=self.start_download_process,
+            on_finish=self.update_install_files_button,
+        )
 
     def update_install_files_button(self):
         """Update the install files button text and color."""
-        self.install_files_button.configure(text=self.ui_data["buttons"]["installed_button"], fg_color="#D9D9D9")
+        self.install_files_button.configure(
+            text=self.ui_data["buttons"]["installed_button"], fg_color="#D9D9D9"
+        )
 
     def start_download_process(self):
         """Download missing files."""
@@ -128,8 +138,18 @@ class FileInstallerModal(Toplevel):
         """Handle the check button click event."""
         all_files_installed = len(self.check_all_files_installed())
         if all_files_installed == 0:
-            modal = InfoModals(self, self.base_dir, "check_files_installed", app_language=self.app_language)
+            modal = InfoModals(
+                self,
+                self.base_dir,
+                "check_files_installed",
+                app_language=self.app_language,
+            )
             self.wait_window(modal)
             self.destroy()
         else:
-            InfoModals(self, self.base_dir, "check_files_not_installed", app_language=self.app_language)
+            InfoModals(
+                self,
+                self.base_dir,
+                "check_files_not_installed",
+                app_language=self.app_language,
+            )
