@@ -11,7 +11,7 @@ class DetectInstalledTheme:
     def __init__(self, parent, chrome_folder, theme_detected_icon, base_dir, app_language):
         self.json_loader = LoadJsonData(json_file_url=None)
         UI_DATA_PATH = path.join(
-            base_dir, "data", "components", "detect_installed_theme", "language", "tr.json"
+            base_dir, "data", "components", "detect_installed_theme", "language", f"{app_language}.json"
         )
         self.ui_data = self.json_loader.load_json_data(UI_DATA_PATH)
 

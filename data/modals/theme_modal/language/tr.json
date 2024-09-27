@@ -1,41 +1,27 @@
 {
-    "search_bar": {
-      "placeholder_text": "Tema ara..."
-    },
-    "treeview": {
-      "columns": ["Başlık", "Açıklama"]
-    },
-    "buttons": {
-      "select_button": {
-        "text": "Temayı Seç"
-      },
-      "error_button": {
-        "text": "Yeniden Dene"
-      },
-      "pagination": {
-        "prev_button": {
-          "text": "Önceki"
-        },
-        "next_button": {
-          "text": "Sonraki"
-        }
-      }
-    },
-    "retrying": {
-      "text": "Tekrar deneniyor..."
-    },
-    "detail_info_text": {
-      "text": "Tema detaylarını görmek için çift tıklayın"
-    },
-    "tags": {
-      "text": "Filtrele"
-    },
-    "error_messages": {
-      "no_themes": "Tema bulunamadı. Tema kaynağınızı veya internet bağlantınızı kontrol edin.",
-      "retry_failed": "Tekrar deneme başarısız oldu:"
-    },
+  "search_bar": {
+    "placeholder_text": "Tema ara..."
+  },
+  "treeview": {
+    "columns": ["Başlık", "Açıklama"]
+  },
+  "buttons": {
+    "select_button": "Temayı Seç",
+    "error_button": "Yeniden Dene",
+    "loading_button": "Yükleniyor...",
     "pagination": {
-      "label_template": "Sayfa"
+      "prev_button": "Önceki",
+      "next_button": "Sonraki"
     }
+  },
+  "retrying": "Tekrar deneniyor...",
+  "detail_info_text": "Tema detaylarını görmek için çift tıklayın",
+  "tags": "Filtrele",
+  "error_messages": {
+    "no_themes": "Tema bulunamadı. Tema kaynağınızı veya internet bağlantınızı kontrol edin.",
+    "retry_failed": "Tekrar deneme başarısız oldu:"
+  },
+  "pagination": {
+    "label_template": "Sayfa"
   }
-  
+}

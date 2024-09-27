@@ -25,7 +25,7 @@ class MultiPageApp(Tk):
         self.language_manager = LanguageManager(self.base_dir ,self.SUPPORTED_LANGUAGES, self.LANGUAGE_NAMES, fallback_language='en')
         self.app_language = self.language_manager.get_language()
 
-        base_data_path = path.join(self.base_dir, "data", "installer_data.json")
+        base_data_path = path.join(self.base_dir, "data", "app", "language", f"{self.app_language}.json")
         self.base_data = LoadJsonData().load_json_data(base_data_path)
 
         self.current_frame = None
@@ -36,9 +36,9 @@ class MultiPageApp(Tk):
 
     def configure_layout(self):
         """Set window title, geometry, and icon."""
-        installer_title = self.base_data["installer_info"]["installer_title"]
+        installer_title = self.base_data["installer_title"]
         self.title(installer_title)
-        self.geometry(f"{self.base_data["window_settings"]["window_width"]}x{self.base_data["window_settings"]["window_height"]}")
+        self.geometry("1115x666")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
         SetWindowIcon(self.base_dir).set_window_icon(self)
@@ -62,7 +62,7 @@ class MultiPageApp(Tk):
         image_loader = ImageLoader(path.join(self.base_dir, "assets", "backgrounds"))
         installer_img = image_loader.load_installer_img("installer_img.png")
         
-        installer_version = self.base_data["installer_info"]["installer_version"]
+        installer_version = self.base_data["installer_version"]
         self.background_label = CTkLabel(
             self.image_frame,
             image=installer_img,
@@ -77,7 +77,7 @@ class MultiPageApp(Tk):
             self.image_frame,
             values=language_names,  # Display user-friendly names
             command=self.change_language,  # Call the change_language method when a language is selected
-            bg_color=self.base_data["window_settings"]["bg_color"],
+            bg_color="#2B2631",
             font=("Inter", 12),
         )
         self.language_button.set(self.LANGUAGE_NAMES[self.app_language])
@@ -97,7 +97,7 @@ class MultiPageApp(Tk):
         
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
-        self.container = Frame(self, bg=self.base_data["window_settings"]["bg_color"])
+        self.container = Frame(self, bg="#2B2631")
         self.container.pack(fill="both", expand=True)
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
@@ -106,7 +106,7 @@ class MultiPageApp(Tk):
     def create_frame(self, page_class):
         """Create and return a new frame for the specified page class, passing the current language."""
         frame = page_class(self.container, self, self.base_dir, self.app_language)
-        frame.configure(bg=self.base_data["window_settings"]["bg_color"])
+        frame.configure(bg="#2B2631")
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
 
@@ -137,7 +137,7 @@ class MultiPageApp(Tk):
             direction = "left" if self.is_left_direction(current_frame, next_frame) else "right"
             self.slide_to_frame(current_frame, next_frame, 0, speed=20, direction=direction)
         else:
-            next_frame.place(x=self.base_data["window_settings"]["default_padding_x"], y=0, relwidth=1, relheight=1)
+            next_frame.place(x=315, y=0, relwidth=1, relheight=1)
 
         next_frame.update_parameters(**kwargs)
         next_frame.tkraise()

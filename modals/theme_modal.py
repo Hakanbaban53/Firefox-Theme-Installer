@@ -35,10 +35,7 @@ class ThemeModal(Toplevel):
         CenterWindow(self).center_window()
 
         self.thread_manager = ThreadManager()
-        self.theme_manager = ThemeManager(
-            json_file_path=path.join(self.cache_dir, self.theme_data["data_path"]),
-            json_file_url=self.theme_data["data_url"],
-        )
+        self.theme_manager = None  # Will be loaded later in a separate thread
         self.image_cache_dir = path.join(self.cache_dir, "image_cache")
 
         self.sort_order = "asc"
@@ -48,13 +45,12 @@ class ThemeModal(Toplevel):
         self.total_pages = 1
 
         self.create_widgets()
-        self.populate_tags()
-        self.load_themes()
+        self.load_themes()  # Loading the themes in a background thread
 
     def configure_layout(self, parent):
         self.configure(bg="#2B2631")
         self.transient(parent)
-        self.geometry("640x610")  # Set the size of the modal for center_window function
+        self.geometry("640x610")
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
@@ -63,7 +59,7 @@ class ThemeModal(Toplevel):
         )
         self.theme_modal_frame.pack(
             fill=BOTH, expand=True, padx=10, pady=10
-        )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
+        )
         self.theme_modal_frame.columnconfigure(0, weight=1)
 
         SetWindowIcon(self.base_dir).set_window_icon(self)
@@ -79,9 +75,7 @@ class ThemeModal(Toplevel):
             self.theme_modal_frame,
             text_color="#000000",
             border_width=0,
-            placeholder_text=self.ui_data["search_bar"][
-                "placeholder_text"
-            ],
+            placeholder_text=self.ui_data["search_bar"]["placeholder_text"],
         )
         self.search_entry.grid(row=0, column=0, sticky="EW")
         self.search_entry.bind("<KeyRelease>", self.update_search)
@@ -94,29 +88,17 @@ class ThemeModal(Toplevel):
             height=self.items_per_page,
         )
 
-        # Dynamically set column headers based on language data
         for col in self.ui_data["treeview"]["columns"]:
             self.tree.heading(
                 col,
-                text=col,  # Use translated column names
+                text=col,
                 command=lambda c=col: self.sort_column_click(c)
             )
 
-        self.tree.column(
-            self.ui_data["treeview"]["columns"][1],
-            width=400,
-        )
+        self.tree.column(self.ui_data["treeview"]["columns"][1], width=400)
         self.tree.grid(row=1, column=0, padx=10, pady=10, sticky="NSEW")
-        self.tree.tag_configure(
-            "oddrow",
-            background="#F1F1F1",
-            font=("Arial", 11),
-        )
-        self.tree.tag_configure(
-            "evenrow",
-            background="#FFFFFF",
-            font=("Arial", 11),
-        )
+        self.tree.tag_configure("oddrow", background="#F1F1F1", font=("Arial", 11))
+        self.tree.tag_configure("evenrow", background="#FFFFFF", font=("Arial", 11))
 
         self.tree.bind("<Double-1>", self.open_theme_detail)
         self.tree.bind("<<TreeviewSelect>>", self.on_select)
@@ -126,7 +108,7 @@ class ThemeModal(Toplevel):
         navigation_frame.grid(row=2, column=0, padx=10, pady=10, sticky="")
         self.select_button = CTkButton(
             navigation_frame,
-            text=self.ui_data["buttons"]["select_button"]["text"],
+            text=self.ui_data["buttons"]["select_button"],
             text_color="#ffffff",
             width=75,
             font=("Arial", 16, "bold"),
@@ -137,7 +119,7 @@ class ThemeModal(Toplevel):
 
         self.detail_info_text = CTkLabel(
             navigation_frame,
-            text=self.ui_data["detail_info_text"]["text"],
+            text=self.ui_data["detail_info_text"],
         )
         self.detail_info_text.grid(row=1, column=0, sticky="")
 
@@ -145,9 +127,7 @@ class ThemeModal(Toplevel):
         pagination_frame.grid(row=2, column=0, padx=10, pady=10, sticky="")
         self.prev_button = CTkButton(
             pagination_frame,
-            text=self.ui_data["buttons"]["pagination"]["prev_button"][
-                "text"
-            ],
+            text=self.ui_data["buttons"]["pagination"]["prev_button"],
             command=self.prev_page,
             width=75,
             fg_color="#db7f1f",
@@ -164,9 +144,7 @@ class ThemeModal(Toplevel):
         self.page_label.pack(side=LEFT, padx=5)
         self.next_button = CTkButton(
             pagination_frame,
-            text=self.ui_data["buttons"]["pagination"]["next_button"][
-                "text"
-            ],
+            text=self.ui_data["buttons"]["pagination"]["next_button"],
             command=self.next_page,
             width=75,
             fg_color="#db7f1f",
@@ -185,7 +163,7 @@ class ThemeModal(Toplevel):
         self.tag_combobox.bind("<<ComboboxSelected>>", self.update_search)
 
         self.tag_info_label = CTkLabel(
-            tags_frame, text=self.ui_data["tags"]["text"]
+            tags_frame, text=self.ui_data["tags"]
         )
         self.tag_info_label.grid(row=0, column=1, padx=(0, 10), pady=10, sticky="W")
 
@@ -207,39 +185,35 @@ class ThemeModal(Toplevel):
         filtered_tags = [tag for tag in self.all_tags if input_text in tag.lower()]
         self.tag_combobox["values"] = filtered_tags
 
+    def load_themes(self):
+        # Disable the UI buttons while loading
+        self.disable_buttons()
+
+        # Start the theme loading in a separate thread
+        self.thread_manager.start_thread(target=self.retry_loading_themes, on_finish=self.on_themes_loaded)
+
     def retry_loading_themes(self):
         try:
-            self.select_button.configure(text=self.ui_data["retrying"]["text"])
+            # Attempt to load the themes
             self.theme_manager = ThemeManager(
-                path.join(
-                    self.cache_dir, self.theme_data["data_path"]
-                ),
-                self.theme_data["data_url"],
+                json_file_path=path.join(self.cache_dir, self.theme_data["data_path"]),
+                json_file_url=self.theme_data["data_url"]
             )
-            self.update_treeview()  # Update the treeview after retrying
-            if self.theme_manager.get_all_themes():
-                self.populate_tags()
-                self.select_button.configure(
-                    text=self.ui_data["buttons"]["select_button"]["text"],
-                    fg_color="#7D31D7",
-                    hover_color="#9747FF",
-                    command=self.select_theme,  # Set the original command
-                    width=75,
-                    state=DISABLED,  # Initially disable until a theme is selected
-                )
-        except Exception as e:
-            self.display_error_message(f"{self.ui_data["error_messages"]["retry_failed"]} {e}")
-        finally:
-            self.enable_buttons()
+            themes = self.theme_manager.get_all_themes()
 
-    def load_themes(self):
-        self.disable_buttons()
-        self.thread_manager.start_thread(
-            target=self.retry_loading_themes, on_finish=self.enable_buttons
-        )
+            if themes:
+                self.populate_tags()  # Populate tags in the background
+        except Exception as e:
+            # Handle loading error
+            self.display_error_message(f"{self.ui_data['error_messages']['retry_failed']} {e}")
+
+    def on_themes_loaded(self):
+        # Re-enable the buttons and update the treeview after loading
+        self.update_treeview()
+        self.enable_buttons()
 
     def disable_buttons(self):
-        self.select_button.configure(state=DISABLED)
+        self.select_button.configure(text=self.ui_data["buttons"]["loading_button"], state=DISABLED)
         self.prev_button.configure(state=DISABLED)
         self.next_button.configure(state=DISABLED)
 
@@ -250,85 +224,56 @@ class ThemeModal(Toplevel):
         search_query = self.search_entry.get().lower()
         selected_tag = self.tag_combobox.get()
 
-        if not self.theme_manager.get_all_themes():
+        if not self.theme_manager or not self.theme_manager.get_all_themes():
             self.display_error_message(self.ui_data["error_messages"]["no_themes"])
             return
 
         filtered_themes = self.get_filtered_themes(search_query, selected_tag)
-        self.total_pages = self.calculate_total_pages(filtered_themes)
 
-        self.tree.delete(*self.tree.get_children())  # Clear Treeview
-        self.add_themes_to_treeview(filtered_themes)
+        # Update pagination
+        self.total_pages = (len(filtered_themes) + self.items_per_page - 1) // self.items_per_page
+        start_index = (self.current_page - 1) * self.items_per_page
+        end_index = start_index + self.items_per_page
+
+        # Clear the treeview
+        self.tree.delete(*self.tree.get_children())
+
+        for i, theme in enumerate(filtered_themes[start_index:end_index]):
+            values = (theme.title, theme.description)
+            row_tag = "evenrow" if i % 2 == 0 else "oddrow"
+            self.tree.insert("", END, values=values, tags=(row_tag,))
 
         self.update_pagination_controls()
 
-    def display_error_message(self, message):
-        self.tree.delete(*self.tree.get_children())  # Clear Treeview
-        self.tree.insert("", END, values=(message,), tags=("errorrow",))
-        self.tree.tag_configure("errorrow", background="#FFCCCC", foreground="#D8000C")
-        self.select_button.configure(
-            text=self.ui_data["buttons"]["error_button"]["text"],
-            text_color="#ffffff",
-            hover_color="#fc3d47",
-            fg_color="#D8000C",
-            command=self.load_themes,
-            state=NORMAL,
+    def update_pagination_controls(self):
+        self.page_label.configure(
+            text=self.ui_data["pagination"]["label_template"].format(
+                current=self.current_page, total=self.total_pages
+            )
         )
+        self.select_button.configure(text=self.ui_data["buttons"]["select_button"])
+        self.prev_button.configure(state=NORMAL if self.current_page > 1 else DISABLED)
+        self.next_button.configure(state=NORMAL if self.current_page < self.total_pages else DISABLED)
 
     def get_filtered_themes(self, search_query, selected_tag):
-        return [
-            theme
-            for theme in self.theme_manager.get_all_themes()
-            if search_query in theme.title.lower()
-            and (not selected_tag or selected_tag in theme.tags)
+        all_themes = self.theme_manager.get_all_themes()
+        filtered_themes = [
+            theme for theme in all_themes
+            if (search_query in theme.title.lower() or search_query in theme.description.lower()) and
+               (selected_tag in theme.tags if selected_tag else True)
         ]
+        return filtered_themes
 
-    def calculate_total_pages(self, filtered_themes):
-        return (len(filtered_themes) + self.items_per_page - 1) // self.items_per_page
-
-    def add_themes_to_treeview(self, filtered_themes):
-        sorted_themes = sorted(
-            filtered_themes,
-            key=lambda t: getattr(t, self.column_mapping[self.sort_column], ""),  # Use mapped data field
-            reverse=self.sort_order == "desc",
-        )
-        start_index = (self.current_page - 1) * self.items_per_page
-        end_index = min(start_index + self.items_per_page, len(sorted_themes))
-
-        for index, theme in enumerate(sorted_themes[start_index:end_index], start=start_index):
-            row_tag = "oddrow" if index % 2 == 0 else "evenrow"
-            self.tree.insert(
-                "", END, values=(theme.title, theme.description), tags=(row_tag,)
-            )
-
-    def update_pagination_controls(self):
-        self.prev_button.configure(state=NORMAL if self.current_page > 1 else DISABLED)
-        self.next_button.configure(
-            state=NORMAL if self.current_page < self.total_pages else DISABLED
-        )
-        self.page_label.configure(
-            text=f"{self.ui_data['pagination']["label_template"]} {self.current_page} / {self.total_pages}"
-        )
-
-    def sort_column_click(self, column):
-        if self.sort_column == column:
-            self.sort_order = "desc" if self.sort_order == "asc" else "asc"
-        else:
-            self.sort_column = column
-            self.sort_order = "asc"
-        self.update_treeview()
-
-
-    def on_select(self, event):
-        selected_theme = self.tree.focus()
-        self.select_button.configure(state=NORMAL if selected_theme else DISABLED)
+    def on_select(self, event=None):
+        self.select_button.configure(state=NORMAL)
 
     def select_theme(self):
         selected_item = self.tree.selection()
         if selected_item:
-            theme_title = self.tree.item(selected_item[0], "values")[0]
-            self.theme_selected = self.theme_manager.get_theme_by_title(theme_title)
-        self.destroy()
+            theme_title = self.tree.item(selected_item)["values"][0]
+            self.selected_theme = self.theme_manager.get_theme_by_title(theme_title)
+            self.grab_release()
+            self.destroy()
 
     def open_theme_detail(self, event):
         selected_items = self.tree.selection()

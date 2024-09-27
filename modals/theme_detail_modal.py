@@ -192,7 +192,7 @@ class ThemeDetailModal(Toplevel):
         tags_frame.grid(row=2, column=0, sticky="NSEW", pady=(0, 10))
 
         tags_label = CTkLabel(
-            tags_frame, text=self.ui_data["add_tags_widget"]["text"]
+            tags_frame, text=self.ui_data["add_tags_widget"]
         )
         tags_label.pack(anchor="w", padx=10)
 
@@ -222,7 +222,7 @@ class ThemeDetailModal(Toplevel):
 
         link_button = CTkButton(
             buttons_frame,
-            text=self.ui_data["open_theme_page_button"]["text"],
+            text=self.ui_data["open_theme_page_button"],
             text_color="#FFFFFF",
             fg_color="#7D31DF",
             hover_color="#9747FF",
