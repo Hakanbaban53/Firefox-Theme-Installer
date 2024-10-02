@@ -26,8 +26,8 @@ class StatusPage(Frame):
         self.controller = controller
         self.base_dir = base_dir
         UI_DATA_PATH = path.join(base_dir, "language", "pages", "status_page", f"{app_language}.json")
-        PATHS = path.join(base_dir, "data", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "global", "icons.json")
+        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
+        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
         self.paths = load_json_data.load_json_data(PATHS)
@@ -146,7 +146,7 @@ class StatusPage(Frame):
         self.finish_button=self.navigation_button.create_navigation_button(
             parent,
             "finish_button",
-            path.join(self.ASSETS_PATH, "icons/finish.png"),
+            path.join(self.ASSETS_PATH, "finish.png"),
             lambda: InfoModals(self, self.base_dir, "Attention", app_language=self.app_language),
             padding_x=(10, 20),
             side="right",
@@ -156,7 +156,7 @@ class StatusPage(Frame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "back_button",
-            path.join(self.ASSETS_PATH, "icons/back.png"),
+            path.join(self.ASSETS_PATH, "back.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame(
@@ -167,7 +167,7 @@ class StatusPage(Frame):
         self.exit_button=self.navigation_button.create_navigation_button(
             parent,
             "exit_button",
-            path.join(self.ASSETS_PATH, "icons/exit.png"),
+            path.join(self.ASSETS_PATH, "exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
             side="left",
@@ -230,6 +230,7 @@ class StatusPage(Frame):
         install = self.ui_data["install"]
         self.action_label.configure(text=f"{install}  ")
         user_js_src = path.join(self.CACHE_PATH, "fx-autoconfig", "user.js")
+        
         if path.exists(user_js_src):
             self.file_actions.copy_file(user_js_src, self.profile_folder)
 

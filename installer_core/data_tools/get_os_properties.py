@@ -3,22 +3,25 @@ from platform import system
 
 from installer_core.data_tools.load_json_data import LoadJsonData
 
+
 class OSProperties:
     def __init__(self, base_dir):
         """
         Initializes the OSProperties class, loads OS-specific data,
         and determines the current operating system.
-        
+
         :param base_dir: Base directory path for locating the JSON data file.
         """
-        self.os_properties_path = path.join(base_dir, "data", "OS data", "os_properties.json")
+        self.os_properties_path = path.join(
+            base_dir, "data", "local", "OS data", "os_properties.json"
+        )
         self.os_name = self.detect_os()
         self.os_data = self.load_os_data()
 
     def detect_os(self):
         """
         Detects the current operating system.
-        
+
         :return: A string representing the OS: 'windows', 'macos', or 'linux'.
         """
         os_name = system()
@@ -91,4 +94,6 @@ class OSProperties:
 
         :return: A string representing the OS color in hex format.
         """
-        return self.get_values().get("os_color", "#FFFFFF")  # Default to white if not specified
+        return self.get_values().get(
+            "os_color", "#FFFFFF"
+        )  # Default to white if not specified

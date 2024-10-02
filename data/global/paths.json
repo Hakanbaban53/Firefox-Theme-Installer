@@ -1,6 +1,0 @@
-{
-  "ASSETS_PATH": "assets",
-  "THEME_PATH": "themes/",
-  "CUSTOM_SCRIPT_LOADER_URL": "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/remote/fx-autoconfig.json",
-  "CUSTOM_SCRIPT_LOADER_PATH": "data/fx-autoconfig.json"  
-}

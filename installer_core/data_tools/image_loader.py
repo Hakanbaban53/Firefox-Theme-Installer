@@ -49,7 +49,7 @@ class ImageLoader:
 
     def load_os_icon_image(self):
         """Load the OS-specific icon image."""
-        return self.load_image(f"icons/{self.os_name}.png", (20, 24))
+        return self.load_image(f"{self.os_name}.png", (20, 24))
 
     def load_select_action_img(self, icons):
         """Load the select action image."""

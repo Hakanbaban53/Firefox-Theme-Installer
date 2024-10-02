@@ -24,8 +24,8 @@ class RemovePage(Frame):
         UI_DATA_PATH = path.join(
             base_dir, "language", "pages", "remove_page", f"{app_language}.json"
         )
-        PATHS = path.join(base_dir, "data", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "global", "icons.json")
+        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
+        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
         self.paths = load_json_data.load_json_data(PATHS)
@@ -193,7 +193,7 @@ class RemovePage(Frame):
         self.remove_button = self.navigation_button.create_navigation_button(
             parent,
             "remove_button",
-            path.join(self.ASSETS_PATH, "icons/remove.png"),
+            path.join(self.ASSETS_PATH, "remove.png"),
             lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="remove",
@@ -213,7 +213,7 @@ class RemovePage(Frame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "back_button",
-            path.join(self.ASSETS_PATH, "icons/back.png"),
+            path.join(self.ASSETS_PATH, "back.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
@@ -221,7 +221,7 @@ class RemovePage(Frame):
         self.navigation_button.create_navigation_button(
             parent,
             "exit_button",
-            path.join(self.ASSETS_PATH, "icons/exit.png"),
+            path.join(self.ASSETS_PATH, "exit.png"),
             lambda: InfoModals(
                 self, self.base_dir, "Exit", app_language=self.app_language
             ),

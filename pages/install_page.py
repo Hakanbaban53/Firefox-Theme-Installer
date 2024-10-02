@@ -30,8 +30,8 @@ class InstallPage(Frame):
             "install_page",
             f"{app_language}.json",
         )
-        PATHS = path.join(base_dir, "data", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "global", "icons.json")
+        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
+        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
         self.paths = load_json_data.load_json_data(PATHS)
@@ -257,7 +257,7 @@ class InstallPage(Frame):
         self.install_button = self.navigation_button.create_navigation_button(
             parent,
             "install_button",
-            path.join(self.ASSETS_PATH, "icons/install.png"),
+            path.join(self.ASSETS_PATH, "install.png"),
             command=lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="install",
@@ -280,7 +280,7 @@ class InstallPage(Frame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "back_button",
-            path.join(self.ASSETS_PATH, "icons/back.png"),
+            path.join(self.ASSETS_PATH, "back.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
@@ -288,7 +288,7 @@ class InstallPage(Frame):
         self.navigation_button.create_navigation_button(
             parent,
             "exit_button",
-            path.join(self.ASSETS_PATH, "icons/exit.png"),
+            path.join(self.ASSETS_PATH, "exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit", self.app_language),
             padding_x=(20, 10),
             side="left",

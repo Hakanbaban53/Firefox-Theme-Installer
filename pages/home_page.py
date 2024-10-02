@@ -20,8 +20,8 @@ class HomePage(Frame):
         super().__init__(parent)
         # Load the UI data from the JSON file based on the selected language
         UI_DATA_PATH = path.join(base_dir, "language", "pages", "home_page", f"{app_language}.json")
-        PATHS = path.join(base_dir, "data", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "global", "icons.json")
+        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
+        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
         self.paths = load_json_data.load_json_data(PATHS)
@@ -113,7 +113,7 @@ class HomePage(Frame):
         os_label.grid(
             row=2,
             column=0,
-            padx=(175,0),
+            padx=(215,0),
             pady=20,
             sticky="ew",
         )
@@ -126,7 +126,7 @@ class HomePage(Frame):
         os_frame.grid(
             row=2,
             column=1,
-            padx=(0,185),
+            padx=(0,215),
             pady=0,
             sticky="ew",
         )
@@ -230,7 +230,7 @@ class HomePage(Frame):
         self.navigation_button.create_navigation_button(
             navigation_frame,
             "remove_button",
-            path.join(self.ASSETS_PATH, "icons/remove.png"),
+            path.join(self.ASSETS_PATH, "remove.png"),
             lambda: self.controller.show_frame("remove_page"),
             padding_x=(10, 20),
             side="right",
@@ -238,7 +238,7 @@ class HomePage(Frame):
         self.install_button = self.navigation_button.create_navigation_button(
             navigation_frame,
             "install_button",
-            path.join(self.ASSETS_PATH, "icons/install.png"),
+            path.join(self.ASSETS_PATH, "install.png"),
             lambda: self.controller.show_frame(
                 "install_page",
                 theme_dir=(
@@ -255,14 +255,13 @@ class HomePage(Frame):
         self.navigation_button.create_navigation_button(
             navigation_frame,
             "exit_button",
-            path.join(self.ASSETS_PATH, "icons/exit.png"),
+            path.join(self.ASSETS_PATH, "exit.png"),
             lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
             side="left",
         )
 
     def create_file_detection(self):
-
         file_detection = self.ui_data["create_file_detection"]
 
         self.detect_files_frame = CTkFrame(
@@ -334,9 +333,8 @@ class HomePage(Frame):
             font=("Arial", 16, "bold"),
         )
         self.clean_install.grid(
-            row=7,
+            row=0,
             column=0,
-            padx=10,
             pady=10,
             sticky="", 
         )
@@ -350,6 +348,13 @@ class HomePage(Frame):
             fg_color="#FFFFFF",
             image=self.reload_icon,
         )
+        self.recheck_button.grid(
+            row=0,
+            column=0,
+            pady=10,
+            sticky="",
+        )
+        self.recheck_button.lower()
 
     def start_loading_animation(self):
         """Start the loading GIF animation."""
@@ -407,6 +412,8 @@ class HomePage(Frame):
         )
         self.install_button.configure(state="disabled")
         self.install_files_button.grid_remove()
+        self.clean_install.lower()
+        self.recheck_button.lower()
 
 
     def update_ui_for_selected_theme(self):
@@ -480,7 +487,9 @@ class HomePage(Frame):
         )
         self.recheck_button.configure(
             state="normal",
-            command=self.get_theme)
+            command=self.get_theme
+            )
+        self.recheck_button.lift()
         self.install_files_button.configure(
             image=self.check_icon,
             text=handle_userChrome_theme["install_files_button"],
@@ -490,13 +499,7 @@ class HomePage(Frame):
             width=150,
         )       
         self.check_var = BooleanVar(value=False)
-        self.recheck_button.grid(
-            row=1,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="",
-        )
+        self.recheck_button.lift()
         self.clean_install.lower()
 
     def no_theme_data_found(self):
@@ -540,13 +543,7 @@ class HomePage(Frame):
             image=self.check_icon,
         )
         self.install_button.configure(state="normal")
-        self.recheck_button.grid(
-            row=7,
-            column=1,
-            padx=10,
-            pady=10,
-            sticky="",
-        )
+        self.recheck_button.lift()
         self.clean_install.lower()
 
     def handle_missing_files(self):
@@ -566,13 +563,7 @@ class HomePage(Frame):
             pady=10,
             sticky="",
         )
-        self.recheck_button.grid(
-            row=7,
-            column=1,
-            padx=10,
-            pady=10,
-            sticky="",
-        )
+        self.recheck_button.lift()
 
     def install_files(self):
         """Open modal to install missing files and recheck afterward."""
@@ -628,14 +619,9 @@ class HomePage(Frame):
         file_manager = FileManager(self.data_json_path)
         self.recheck_button.configure(
             state="normal",
-            command=self.refetch_files)
-        self.recheck_button.grid(
-            row=7,
-            column=1,
-            padx=10,
-            pady=10,
-            sticky="",
+            command=self.refetch_files
         )
+        self.recheck_button.lift()
 
         if file_manager.json_data:
             self.thread_manager.start_thread(self.locate_files, on_finish=self.stop_loading_animation)
@@ -664,13 +650,7 @@ class HomePage(Frame):
             text_color="#f04141",
             state="disabled",
         )
-        self.clean_install.grid(
-            row=7,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="",
-        )
+        self.clean_install.lift()
 
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed

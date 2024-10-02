@@ -59,7 +59,7 @@ class MultiPageApp(Tk):
         )
         self.image_frame.place(x=0, y=0)
 
-        image_loader = ImageLoader(path.join(self.base_dir, "assets", "backgrounds"))
+        image_loader = ImageLoader(path.join(self.base_dir, "assets"))
         installer_img = image_loader.load_installer_img("installer_img.png")
         
         installer_version = self.base_data["installer_version"]

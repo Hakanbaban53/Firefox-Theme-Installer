@@ -1,5 +1,5 @@
 from installer_core.data_tools.load_json_data import LoadJsonData
-
+from re import search
 
 class Theme:
     def __init__(self, title, link, description, image, tags):
@@ -26,7 +26,7 @@ class Theme:
         :return: A complete URL to the image.
         """
         base_url = 'https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/'
-        if image_path.startswith(('https://', 'http://')):
+        if image_path != None and image_path.startswith(('https://', 'http://')):
             return image_path
         return f"{base_url}{image_path}"
 
@@ -43,7 +43,6 @@ class Theme:
             "image": self.image,
             "tags": self.tags,
         }
-
 
 class ThemeManager:
     def __init__(self, json_file_path, json_file_url):
@@ -67,7 +66,6 @@ class ThemeManager:
         load_json_data = LoadJsonData(json_file_url)
         json_data = load_json_data.load_json_data(json_file_path)
         return [Theme(**theme_data) for theme_data in json_data if self.validate_theme_data(theme_data)]
-
 
     @staticmethod
     def validate_theme_data(theme_data):
@@ -105,3 +103,57 @@ class ThemeManager:
         :return: A list of Theme objects that contain the specified tag.
         """
         return [theme for theme in self.themes if tag in theme.tags]
+    
+    def get_filtered_themes(self, search_query, selected_tag):
+        """
+        Retrieves themes that match the search query and selected tag.
+
+        :param search_query: The search query to filter themes by.
+        :param selected_tag: The tag to filter themes by.
+        :return: A list of Theme objects that match the search query and selected tag.
+        """
+        return [
+            theme
+            for theme in self.themes
+            if search_query in theme.title.lower()
+            and (not selected_tag or selected_tag in theme.tags)
+        ]
+    
+    def short_themes(self, themes, column, sort_order):
+        """
+        Sorts themes based on the specified column and sort order.
+
+        :param themes: A list of Theme objects to sort.
+        :param column: The column to sort by.
+        :param sort_order: The order to sort the themes in.
+        :return: A list of sorted Theme objects.
+        """
+        return sorted(
+            themes,
+            key=lambda t: getattr(t, column, ""),
+            reverse=sort_order == "desc",
+        )
+    
+    def is_valid_custom_theme(self, url):
+        """
+        Validates a custom theme URL by checking if it is a valid URL.
+
+        :param url: The URL to validate.
+        :return: True if the URL is valid, False otherwise.
+        """
+        allowed_domains = ["github.com", "gitlab.com", "codeberg.org", "git.gay"]
+        return any(domain in url for domain in allowed_domains)
+    
+    def extract_repo_name(self, url):
+        """
+        Extracts the repository name from a GitHub/GitLab URL.
+
+        :param url: The URL of the theme's repository.
+        :return: The repository name (e.g., RealFire from https://github.com/Hakanbaban53/RealFire/).
+        """
+        # Regular expression to extract the repo name (last part of the URL)
+        match = search(r'/([^/]+)/?$', url)
+        if match:
+            return match.group(1)
+        return "Custom"  # Default to "Custom" if no match is found
+    

@@ -7,7 +7,7 @@ class SetWindowIcon:
 
     def set_window_icon(self, window):
         """Set the window icon based on the operating system."""
-        icon_path = path.join(self.base_dir, "assets", "icons", "firefox.ico")
+        icon_path = path.join(self.base_dir, "assets", "firefox.ico")
         try:
             if name == "nt":
                 window.iconbitmap(icon_path)

@@ -9,12 +9,19 @@
     "select_button": "Temayı Seç",
     "error_button": "Yeniden Dene",
     "loading_button": "Yükleniyor...",
+    "custom_select_button": "Özel Temayı Seç",
+    "empty_custom_theme": "Özel tema seçilmedi",
+    "invalid_custom_theme": "Geçersiz özel tema",
     "pagination": {
       "prev_button": "Önceki",
       "next_button": "Sonraki"
     }
   },
-  "retrying": "Tekrar deneniyor...",
+  "custom_theme": {
+    "checkbox_label": "Özel Tema",
+    "custom_theme_title": "Özel tema URL'nizi girin:",
+    "supported_version_controllers": "Desteklenen Sürüm Kontrolcüleri: Github, GitLab, CodeBerg, GitGay"
+  },  "retrying": "Tekrar deneniyor...",
   "detail_info_text": "Tema detaylarını görmek için çift tıklayın",
   "tags": "Filtrele",
   "error_messages": {

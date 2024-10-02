@@ -8,7 +8,7 @@ class NavigationButton:
     def __init__(self, base_dir, app_language):
         load_json_data = LoadJsonData()
         NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, "data", "components", "navigation_buttons", "data.json"
+            base_dir, "data", "local", "components", "navigation_buttons", "data.json"
         )
         self.navigation_button_data = load_json_data.load_json_data(
             NAVIGATION_BUTTON_DATA_PATH

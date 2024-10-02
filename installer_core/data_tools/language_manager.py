@@ -1,6 +1,6 @@
-import json
-import os
-import locale
+from os import path, makedirs
+from locale import getdefaultlocale
+from json import dump, load
 
 from installer_core.data_tools.get_os_properties import OSProperties
 
@@ -20,7 +20,7 @@ class LanguageManager:
         self.supported_languages = supported_languages
         self.language_names = language_names  # Map codes to names (e.g. {'en': 'English', 'tr': 'Türkçe'})
         self.fallback_language = fallback_language
-        self.config_file = os.path.join(self.CACHE_PATH, config_file)
+        self.config_file = path.join(self.CACHE_PATH, config_file)
         self.system_language = self.detect_system_language()
         self.current_language = self.load_language()  # Load saved language if available
 
@@ -30,7 +30,7 @@ class LanguageManager:
 
         :return: A string representing the system's language code (e.g., 'en', 'fr', etc.).
         """
-        system_locale = locale.getdefaultlocale()[0]  # Returns a tuple (language_code, encoding)
+        system_locale = getdefaultlocale()[0]  # Returns a tuple (language_code, encoding)
         if system_locale:
             language_code = system_locale.split('_')[0]  # Extract the language part ('en_US' -> 'en')
             return language_code
@@ -55,13 +55,19 @@ class LanguageManager:
 
     def save_language(self, language_code):
         """
-        Saves the selected language to a JSON config file.
+        Saves the selected language to a JSON config file. Creates the directory if it doesn't exist.
 
         :param language_code: The language code to save.
         """
+        # Ensure the directory exists
+        makedirs(path.dirname(self.config_file), exist_ok=True)
+
+        # Save the language to the config file
         with open(self.config_file, 'w') as file:
-            json.dump({"language": language_code}, file)
+            dump({"language": language_code}, file)
+        
         self.current_language = language_code
+
 
     def load_language(self):
         """
@@ -70,9 +76,9 @@ class LanguageManager:
 
         :return: The loaded or default language code.
         """
-        if os.path.exists(self.config_file):
+        if path.exists(self.config_file):
             with open(self.config_file, 'r') as file:
-                config = json.load(file)
+                config = load(file)
                 saved_language = config.get("language")
                 if saved_language in self.supported_languages:
                     return saved_language
