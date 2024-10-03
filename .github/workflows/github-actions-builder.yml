@@ -254,7 +254,7 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
 
       - name: Upload Linux AppImage
         uses: softprops/action-gh-release@v1
@@ -270,7 +270,7 @@ jobs:
           files: |
             Theme-Installer-Windows.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
 
     #   - name: Upload macOS DMG
     #     uses: softprops/action-gh-release@v1
@@ -279,5 +279,5 @@ jobs:
     #       files: |
     #         RealFire-Installer-MacOS.dmg
     #     env:
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #       GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
 
