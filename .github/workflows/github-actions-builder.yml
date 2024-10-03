@@ -89,17 +89,17 @@ jobs:
 
           chmod +x Firefox-Theme-Installer.AppDir/AppRun
 
-          cat << 'EOF' > Firefox-Theme-Installer.AppDir/RealFire.desktop
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/Firefox-Theme-Installer.desktop
           [Desktop Entry]
           Type=Application
-          Name=RealFire Installer
+          Name=Firefox Theme Installer
           Exec=start_app.sh
           Icon=firefox
-          Comment=RealFire Installer
+          Comment=Firefox Theme Installer
           Categories=Utility;
           EOF
 
-          chmod +x Firefox-Theme-Installer.AppDir/RealFire.desktop
+          chmod +x Firefox-Theme-Installer.AppDir/Firefox-Theme-Installer.desktop
 
           cat << 'EOF' > Firefox-Theme-Installer.AppDir/usr/bin/start_app.sh
           #!/bin/bash
