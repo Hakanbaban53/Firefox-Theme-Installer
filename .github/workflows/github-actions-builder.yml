@@ -40,13 +40,13 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile ./main.py --name RealFire-Installer-Linux --hidden-import='PIL._tkinter_finder' --add-data="../RealFire-Installer/assets:assets" --add-data="../RealFire-Installer/language:language" --add-data="../RealFire-Installer/data/local:data/local" --hidden-import='PIL._tkinter_finder' --noconsole
+          pyinstaller --onefile ./main.py --name Firefox-Theme-Installer-Linux --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/assets:assets" --add-data="../Firefox-Theme-Installer/language:language" --add-data="../Firefox-Theme-Installer/data/local:data/local" --hidden-import='PIL._tkinter_finder' --noconsole
 
       - name: Upload Linux executable
         uses: actions/upload-artifact@v3
         with:
           name: linux-executable
-          path: dist/RealFire-Installer-Linux
+          path: dist/Firefox-Theme-Installer-Linux
       - name: Upload firefox icon
         uses: actions/upload-artifact@v3
         with:
@@ -75,11 +75,11 @@ jobs:
 
       - name: Package into AppImage
         run: |
-          mkdir -p RealFire-Installer.AppDir/usr/bin
-          cp RealFire-Installer-Linux RealFire-Installer.AppDir/usr/bin/
-          cp firefox.png RealFire-Installer.AppDir/
+          mkdir -p Firefox-Theme-Installer.AppDir/usr/bin
+          cp Firefox-Theme-Installer-Linux Firefox-Theme-Installer.AppDir/usr/bin/
+          cp firefox.png Firefox-Theme-Installer.AppDir/
 
-          cat << 'EOF' > RealFire-Installer.AppDir/AppRun
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/AppRun
           #!/bin/bash
           SELF=$(readlink -f "$0")
           HERE=${SELF%/*}
@@ -87,9 +87,9 @@ jobs:
           exec "${EXEC}"
           EOF
 
-          chmod +x RealFire-Installer.AppDir/AppRun
+          chmod +x Firefox-Theme-Installer.AppDir/AppRun
 
-          cat << 'EOF' > RealFire-Installer.AppDir/RealFire.desktop
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/RealFire.desktop
           [Desktop Entry]
           Type=Application
           Name=RealFire Installer
@@ -99,12 +99,12 @@ jobs:
           Categories=Utility;
           EOF
 
-          chmod +x RealFire-Installer.AppDir/RealFire.desktop
+          chmod +x Firefox-Theme-Installer.AppDir/RealFire.desktop
 
-          cat << 'EOF' > RealFire-Installer.AppDir/usr/bin/start_app.sh
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/usr/bin/start_app.sh
           #!/bin/bash
           APPIMAGE_DIR=$(dirname "$(realpath "$0")")
-          APP_EXECUTABLE="${APPIMAGE_DIR}/RealFire-Installer-Linux"
+          APP_EXECUTABLE="${APPIMAGE_DIR}/Firefox-Theme-Installer-Linux"
           if [ ! -f "$APP_EXECUTABLE" ]; then
               echo "Error: App executable not found: $APP_EXECUTABLE"
               exit 1
@@ -112,18 +112,18 @@ jobs:
           env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" "$APP_EXECUTABLE" "$@"
           EOF
 
-          chmod +x RealFire-Installer.AppDir/usr/bin/start_app.sh
+          chmod +x Firefox-Theme-Installer.AppDir/usr/bin/start_app.sh
 
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x ./appimagetool-x86_64.AppImage
-          ARCH=x86_64 ./appimagetool-x86_64.AppImage RealFire-Installer.AppDir RealFire-Installer.AppImage
+          ARCH=x86_64 ./appimagetool-x86_64.AppImage Firefox-Theme-Installer.AppDir Firefox-Theme-Installer.AppImage
         shell: bash
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v3
         with:
-          name: Theme-Installer-Linux.AppImage
-          path: RealFire-Installer.AppImage
+          name: Firefox-Theme-Installer.AppImage
+          path: Firefox-Theme-Installer.AppImage
 
   build-windows:
     runs-on: windows-latest
@@ -145,11 +145,11 @@ jobs:
 
         - name: Build with PyInstaller
           run: |
-            pyinstaller --onefile .\main.py --name Theme-Installer-Windows --icon=../RealFire-Installer/assets/firefox.ico --add-data "..\RealFire-Installer\assets:assets" --add-data "..\RealFire-Installer\language:language" --add-data "..\RealFire-Installer\data\local:data\local" --noconsole
+            pyinstaller --onefile .\main.py --name Firefox-Theme-Installer --icon=../Firefox-Theme-Installer/assets/firefox.ico --add-data "..\Firefox-Theme-Installer\assets:assets" --add-data "..\Firefox-Theme-Installer\language:language" --add-data "..\Firefox-Theme-Installer\data\local:data\local" --noconsole
 
         - name: Create self-signed certificate
           run: |
-            openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=RealFire"
+            openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=Firefox-Theme-Installer"
             openssl pkcs12 -export -out cert.pfx -inkey key.pem -in cert.pem -passout pass:password
 
         - name: Install Windows SDK
@@ -160,14 +160,14 @@ jobs:
         - name: Sign the executable
           run: |
             $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\x64"
-            signtool sign /f cert.pfx /p password /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\Theme-Installer-Windows.exe
+            signtool sign /f cert.pfx /p password /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\Firefox-Theme-Installer.exe
           shell: powershell
 
         - name: Upload signed executable
           uses: actions/upload-artifact@v3
           with:
-            name: Theme-Installer-Windows.exe
-            path: dist\Theme-Installer-Windows.exe
+            name: Firefox-Theme-Installer.exe
+            path: dist\Firefox-Theme-Installer.exe
 
 
 #   build-macos:
@@ -190,13 +190,13 @@ jobs:
 
 #       - name: Build with PyInstaller
 #         run: |
-#           pyinstaller --onefile ./main.py --name RealFire-Installer-MacOS --hidden-import='PIL._tkinter_finder' --add-data="../RealFire-Installer/assets:assets" --add-data="../RealFire-Installer/language:language" --add-data="../RealFire-Installer/data/local:data/local" --noconsole
+#           pyinstaller --onefile ./main.py --name Firefox-Theme-Installer-MacOS --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/assets:assets" --add-data="../Firefox-Theme-Installer/language:language" --add-data="../Firefox-Theme-Installer/data/local:data/local" --noconsole
 
 #       - name: Upload macOS executable
 #         uses: actions/upload-artifact@v3
 #         with:
 #           name: theme-installer-macos
-#           path: dist/RealFire-Installer-MacOS
+#           path: dist/Firefox-Theme-Installer-MacOS
 
 #   package-to-dmg:
 #     runs-on: macos-latest
@@ -214,14 +214,14 @@ jobs:
 
 #       - name: Package into DMG
 #         run: |
-#           create-dmg dist/RealFire-Installer-MacOS RealFire-Installer-MacOS.dmg
+#           create-dmg dist/Firefox-Theme-Installer-MacOS Firefox-Theme-Installer-MacOS.dmg
 #         shell: bash
 
 #       - name: Upload DMG
 #         uses: actions/upload-artifact@v3
 #         with:
-#           name: RealFire-Installer-MacOS.dmg
-#           path: RealFire-Installer-MacOS.dmg
+#           name: Firefox-Theme-Installer-MacOS.dmg
+#           path: Firefox-Theme-Installer-MacOS.dmg
 
   create-release:
     runs-on: ubuntu-latest
@@ -236,48 +236,61 @@ jobs:
       - name: Download Linux AppImage
         uses: actions/download-artifact@v3
         with:
-          name: Theme-Installer-Linux.AppImage
+          name: Firefox-Theme-Installer.AppImage
+          path: ./
 
       - name: Download Windows Executable
         uses: actions/download-artifact@v3
         with:
-          name: Theme-Installer-Windows.exe
+          name: Firefox-Theme-Installer.exe
+          path: ./
+
+      - name: Read info
+        id: tags
+        shell: bash
+        run: |
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
+          echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: actions/create-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
         with:
-          name: Release ${{ github.ref }}
+          tag_name: ${{ steps.tags.outputs.TAG }}
+          release_name: Release ${{ steps.tags.outputs.TAG }}
           body: |
-            ## Changes in this release
-            - Add a brief description of the changes or features included in this release.
+            Release ${{ steps.tags.outputs.tag }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
 
       - name: Upload Linux AppImage
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            RealFire-Installer-Linux.AppImage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Windows Executable
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            Theme-Installer-Windows.exe
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Firefox-Theme-Installer.AppImage
+          asset_name: Firefox-Theme-Installer-Linux.AppImage
+          asset_content_type: application/x-executable
+
+      - name: Upload Windows Executable
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Firefox-Theme-Installer.exe
+          asset_name: Firefox-Theme-Installer.exe
+          asset_content_type: application/x-msdownload
 
     #   - name: Upload macOS DMG
     #     uses: softprops/action-gh-release@v1
     #     with:
     #       tag: ${{ github.ref }}
     #       files: |
-    #         RealFire-Installer-MacOS.dmg
+    #         /home/runner/work/Firefox-Theme-Installer/Firefox-Theme-Installer/Firefox-Theme-Installer-MacOS.dmg
     #     env:
     #       GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
 
