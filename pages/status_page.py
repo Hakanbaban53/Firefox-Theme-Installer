@@ -1,52 +1,57 @@
-from os import path
-from json import load
-from threading import Thread
+from os import listdir, makedirs, path
+from json import dump
 from customtkinter import (
     CTkFrame,
-    CTkImage,
     CTkLabel,
-    CTkFont,
     CTkTextbox,
-    CTkButton,
     CTkProgressBar,
 )
-from PIL import Image
-from modals.combined_modal import CombinedModal
-from functions.edit_file_variables import VariableUpdater
-from functions.get_os_properties import OSProperties
-from functions.install_files import FileActions
+from tkinter import Frame
+
+from components.create_header import CreateHeader
+from components.create_navigation_button import NavigationButton
+from installer_core.component_tools.thread_manager import ThreadManager
+from installer_core.data_tools.get_os_properties import OSProperties
+from installer_core.data_tools.image_loader import ImageLoader
+from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.file_utils.file_actions import FileActions
+from modals.info_modals import InfoModals
 
 
-class StatusPage(CTkFrame):
-    def __init__(self, parent, controller, base_dir):
+class StatusPage(Frame):
+    def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
+        # Load the UI data from the JSON file
+        self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
+        UI_DATA_PATH = path.join(base_dir, "language", "pages", "status_page", f"{app_language}.json")
+        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
+        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
+        load_json_data = LoadJsonData()
+        self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
+        self.paths = load_json_data.load_json_data(PATHS)
+        self.icons = load_json_data.load_json_data(ICONS)
 
-        self.ICON_PATH = path.join(base_dir, "assets", "icons")
-        self.BACKGROUND_PATH = path.join(base_dir, "assets", "backgrounds")
-        self.DATA_PATH = path.join(base_dir, "data", "installer_data.json")
+        self.thread_manager = ThreadManager()
 
-        self.file_actions = FileActions(self.DATA_PATH)
+        # Set the paths
+        self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
+
+        self.os_properties = OSProperties(base_dir)
+        self.os_values = self.os_properties.get_values()
+
+        self.CACHE_PATH = self.os_properties.get_cache_location()
+
+        self.navigation_button = NavigationButton(base_dir=base_dir, app_language=app_language)
+
         self.come_from_which_page = None
 
-        self.os_values = OSProperties(self.DATA_PATH).get_values()
-        self.load_text_data()
-        self.button_data = self.text_data.get("common_values")["navigation_buttons"]
+        self.file_actions = FileActions(self.os_values["os_name"])
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         self.configure_layout()
         self.create_widgets()
-
-    def load_text_data(self):
-        with open(self.DATA_PATH, "r", encoding="utf-8") as file:
-            self.text_data = load(file)
-
-    def load_image(self, file_name, size):
-        return CTkImage(
-            light_image=Image.open(file_name),
-            dark_image=Image.open(file_name),
-            size=size,
-        )
 
     def configure_layout(self):
         self.status_page_frame = CTkFrame(
@@ -57,32 +62,29 @@ class StatusPage(CTkFrame):
         self.status_page_frame.columnconfigure(0, weight=1)
 
     def create_widgets(self):
+        self.create_images()
         self.create_header()
         self.create_action_status()
         self.create_progress_bar()
         self.create_output_entry()
         self.create_bottom_widgets()
 
+    def create_images(self):
+        self.check_icon = self.image_loader.load_check_icon(self.icons)
+        self.os_icon_image = self.image_loader.load_os_icon_image()
+        self.header_title_bg = self.image_loader.load_header_title_bg(
+            self.icons,
+        )
+        self.line_top_img = self.image_loader.load_line_top_img(self.icons)
+
     def create_header(self):
-        header_title_bg = self.load_image(
-            path.join(self.BACKGROUND_PATH, "header_title_background.png"), (250, 64)
-        )
-        line_top_img = self.load_image(path.join(self.BACKGROUND_PATH, "line_top.png"), (650, 6))
+        header = CreateHeader()
 
-        header_label = CTkLabel(
+        self.header_label, self.line_top_label = header.create_header(
             self.status_page_frame,
-            text="Status",
-            image=header_title_bg,
-            text_color="White",
-            font=CTkFont(family="Inter", size=24, weight="bold"),
-        )
-        header_label.grid(
-            row=0, column=0, columnspan=2, padx=273, pady=(75, 0), sticky="NSEW"
-        )
-
-        line_top_label = CTkLabel(self.status_page_frame, text="", image=line_top_img)
-        line_top_label.grid(
-            row=1, column=0, columnspan=2, padx=10, pady=(20, 30), sticky="NSEW"
+            header_title_bg=self.header_title_bg,
+            line_top_img=self.line_top_img,
+            text=self.ui_data["header_label"],
         )
 
     def create_action_status(self):
@@ -93,19 +95,22 @@ class StatusPage(CTkFrame):
             text="",
             image=None,
             compound="right",
-            font=CTkFont(family="Inter", size=18, weight="bold"),
+            font=("Arial", 18, "bold"),
         )
-        self.action_label.grid(row=2, column=0, padx=60, pady=(14, 2), sticky="W")
+        self.action_label.grid(row=2, column=0, padx=60, pady=(14, 2), sticky="NSEW")
 
     def create_progress_bar(self):
         self.progress_bar = CTkProgressBar(
             self.status_page_frame,
+            width=650,
             orientation="horizontal",
             height=24,
             fg_color="#666666",
             progress_color="#9747FF",
         )
-        self.progress_bar.grid(row=3, column=0, padx=50, pady=10, sticky="NSEW")
+        self.progress_bar.grid(
+            row=3, column=0, padx=80, pady=10, sticky="NSEW"
+        )  # This widget centering the frame. :d
         self.progress_bar.set(0)
 
     def create_output_entry(self):
@@ -138,72 +143,37 @@ class StatusPage(CTkFrame):
         self.create_os_info(bottom_frame)
 
     def create_navigation_buttons(self, parent):
-        self.create_navigation_button(
+        self.finish_button=self.navigation_button.create_navigation_button(
             parent,
-            "Finish",
-            path.join(self.ICON_PATH, "finish_icon.png"),
-            lambda: CombinedModal(self, self.base_dir, "Attention"),
+            "finish_button",
+            path.join(self.ASSETS_PATH, "finish.png"),
+            lambda: InfoModals(self, self.base_dir, "Attention", app_language=self.app_language),
             padding_x=(10, 20),
             side="right",
             img_side="right",
         )
 
-        self.back_button = self.create_navigation_button(
+        self.back_button = self.navigation_button.create_navigation_button(
             parent,
-            "Back",
-            path.join(self.ICON_PATH, "back_icon.png"),
+            "back_button",
+            path.join(self.ASSETS_PATH, "back.png"),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame(
                 f"{self.come_from_which_page}_page"
             ),
-            state="disabled",
+            state="Normal",
         )
-        self.create_navigation_button(
+        self.exit_button=self.navigation_button.create_navigation_button(
             parent,
-            "Exit",
-            path.join(self.ICON_PATH, "exit_icon.png"),
-            lambda: CombinedModal(self, self.base_dir, "Exit"),
+            "exit_button",
+            path.join(self.ASSETS_PATH, "exit.png"),
+            lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
             padding_x=(20, 10),
             side="left",
         )
 
-    def create_navigation_button(
-        self,
-        parent,
-        text,
-        image_path,
-        command,
-        padding_x,
-        side,
-        img_side="left",
-        **kwargs,
-    ):
-        button_image = self.load_image(image_path, (20, 20))
-        button = CTkButton(
-            parent,
-            width=float(self.button_data["width"]),
-            height=float(self.button_data["height"]),
-            corner_radius=float(self.button_data["corner_radius"]),
-            bg_color=self.button_data["bg_color"],
-            fg_color=self.button_data["fg_color"],
-            hover_color=self.button_data["hover_color"],
-            text_color=self.button_data["text_color"],
-            font=(self.button_data["font_family"], int(self.button_data["font_size"])),
-            image=button_image,
-            text=text,
-            compound=img_side,
-            command=command,
-            **kwargs,
-        )
-        button.pack(padx=padding_x, pady=10, side=side)
-        return button
-
     def create_os_info(self, parent):
-        os_icon_image = self.load_image(
-            path.join(self.ICON_PATH, f"{self.os_values['os_name'].lower()}.png"), (20, 24)
-        )
-
         os_frame = CTkFrame(parent, corner_radius=12, fg_color="white")
         os_frame.grid(row=0, column=0, padx=20, sticky="W")
 
@@ -212,93 +182,103 @@ class StatusPage(CTkFrame):
             text=f"{self.os_values['os_name']} ",
             text_color=self.os_values["os_color"],
             font=("Arial", 20, "bold"),
-            image=os_icon_image,
+            image=self.os_icon_image,
             compound="right",
         )
         os_label.pack(padx=10, pady=10, side="right")
 
-    def update_text(self):
+    def update_text_2(self):
+        update_text = self.ui_data["update_text"]
         if self.come_from_which_page == "install":
             self.action_label.configure(
-                text="Installed  ",
-                image=self.load_image(path.join(self.ICON_PATH, "check.png"), (20, 20)),
+                text=f"{update_text["install"]}  ",
+                image=self.check_icon,
                 compound="right",
             )
         elif self.come_from_which_page == "remove":
             self.action_label.configure(
-                text="Removed  ",
-                image=self.load_image(path.join(self.ICON_PATH, "check.png"), (20, 20)),
+                text=f"{update_text["remove"]}  ",
+                image=self.check_icon,
                 compound="right",
             )
 
     def update_parameters(self, **kwargs):
         self.come_from_which_page = kwargs.get("come_from_which_page")
-        profile_folder = kwargs.get("profile_folder")
-        application_folder = kwargs.get("application_folder")
-        new_tab_wallpaper = kwargs.get("new_tab_wallpaper")
-        accent_color = kwargs.get("accent_color")
+        self.profile_folder = kwargs.get("profile_folder")
+        self.application_folder = kwargs.get("application_folder")
+        self.base_dir = kwargs.get("base_dir")
+        self.theme_dir = kwargs.get("theme_dir")
+        self.custom_script_loader = kwargs.get("custom_script_loader")
+        self.selected_theme_data = kwargs.get("selected_theme_data")
+        self.chrome_folder = path.join(self.profile_folder, "chrome")
 
+        # Decide which function to call based on the page source
         if self.come_from_which_page == "install":
-            self.action_label.configure(text="Installing...")
-
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "config.js"), application_folder
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "mozilla.cfg"), application_folder,
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "config-prefs.js"),
-                path.join(application_folder, "defaults", "pref"),
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "local-settings.js"),
-                path.join(application_folder, "defaults", "pref"),
-            )
-            self.file_actions.move_folder(
-                path.join(self.base_dir, "chrome"), profile_folder
-            )
-            self.file_actions.move_file(
-                path.join(self.base_dir, "fx-autoconfig", "user.js"), profile_folder
-            )
-
-
-            if new_tab_wallpaper != "Default Wallpaper" and new_tab_wallpaper is not None:
-                self.file_actions.move_existing_file(
-                    new_tab_wallpaper,
-                    path.join(profile_folder, "chrome", "img", "new_tab_wallpaper.jpg"),
-                )
-
-            VariableUpdater(
-                path.join(self.base_dir, "chrome", "includes", "realfire-colours.css")
-            ).update_variable("--accent-color", accent_color)
-
+            self.install()
         elif self.come_from_which_page == "remove":
-            self.action_label.configure(text="Removing...")
+            self.remove()
 
-            self.file_actions.remove_file(path.join(application_folder, "config.js"))
-            self.file_actions.remove_file(path.join(application_folder, "mozilla.cfg"))
-            self.file_actions.remove_file(
-                path.join(application_folder, "defaults", "pref", "config-prefs.js")
-            )
-            self.file_actions.remove_file(
-                path.join(application_folder, "defaults", "pref", "local-settings.js")
-            )
-            self.file_actions.remove_file(path.join(profile_folder, "user.js"))
-            self.file_actions.remove_folder(path.join(profile_folder, "chrome"))
-
-        operation_thread = Thread(
-            target=self.file_actions.execute_operations,
-            args=(self.progress_bar, self.output_entry),
+        self.thread_manager.start_thread(
+            self.file_actions.execute_operations,
+            self.progress_bar,
+            self.output_entry,
+            on_finish=self.update_text_2,
         )
-        operation_thread.start()
 
-        self.after(500, self.update_text)
+    def install(self):
+        # Handles the installation process
+        install = self.ui_data["install"]
+        self.action_label.configure(text=f"{install}  ")
+        user_js_src = path.join(self.CACHE_PATH, "fx-autoconfig", "user.js")
+        
+        if path.exists(user_js_src):
+            self.file_actions.copy_file(user_js_src, self.profile_folder)
 
-        # For Testing
-        # self.back_button.configure(
-        #     command=lambda: self.controller.show_frame(
-        #         f"{self.come_from_which_page}_page"
-        #     ),
-        # )
+        if self.custom_script_loader:
+            self.file_actions.copy_file(
+                path.join(self.CACHE_PATH, "fx-autoconfig", "config.js"),
+                self.application_folder,
+            )
+            self.file_actions.copy_file(
+                path.join(self.CACHE_PATH, "fx-autoconfig", "mozilla.cfg"),
+                self.application_folder,
+            )
+            self.file_actions.copy_file(
+                path.join(self.CACHE_PATH, "fx-autoconfig", "config-prefs.js"),
+                path.join(self.application_folder, "defaults", "pref"),
+            )
+            self.file_actions.copy_file(
+                path.join(self.CACHE_PATH, "fx-autoconfig", "local-settings.js"),
+                path.join(self.application_folder, "defaults", "pref"),
+            )
+
+        # Copy all other files and folders into the chrome folder (excluding user.js)
+        for item in listdir(self.theme_dir):
+            src_path = path.join(self.theme_dir, item)
+            dest_path = path.join(self.chrome_folder, item)  # Copy into chrome folder
+            if path.isdir(src_path):
+                self.file_actions.copy_folder(src_path, dest_path)
+            elif path.isfile(src_path) and item != "user.js":
+                makedirs(path.dirname(dest_path), exist_ok=True)
+                self.file_actions.copy_file(src_path, dest_path)
+
+        theme_data_path = path.join(self.chrome_folder, "selected_theme_data.json")
+        with open(theme_data_path, "w") as json_file:
+            dump(self.selected_theme_data, json_file, indent=4)
+
+    def remove(self):
+        remove = self.ui_data["remove"]
+        # Handles the removal process
+        self.action_label.configure(text=f"{remove}  ")
+
+        self.file_actions.remove_file(path.join(self.application_folder, "config.js"))
+        self.file_actions.remove_file(path.join(self.application_folder, "mozilla.cfg"))
+        self.file_actions.remove_file(
+            path.join(self.application_folder, "defaults", "pref", "config-prefs.js")
+        )
+        self.file_actions.remove_file(
+            path.join(self.application_folder, "defaults", "pref", "local-settings.js")
+        )
+        self.file_actions.remove_file(path.join(self.profile_folder, "user.js"))
+        self.file_actions.remove_folder(path.join(self.profile_folder, "chrome"))
 

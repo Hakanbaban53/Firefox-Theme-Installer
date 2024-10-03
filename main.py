@@ -1,132 +1,137 @@
-import os
-import ctypes
-from json import load
-from sys import exit
 import sys
-from customtkinter import CTk, CTkImage, CTkLabel, CTkFont, CTkFrame, CTkButton
-from PIL import Image, ImageTk
-from modals.combined_modal import CombinedModal
+from os import path
+from tkinter import Frame, Tk
+from customtkinter import CTkLabel, CTkOptionMenu
+
+from components.set_window_icon import SetWindowIcon
+from installer_core.data_tools.image_loader import ImageLoader
+from installer_core.data_tools.language_manager import LanguageManager
+from installer_core.data_tools.load_json_data import LoadJsonData
+from installer_core.window_tools.center_window import CenterWindow
+from modals.info_modals import InfoModals
 from pages.home_page import HomePage
 from pages.install_page import InstallPage
 from pages.remove_page import RemovePage
 from pages.status_page import StatusPage
 
 
-class MultiPageApp(CTk):
+class ThemeInstaller(Tk):
+    SUPPORTED_LANGUAGES = ["en", "tr"]
+    LANGUAGE_NAMES = {"en": "English", "tr": "Türkçe"}
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Determine base directory using _MEIPASS or current script directory
-        self.base_dir = getattr(
-            sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
-        )  # Also I send the other pages and functions this path.
+        self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
+        self.language_manager = LanguageManager(
+            self.base_dir,
+            self.SUPPORTED_LANGUAGES,
+            self.LANGUAGE_NAMES,
+            fallback_language="en",
+        )
+        self.app_language = self.language_manager.get_language()
 
-        if not self.is_admin():
-            self.show_admin_error(self)
-            exit()
+        base_data_path = path.join(
+            self.base_dir, "language", "app", f"{self.app_language}.json"
+        )
+        self.base_data = LoadJsonData().load_json_data(base_data_path)
 
-        installer_data_path = os.path.join(self.base_dir, "data", "installer_data.json")
-        with open(installer_data_path, "r", encoding="utf-8") as file:
-            self.text_data = load(file)
+        self.current_frame = None
 
-        self.title(self.text_data["common_values"]["installer_info"]["installer_title"])
+        self.configure_layout()
+        self.create_widgets()
+        self.show_frame("home_page")
+
+    def configure_layout(self):
+        """Set window title, geometry, and icon."""
+        installer_title = self.base_data["installer_title"]
+        self.title(installer_title)
         self.geometry("1115x666")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
+        SetWindowIcon(self.base_dir).set_window_icon(self)
+        CenterWindow(self).center_window()
 
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        if os.name == "nt":
-            self.iconbitmap(icon_path)
-        else:
-            icon = Image.open(icon_path)
-            self.iconphoto(True, ImageTk.PhotoImage(icon))
+    def create_widgets(self):
+        """Create image label and container frame for page content."""
+        self.create_image_label()
+        self.create_page_container()
 
-        self.center_window()
-
-        self.installer_img = CTkImage(
-            light_image=Image.open(
-                os.path.join(
-                    self.base_dir, "assets", "backgrounds", "installer_img.png"
-                )
-            ),
-            dark_image=Image.open(
-                os.path.join(
-                    self.base_dir, "assets", "backgrounds", "installer_img.png"
-                )
-            ),
-            size=(315, 666),
+    def create_image_label(self):
+        """Create and place the image label with a background image."""
+        self.image_frame = Frame(
+            master=self,
+            width=315,
+            height=666,
         )
+        self.image_frame.place(x=0, y=0)
 
-        self.installer_img_label = CTkLabel(
-            self,
-            text=self.text_data["common_values"]["installer_info"]["installer_version"],
+        image_loader = ImageLoader(path.join(self.base_dir, "assets"))
+        installer_img = image_loader.load_installer_img("installer_img.png")
+
+        installer_version = self.base_data["installer_version"]
+        self.background_label = CTkLabel(
+            self.image_frame,
+            image=installer_img,
+            text=installer_version,
             text_color="white",
-            image=self.installer_img,
-            font=CTkFont(family="Inter", size=14),
+            font=("Inter", 14),
         )
-        self.installer_img_label.place(x=0, y=0)  # Place image label at (0, 0)
+        self.background_label.pack(fill="both", expand=True)
 
-        self.container = CTkFrame(self)
-        self.container.pack(side="top", fill="both", expand=True)
+        language_names = [
+            self.LANGUAGE_NAMES[lang] for lang in self.SUPPORTED_LANGUAGES
+        ]
+        self.language_button = CTkOptionMenu(
+            self.image_frame,
+            values=language_names,  # Display user-friendly names
+            command=self.change_language,  # Call the change_language method when a language is selected
+            bg_color="#2B2631",
+            font=("Inter", 12),
+        )
+        self.language_button.set(self.LANGUAGE_NAMES[self.app_language])
+        self.language_button.place(relx=0.5, rely=0.95, anchor="center")
+
+    def change_language(self, selected_language):
+        """
+        Change the application language based on the selected language.
+
+        :param selected_language: The user-friendly language name selected from the OptionMenu.
+        """
+        if (
+            selected_language in self.LANGUAGE_NAMES.values()
+            and selected_language != self.LANGUAGE_NAMES[self.app_language]
+        ):
+            language_code = [
+                lang
+                for lang, name in self.LANGUAGE_NAMES.items()
+                if name == selected_language
+            ][0]
+            self.language_manager.save_language(language_code)
+            self.app_language = language_code
+            InfoModals(
+                self, self.base_dir, "language_change", app_language=self.app_language
+            )
+
+    def create_page_container(self):
+        """Create a container to hold all the frames (pages) of the application."""
+        self.container = Frame(self, bg="#2B2631")
+        self.container.pack(fill="both", expand=True)
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
         self.frames = {}
 
     def create_frame(self, page_class):
-        frame = page_class(self.container, self, self.base_dir)
-
-        frame.configure(
-            fg_color="#2B2631",
-            corner_radius=0,
-        )
-
+        """Create and return a new frame for the specified page class, passing the current language."""
+        frame = page_class(self.container, self, self.base_dir, self.app_language)
+        frame.configure(bg="#2B2631")
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
 
-    def slide_to_frame(self, current_frame, next_frame, x, speed=35, direction=None):
-        if direction is None:
-            current_index = list(self.frames.values()).index(current_frame)
-            next_index = list(self.frames.values()).index(next_frame)
-            direction = "left" if current_index > next_index else "right"
-
-        if direction == "right":
-            next_x = self.winfo_width() - x
-            current_x = -x + 315
-        else:
-            next_x = x - self.winfo_width() + 625
-            current_x = x + 2 * 315
-
-        next_frame.place(x=next_x, y=0, relwidth=1, relheight=1)
-        current_frame.place(x=current_x, y=0, relwidth=1, relheight=1)
-
-        next_frame.lift()
-        self.update()
-
-        if direction == "left" and x <= self.winfo_width() - 315:
-            self.after(
-                1,
-                self.slide_to_frame,
-                current_frame,
-                next_frame,
-                x + speed,
-                speed,
-                direction,
-            )
-        elif direction == "right" and x <= self.winfo_width() - 315:
-            self.after(
-                1,
-                self.slide_to_frame,
-                current_frame,
-                next_frame,
-                x + speed,
-                speed,
-                direction,
-            )
-        else:
-            current_frame.place_forget()
-
     def show_frame(self, page_name, **kwargs):
-        self.installer_img_label.lift()
+        """Display the frame associated with the given page name, sliding it into view."""
+        self.image_frame.lift()
 
+        # Map page name to its corresponding class
         page_class = {
             "home_page": HomePage,
             "install_page": InstallPage,
@@ -134,103 +139,94 @@ class MultiPageApp(CTk):
             "status_page": StatusPage,
         }.get(page_name)
 
-        if page_class:
-            if page_class not in self.frames:
-                self.frames[page_class] = self.create_frame(page_class)
+        if not page_class:
+            print(f"Page '{page_name}' not found.")
+            return
 
-            current_frame = None
-            for frame in self.frames.values():
-                if frame.winfo_ismapped():
-                    current_frame = frame
-                    break
+        # If the frame does not exist yet, create it
+        if page_class not in self.frames:
+            self.frames[page_class] = self.create_frame(page_class)
 
-            next_frame = self.frames[page_class]
-            if current_frame is not None:
-                self.slide_to_frame(current_frame, next_frame, 0)
+        current_frame = self.get_current_frame()
+        next_frame = self.frames[page_class]
+
+        if current_frame:
+            direction = (
+                "left" if self.is_left_direction(current_frame, next_frame) else "right"
+            )
+            self.slide_to_frame(
+                current_frame, next_frame, 0, speed=20, direction=direction
+            )
+        else:
+            next_frame.place(x=315, y=0, relwidth=1, relheight=1)
+
+        next_frame.update_parameters(**kwargs)
+        next_frame.tkraise()
+
+        self.current_frame = next_frame
+
+    def get_current_frame(self):
+        """Return the currently visible frame."""
+        for frame in self.frames.values():
+            if frame.winfo_ismapped():
+                return frame
+        return None
+
+    def slide_to_frame(
+        self, current_frame, next_frame, x=0, speed=20, direction="left"
+    ):
+        # Determine slide directions based on relative positions
+        window_width = self.winfo_width()
+        target_x = 0 if direction == "left" else window_width + 315
+
+        # Apply easing for smoother sliding effect
+        def ease_in_out(t):
+            return 3 * (t**2) - 2 * (t**3)
+
+        next_frame.place(
+            x=target_x + window_width if direction == "left" else -window_width,
+            y=0,
+            relwidth=1,
+            relheight=1,
+        )
+        next_frame.lift()
+        self.update()
+
+        def slide_step(position):
+            ease_position = int(ease_in_out(position / window_width) * window_width)
+            current_pos = (
+                ease_position + 315
+                if direction == "left"
+                else window_width - ease_position
+            )
+
+            # Position frames based on easing calculation
+            next_frame.place(x=target_x - (window_width - current_pos), y=0)
+            (
+                current_frame.place(x=current_pos, y=0)
+                if direction == "left"
+                else current_frame.place(x=current_pos - 800, y=0)
+            )
+
+            if position < window_width:
+                self.after(5, slide_step, position + speed)
             else:
+                current_frame.place_forget()
                 next_frame.place(x=315, y=0, relwidth=1, relheight=1)
 
-            next_frame.update_parameters(**kwargs)
-            next_frame.tkraise()
+        slide_step(x)
 
-    def is_admin(self):
-        try:
-            if os.name == "nt":  # Windows
-                try:
-                    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-                except AttributeError:
-                    is_admin = False
-                return is_admin
-            else:  # Unix-like systems
-                return os.getuid() == 0
-        except Exception as e:
-            print(f"Error checking admin rights: {e}")
-            return False
+    def is_left_direction(self, current_frame, next_frame):
+        """Determine if the sliding direction is left based on frame order."""
+        return list(self.frames.values()).index(current_frame) > list(
+            self.frames.values()
+        ).index(next_frame)
 
     def exit_confirmation(self):
-        CombinedModal(self, self.base_dir, "Exit")
-
-    def center_window(self):
-        self.update_idletasks()
-
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-
-        self.geometry("+{}+{}".format(x, y))
-
-    def show_admin_error(self, master):
-        master.title("Admin Error")
-        master.geometry("300x150")
-        master.configure(fg_color="#2B2631")
-        master.resizable(False, False)
-
-        icon_path = os.path.join(self.base_dir, "assets", "icons", "firefox.ico")
-        if os.name == "nt":
-            self.iconbitmap(icon_path)
-        else:
-            icon = Image.open(icon_path)
-            self.iconphoto(True, ImageTk.PhotoImage(icon))
-
-        label = CTkLabel(
-            master,
-            text="Administrative privileges are required.",
-            text_color="white",
-            font=CTkFont(family="Segoe UI", size=15),
-        )
-        label.pack(padx=20, pady=20)
-
-        ok_button = CTkButton(
-            master,
-            text="OK",
-            text_color="white",
-            command=exit,
-            bg_color="#2B2631",
-            fg_color="#f04141",
-            font=("Arial", 14),
-        )
-        ok_button.pack(pady=10)
-
-        # Bind the close event to the exit function
-        master.protocol("WM_DELETE_WINDOW", exit)
-
-        # Center the master window
-        master.update_idletasks()
-        width = master.winfo_width()
-        height = master.winfo_height()
-        x = (master.winfo_screenwidth() // 2) - (width // 2)
-        y = (master.winfo_screenheight() // 2) - (height // 2)
-        master.geometry(f"{width}x{height}+{x}+{y}")
-
-        master.grab_set()
-        master.mainloop()
+        """Display exit confirmation modal."""
+        InfoModals(self, self.base_dir, "Exit", app_language=self.app_language)
 
 
 if __name__ == "__main__":
-    app = MultiPageApp()
-    app.show_frame("home_page")
+    app = ThemeInstaller()
     app.mainloop()

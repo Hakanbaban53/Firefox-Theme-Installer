@@ -1,0 +1,35 @@
+{
+  "search_bar": {
+    "placeholder_text": "Search theme..."
+  },
+  "treeview": {
+    "columns": ["Title", "Description"]
+  },
+  "buttons": {
+    "select_button": "Select Theme",
+    "error_button": "Retry",
+    "loading_button": "Loading...",
+    "custom_select_button": "Select Custom Theme",
+    "empty_custom_theme": "No custom theme selected",
+    "invalid_custom_theme": "Invalid custom theme",
+    "pagination": {
+      "prev_button": "Previous",
+      "next_button": "Next"
+    }
+  },
+  "custom_theme": {
+    "checkbox_label": "Custom Theme",
+    "custom_theme_title": "Enter your custom theme URL:",
+    "supported_version_controllers": "Supported Version Controllers: Github, GitLab, CodeBerg, GitGay"
+  },
+  "retrying": "Retrying...",
+  "detail_info_text": "Double-click to see theme details",
+  "tags": "Filter",
+  "error_messages": {
+    "no_themes": "No themes available. Please check your theme source or internet connection.",
+    "retry_failed": "Retry failed:"
+  },
+  "pagination": {
+    "label_template": "Page"
+  }
+}

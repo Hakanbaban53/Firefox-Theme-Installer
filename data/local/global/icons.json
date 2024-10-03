@@ -1,0 +1,14 @@
+{
+  "attention_icon": "attention.png",
+  "check_icon": "check.png",
+  "install_files_icon": "install.png",
+  "preview_icon": "preview_icon.png",
+  "theme_not_selected_icon": "theme-not-selected.png",
+  "theme_selected_icon": "theme-selected.png",
+  "header_title_bg": "header_title_background.png",
+  "line_top_img": "line_top.png",
+  "reload_icon": "reload_icon.png",
+  "remove_icon": "remove.png",
+  "exit_icon": "exit.png",
+  "block_spin_gif": "block_spin.gif"
+}

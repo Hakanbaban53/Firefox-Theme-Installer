@@ -1,0 +1,32 @@
+{
+  "windows": {
+    "os_name": "Windows",
+    "os_color": "#357EC7",
+    "default_locations": {
+      "application_folder": "C:\\Program Files\\Mozilla Firefox",
+      "firefox_folder": "%APPDATA%\\Mozilla\\Firefox"
+    },
+    "preview_location": "%LOCALAPPDATA%\\Temp\\firefox_theme_preview",
+    "cache_location": "%LOCALAPPDATA%\\Firefox Theme Installer"
+  },
+  "linux": {
+    "os_name": "Linux",
+    "os_color": "#F06F27",
+    "default_locations": {
+      "application_folder": "/usr/lib64/firefox",
+      "firefox_folder": "/home/$USER/.mozilla/firefox"
+    },
+    "preview_location": "/tmp/firefox_theme_preview",
+    "cache_location": "~/.cache/Firefox Theme Installer"
+  },
+  "macos": {
+    "os_name": "macOS",
+    "os_color": "#000000",
+    "default_locations": {
+      "application_folder": "/Applications/Firefox.app/Contents/MacOS/Firefox",
+      "firefox_folder": "/Library/Application Support/Firefox"
+    },
+    "preview_location": "/tmp/firefox_theme_preview",
+    "cache_location": "~/.cache/Firefox Theme Installer"
+  }
+}

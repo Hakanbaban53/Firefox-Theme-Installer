@@ -1,0 +1,9 @@
+{
+  "header_label": "Installation Status",
+  "update_text": {
+    "install": "Installation is successful",
+    "remove": "Removal is successful"
+  },
+  "install": "Installing",
+  "remove": "Removing"
+}

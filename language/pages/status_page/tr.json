@@ -1,0 +1,9 @@
+{
+  "header_label":"Yükleme Durumu",
+  "update_text": {
+    "install": "Yükleme başarılı",
+    "remove": "Kaldırma başarılı"
+  },
+  "install": "Yükleniyor",
+  "remove": "Kaldırılıyor"
+}

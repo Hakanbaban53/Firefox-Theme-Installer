@@ -23,7 +23,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile .\main.py --icon=assets\icons\firefox.ico --add-data "data\installer_data.json;data" --add-data "assets\icons;assets/icons" --add-data "assets\backgrounds;assets/backgrounds" --noconsole
+          pyinstaller --onefile .\main.py --icon=../Firefox-Theme-Installer/assets/icons/firefox.ico --add-data "..\Firefox-Theme-Installer\assets:assets" --add-data "..\Firefox-Theme-Installer\language:language" --add-data "..\Firefox-Theme-Installer\data\local:data\local" --noconsole
 
       - name: Install Windows SDK
         run: |

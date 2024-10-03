@@ -1,0 +1,9 @@
+{
+  "header_label": "Kaldırma Yapılandırmasını Kontrol Edin",
+  "create_invalid_entry_frame": {
+    "invalid_entries_text": ""
+  },
+  "update_button_and_frame": {
+    "invalid_entries_text": " girdi geçersiz"
+  }
+}
