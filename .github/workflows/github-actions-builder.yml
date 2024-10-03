@@ -75,6 +75,7 @@ jobs:
 
       - name: Package into AppImage
         run: |
+          chmod +x Firefox-Theme-Installer-Linux
           mkdir -p Firefox-Theme-Installer.AppDir/usr/bin
           cp Firefox-Theme-Installer-Linux Firefox-Theme-Installer.AppDir/usr/bin/
           cp firefox.png Firefox-Theme-Installer.AppDir/
