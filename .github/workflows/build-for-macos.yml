@@ -23,7 +23,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile main.py --icon=assets/icons/firefox.ico --add-data "data/installer_data.json:data" --add-data "assets/icons:assets/icons" --add-data "assets/backgrounds:assets/backgrounds"
+          pyinstaller --onefile ./main.py --hidden-import='PIL._tkinter_finder' --add-data="../RealFire-Installer/assets:assets" --add-data="../RealFire-Installer/language:language" --add-data="../RealFire-Installer/data/local:data/local" --hidden-import='PIL._tkinter_finder' --noconsole
 
       - name: Upload macOS build artifact
         uses: actions/upload-artifact@v3

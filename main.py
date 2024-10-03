@@ -15,17 +15,24 @@ from pages.remove_page import RemovePage
 from pages.status_page import StatusPage
 
 
-class MultiPageApp(Tk):
+class ThemeInstaller(Tk):
     SUPPORTED_LANGUAGES = ["en", "tr"]
     LANGUAGE_NAMES = {"en": "English", "tr": "Türkçe"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
-        self.language_manager = LanguageManager(self.base_dir ,self.SUPPORTED_LANGUAGES, self.LANGUAGE_NAMES, fallback_language='en')
+        self.language_manager = LanguageManager(
+            self.base_dir,
+            self.SUPPORTED_LANGUAGES,
+            self.LANGUAGE_NAMES,
+            fallback_language="en",
+        )
         self.app_language = self.language_manager.get_language()
 
-        base_data_path = path.join(self.base_dir, "language", "app", f"{self.app_language}.json")
+        base_data_path = path.join(
+            self.base_dir, "language", "app", f"{self.app_language}.json"
+        )
         self.base_data = LoadJsonData().load_json_data(base_data_path)
 
         self.current_frame = None
@@ -49,7 +56,6 @@ class MultiPageApp(Tk):
         self.create_image_label()
         self.create_page_container()
 
-
     def create_image_label(self):
         """Create and place the image label with a background image."""
         self.image_frame = Frame(
@@ -61,18 +67,20 @@ class MultiPageApp(Tk):
 
         image_loader = ImageLoader(path.join(self.base_dir, "assets"))
         installer_img = image_loader.load_installer_img("installer_img.png")
-        
+
         installer_version = self.base_data["installer_version"]
         self.background_label = CTkLabel(
             self.image_frame,
             image=installer_img,
             text=installer_version,
             text_color="white",
-            font=("Inter", 14)
+            font=("Inter", 14),
         )
         self.background_label.pack(fill="both", expand=True)
 
-        language_names = [self.LANGUAGE_NAMES[lang] for lang in self.SUPPORTED_LANGUAGES]
+        language_names = [
+            self.LANGUAGE_NAMES[lang] for lang in self.SUPPORTED_LANGUAGES
+        ]
         self.language_button = CTkOptionMenu(
             self.image_frame,
             values=language_names,  # Display user-friendly names
@@ -86,15 +94,24 @@ class MultiPageApp(Tk):
     def change_language(self, selected_language):
         """
         Change the application language based on the selected language.
-        
+
         :param selected_language: The user-friendly language name selected from the OptionMenu.
         """
-        if selected_language in self.LANGUAGE_NAMES.values() and selected_language != self.LANGUAGE_NAMES[self.app_language]:
-            language_code = [lang for lang, name in self.LANGUAGE_NAMES.items() if name == selected_language][0]
+        if (
+            selected_language in self.LANGUAGE_NAMES.values()
+            and selected_language != self.LANGUAGE_NAMES[self.app_language]
+        ):
+            language_code = [
+                lang
+                for lang, name in self.LANGUAGE_NAMES.items()
+                if name == selected_language
+            ][0]
             self.language_manager.save_language(language_code)
             self.app_language = language_code
-            InfoModals(self, self.base_dir, "language_change", app_language=self.app_language)
-        
+            InfoModals(
+                self, self.base_dir, "language_change", app_language=self.app_language
+            )
+
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
         self.container = Frame(self, bg="#2B2631")
@@ -134,8 +151,12 @@ class MultiPageApp(Tk):
         next_frame = self.frames[page_class]
 
         if current_frame:
-            direction = "left" if self.is_left_direction(current_frame, next_frame) else "right"
-            self.slide_to_frame(current_frame, next_frame, 0, speed=20, direction=direction)
+            direction = (
+                "left" if self.is_left_direction(current_frame, next_frame) else "right"
+            )
+            self.slide_to_frame(
+                current_frame, next_frame, 0, speed=20, direction=direction
+            )
         else:
             next_frame.place(x=315, y=0, relwidth=1, relheight=1)
 
@@ -197,12 +218,15 @@ class MultiPageApp(Tk):
 
     def is_left_direction(self, current_frame, next_frame):
         """Determine if the sliding direction is left based on frame order."""
-        return list(self.frames.values()).index(current_frame) > list(self.frames.values()).index(next_frame)
+        return list(self.frames.values()).index(current_frame) > list(
+            self.frames.values()
+        ).index(next_frame)
 
     def exit_confirmation(self):
         """Display exit confirmation modal."""
         InfoModals(self, self.base_dir, "Exit", app_language=self.app_language)
 
+
 if __name__ == "__main__":
-    app = MultiPageApp()
+    app = ThemeInstaller()
     app.mainloop()
