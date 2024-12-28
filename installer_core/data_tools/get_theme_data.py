@@ -2,7 +2,7 @@ from installer_core.data_tools.load_json_data import LoadJsonData
 from re import search
 
 class Theme:
-    def __init__(self, title, link, description, image, tags):
+    def __init__(self, title, link, description, image, tags, **kwargs):
         """
         Initialize a Theme instance with title, link, description, image URL, and tags.
 
@@ -17,6 +17,7 @@ class Theme:
         self.description = description
         self.image = self.convert_image_url(image)
         self.tags = tags
+        # Ignore any additional keyword arguments
 
     def convert_image_url(self, image_path):
         """
