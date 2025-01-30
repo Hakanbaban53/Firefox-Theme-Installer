@@ -2,10 +2,10 @@ from tkinter import Toplevel, Label
 from customtkinter import CTkButton
 from os import path
 
-from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.window_tools.center_window import CenterWindow
+from UI.components.set_window_icon import SetWindowIcon
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.load_json_data import LoadJsonData
+from core.window_tools.center_window import CenterWindow
 
 
 class InfoModals(Toplevel):
@@ -21,6 +21,7 @@ class InfoModals(Toplevel):
         super().__init__(parent)
         INFO_MODALS_DATA_PATH = path.join(
             base_dir,
+            "data",
             "language",
             "modals",
             "info_modals",
@@ -72,9 +73,9 @@ class InfoModals(Toplevel):
         elif self.modal_key in ["attention_modal", "language_change_modal"]:
             self.create_attention_exit_button()
         else:
-            self.create_button(self.button_data["ok_button"], "#10dc60", self.cancel_action).pack(
-                pady=20
-            )
+            self.create_button(
+                self.button_data["ok_button"], "#10dc60", self.cancel_action
+            ).pack(pady=20)
 
     def create_label(self, text):
         """Create a label for the modal."""
@@ -102,7 +103,9 @@ class InfoModals(Toplevel):
     def create_attention_exit_button(self):
         """Create Ok button for attention modal."""
         self.protocol("WM_DELETE_WINDOW", self.ok_action)
-        self.create_button(self.button_data["ok_button"], "#10dc60", self.ok_action).pack(pady=20)
+        self.create_button(
+            self.button_data["ok_button"], "#10dc60", self.ok_action
+        ).pack(pady=20)
 
     def create_button(self, text, fg_color, command):
         """Create a CTkButton with specified text, color, and command."""

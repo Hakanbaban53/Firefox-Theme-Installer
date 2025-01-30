@@ -3,23 +3,23 @@ from os import path
 from tkinter import BooleanVar, PhotoImage, Label, TclError, Frame
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkCheckBox
 
-from components.create_header import CreateHeader
-from components.create_navigation_button import NavigationButton
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.get_os_properties import OSProperties
-from installer_core.data_tools.image_loader import ImageLoader
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.file_utils.detect_and_download_files import FileManager
-from installer_core.file_utils.get_the_theme_files import ThemeDownloader
-from modals.check_files_modal import FileInstallerModal
-from modals.info_modals import InfoModals
-from modals.theme_modal import ThemeModal
+from UI.components.create_header import CreateHeader
+from UI.components.create_navigation_button import NavigationButton
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.get_os_properties import OSProperties
+from core.data_tools.image_loader import ImageLoader
+from core.data_tools.load_json_data import LoadJsonData
+from core.file_utils.detect_and_download_files import FileManager
+from core.file_utils.get_the_theme_files import ThemeDownloader
+from UI.modals.check_files_modal import FileInstallerModal
+from UI.modals.info_modals import InfoModals
+from UI.modals.theme_modal import ThemeModal
 
 class HomePage(Frame):
     def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file based on the selected language
-        UI_DATA_PATH = path.join(base_dir, "language", "pages", "home_page", f"{app_language}.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "language", "pages", "home_page", f"{app_language}.json")
         PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()

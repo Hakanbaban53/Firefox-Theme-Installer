@@ -1,7 +1,7 @@
 from os import path
 from platform import system
 
-from installer_core.data_tools.load_json_data import LoadJsonData
+from core.data_tools.load_json_data import LoadJsonData
 
 
 class OSProperties:

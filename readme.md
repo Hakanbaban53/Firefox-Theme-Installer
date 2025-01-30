@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <br>
-  <a><img src="Readme Images/pages/home.png" alt="Firefox Theme Installer" width="800"></a>
+  <a><img src="assets/pages/home.png" alt="Firefox Theme Installer" width="800"></a>
   <br>
   Firefox Theme Installer
   <br>
@@ -23,29 +23,29 @@
 <details><summary>Pages</summary>
 
 <h3 align="center">Install Page</h3>
-<p align="center" style="max-heigh:250px"><img src="Readme Images/pages/install.png"></p>
+<p align="center" style="max-heigh:250px"><img src="assets/pages/install.png"></p>
 
 <h3 align="center">Remove Page</h3>
-<p align="center" style="max-heigh:250px"><img src="Readme Images/pages/remove.png"></p>
+<p align="center" style="max-heigh:250px"><img src="assets/pages/remove.png"></p>
 
 <h3 align="center">Status Page</h3>
-<p align="center" style="max-heigh:300px"><img src="Readme Images/pages/status.png"></p>
+<p align="center" style="max-heigh:300px"><img src="assets/pages/status.png"></p>
 
 </details>
 
 <details><summary>Modals</summary>
 
 <h3 align="center">Themes Modal</h3>
-<p align="center" style="max-heigh:150px"><img src="Readme Images/modals/themes.png"></p>
+<p align="center" style="max-heigh:150px"><img src="assets/modals/themes.png"></p>
 
 <h3 align="center">Theme Detail</h3>
-<p align="center" style="max-heigh:150px"><img src="Readme Images/modals/theme_details.png"></p>
+<p align="center" style="max-heigh:150px"><img src="assets/modals/theme_details.png"></p>
 
 <h3 align="center">Json Theme Handler</h3>
-<p align="center" style="max-heigh:150px"><img src="Readme Images/modals/json_theme_handler.png"></p>
+<p align="center" style="max-heigh:150px"><img src="assets/modals/json_theme_handler.png"></p>
 
 <h3 align="center">Info Modals</h3>
-<p align="center" style="max-heigh:150px"><img src="Readme Images/modals/attention.png"><img src="Readme Images/modals/exit.png"></p>
+<p align="center" style="max-heigh:150px"><img src="assets/modals/attention.png"><img src="assets/modals/exit.png"></p>
 
 </details>
 
@@ -147,8 +147,8 @@ You can [download](https://github.com/Hakanbaban53/Firefox-Theme-Installer/relea
 │   ├── install_page.py
 │   ├── remove_page.py
 │   └── status_page.py
-├── Readme Images
-│   └── Readme images png format
+├── assets
+│   └── assets png format
 └── readme.md
 ```
 

@@ -1,9 +1,9 @@
 from os import path, makedirs, listdir
 from subprocess import Popen, run, CalledProcessError
-# from logging import basicConfig, info, error, warning, INFO
 
-from installer_core.data_tools.get_os_properties import OSProperties
-from installer_core.file_utils.file_actions import FileActions
+from core.data_tools.get_os_properties import OSProperties
+from core.file_utils.file_actions import FileActions
+# from logging import basicConfig, info, error, warning, INFO
 
 # Configure logging
 # basicConfig(level=INFO, format='%(asctime)s - %(levelname)s - %(message)s')

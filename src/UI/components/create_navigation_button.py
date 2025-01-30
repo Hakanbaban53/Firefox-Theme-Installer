@@ -2,7 +2,8 @@ from os import path
 from PIL import Image
 from customtkinter import CTkButton, CTkImage
 
-from installer_core.data_tools.load_json_data import LoadJsonData
+from core.data_tools.load_json_data import LoadJsonData
+
 
 class NavigationButton:
     def __init__(self, base_dir, app_language):
@@ -15,7 +16,12 @@ class NavigationButton:
         )
         self.base_dir = base_dir
         NAVIGATION_BUTTON_TEXT = path.join(
-            base_dir, "language", "components", "navigation_buttons", f"{app_language}.json"
+            base_dir,
+            "data",
+            "language",
+            "components",
+            "navigation_buttons",
+            f"{app_language}.json",
         )
         self.navigation_button_text = load_json_data.load_json_data(
             NAVIGATION_BUTTON_TEXT
@@ -32,7 +38,15 @@ class NavigationButton:
         img_side="left",
         **kwargs,
     ):
-        button_image = CTkImage(light_image=Image.open(image_path), dark_image=Image.open(image_path), size=(20, 20)) if image_path else None
+        button_image = (
+            CTkImage(
+                light_image=Image.open(image_path),
+                dark_image=Image.open(image_path),
+                size=(20, 20),
+            )
+            if image_path
+            else None
+        )
 
         button = CTkButton(
             parent,
@@ -43,9 +57,16 @@ class NavigationButton:
             fg_color=self.navigation_button_data["fg_color"],
             hover_color=self.navigation_button_data["hover_color"],
             text_color=self.navigation_button_data["text_color"],
-            font=(self.navigation_button_data["font_family"], int(self.navigation_button_data["font_size"])),
+            font=(
+                self.navigation_button_data["font_family"],
+                int(self.navigation_button_data["font_size"]),
+            ),
             image=button_image,
-            text=self.navigation_button_text[text] if text in self.navigation_button_text else text,
+            text=(
+                self.navigation_button_text[text]
+                if text in self.navigation_button_text
+                else text
+            ),
             compound=img_side,
             command=command,
             **kwargs,

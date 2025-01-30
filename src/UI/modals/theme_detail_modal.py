@@ -14,18 +14,17 @@ from io import BytesIO
 from webbrowser import open as openweb
 from requests import get, RequestException
 
-from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.get_os_properties import OSProperties
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.window_tools.center_window import CenterWindow
+from UI.components.set_window_icon import SetWindowIcon
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.get_os_properties import OSProperties
+from core.data_tools.load_json_data import LoadJsonData
+from core.window_tools.center_window import CenterWindow
 
 class ThemeDetailModal(Toplevel):
     def __init__(self, parent, theme, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(
-            base_dir, "language", "modals", "theme_detail_modal", f"{app_language}.json"
+        UI_DATA_PATH = path.join(base_dir, "data", "language", "modals", "theme_detail_modal", f"{app_language}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)

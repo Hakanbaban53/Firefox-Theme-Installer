@@ -3,12 +3,12 @@ from tkinter import Toplevel, Label, Frame, BOTH
 from tkinter import ttk
 from customtkinter import CTkButton, CTkFrame
 
-from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.file_utils.detect_and_download_files import FileManager
-from installer_core.window_tools.center_window import CenterWindow
-from modals.info_modals import InfoModals
+from UI.components.set_window_icon import SetWindowIcon
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.load_json_data import LoadJsonData
+from core.file_utils.detect_and_download_files import FileManager
+from core.window_tools.center_window import CenterWindow
+from UI.modals.info_modals import InfoModals
 
 
 class FileInstallerModal(Toplevel):
@@ -16,7 +16,12 @@ class FileInstallerModal(Toplevel):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "language", "modals", "check_files_modal", f"{app_language}.json"
+            base_dir,
+            "data",
+            "language",
+            "modals",
+            "check_files_modal",
+            f"{app_language}.json",
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)

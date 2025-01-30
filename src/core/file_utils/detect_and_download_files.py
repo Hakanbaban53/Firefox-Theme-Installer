@@ -2,7 +2,8 @@ from os import path, makedirs
 from requests import get, exceptions
 from concurrent.futures import ThreadPoolExecutor
 
-from installer_core.data_tools.load_json_data import LoadJsonData
+from core.data_tools.load_json_data import LoadJsonData
+
 
 # Uncomment and configure logging if needed
 # from logging import basicConfig, INFO, info, error

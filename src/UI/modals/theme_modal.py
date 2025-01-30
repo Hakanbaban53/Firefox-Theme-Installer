@@ -2,20 +2,19 @@ from os import path
 from tkinter import BooleanVar, StringVar, ttk, Toplevel, DISABLED, LEFT, END, NORMAL, BOTH
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkEntry, CTkCheckBox
 
-from components.set_window_icon import SetWindowIcon
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.get_theme_data import ThemeManager
-from installer_core.data_tools.get_theme_data import Theme
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.window_tools.center_window import CenterWindow
-from modals.theme_detail_modal import ThemeDetailModal
+from UI.components.set_window_icon import SetWindowIcon
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.get_theme_data import Theme, ThemeManager
+from core.data_tools.load_json_data import LoadJsonData
+from core.window_tools.center_window import CenterWindow
+from UI.modals.theme_detail_modal import ThemeDetailModal
 
 
 class ThemeModal(Toplevel):
     def __init__(self, parent, base_dir, cache_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "language", "modals", "theme_modal", f"{app_language}.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "language", "modals", "theme_modal", f"{app_language}.json")
         THEME_DATA_PATH = path.join(
             base_dir, "data", "local", "modals", "theme_modal", "data.json"
         )

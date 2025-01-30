@@ -1,17 +1,24 @@
 from os import path
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.get_theme_data import Theme
-from installer_core.data_tools.load_json_data import LoadJsonData
-from modals.theme_detail_modal import ThemeDetailModal
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.get_theme_data import Theme
+from core.data_tools.load_json_data import LoadJsonData
+from UI.modals.theme_detail_modal import ThemeDetailModal
 
 
 class DetectInstalledTheme:
-    def __init__(self, parent, chrome_folder, theme_detected_icon, base_dir, app_language):
+    def __init__(
+        self, parent, chrome_folder, theme_detected_icon, base_dir, app_language
+    ):
         self.json_loader = LoadJsonData(json_file_url=None)
         UI_DATA_PATH = path.join(
-            base_dir, "language", "components", "detect_installed_theme", f"{app_language}.json"
+            base_dir,
+            "data",
+            "language",
+            "components",
+            "detect_installed_theme",
+            f"{app_language}.json",
         )
         self.ui_data = self.json_loader.load_json_data(UI_DATA_PATH)
 
@@ -71,7 +78,7 @@ class DetectInstalledTheme:
                 self.parent,
                 theme=self.theme_data,
                 base_dir=self.base_dir,
-                app_language=self.app_language
+                app_language=self.app_language,
             ),
         )
 

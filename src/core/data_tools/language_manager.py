@@ -2,7 +2,7 @@ from os import path, makedirs
 from locale import getdefaultlocale
 from json import dump, load
 
-from installer_core.data_tools.get_os_properties import OSProperties
+from core.data_tools.get_os_properties import OSProperties
 
 
 class LanguageManager:

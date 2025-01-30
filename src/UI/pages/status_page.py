@@ -8,14 +8,14 @@ from customtkinter import (
 )
 from tkinter import Frame
 
-from components.create_header import CreateHeader
-from components.create_navigation_button import NavigationButton
-from installer_core.component_tools.thread_manager import ThreadManager
-from installer_core.data_tools.get_os_properties import OSProperties
-from installer_core.data_tools.image_loader import ImageLoader
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.file_utils.file_actions import FileActions
-from modals.info_modals import InfoModals
+from UI.components.create_header import CreateHeader
+from UI.components.create_navigation_button import NavigationButton
+from core.component_tools.thread_manager import ThreadManager
+from core.data_tools.get_os_properties import OSProperties
+from core.data_tools.image_loader import ImageLoader
+from core.data_tools.load_json_data import LoadJsonData
+from core.file_utils.file_actions import FileActions
+from UI.modals.info_modals import InfoModals
 
 
 class StatusPage(Frame):
@@ -25,7 +25,7 @@ class StatusPage(Frame):
         self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
-        UI_DATA_PATH = path.join(base_dir, "language", "pages", "status_page", f"{app_language}.json")
+        UI_DATA_PATH = path.join(base_dir, "data", "language", "pages", "status_page", f"{app_language}.json")
         PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
         ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()

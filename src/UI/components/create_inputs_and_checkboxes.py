@@ -1,7 +1,8 @@
 from os import path
 from tkinter import BooleanVar
-from installer_core.data_tools.load_json_data import LoadJsonData
 from customtkinter import CTkFrame, CTkLabel, CTkEntry, CTkCheckBox
+
+from core.data_tools.load_json_data import LoadJsonData
 
 
 class InputsAndCheckboxes:
@@ -20,6 +21,7 @@ class InputsAndCheckboxes:
 
         INPUTS_LABELS_DATA_PATH = path.join(
             base_dir,
+            "data",
             "language",
             "components",
             "inputs_and_checkboxes",

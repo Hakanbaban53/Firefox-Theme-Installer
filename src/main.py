@@ -3,16 +3,16 @@ from os import path
 from tkinter import Frame, Tk
 from customtkinter import CTkLabel, CTkOptionMenu
 
-from components.set_window_icon import SetWindowIcon
-from installer_core.data_tools.image_loader import ImageLoader
-from installer_core.data_tools.language_manager import LanguageManager
-from installer_core.data_tools.load_json_data import LoadJsonData
-from installer_core.window_tools.center_window import CenterWindow
-from modals.info_modals import InfoModals
-from pages.home_page import HomePage
-from pages.install_page import InstallPage
-from pages.remove_page import RemovePage
-from pages.status_page import StatusPage
+from UI.components.set_window_icon import SetWindowIcon
+from UI.modals.info_modals import InfoModals
+from UI.pages.home_page import HomePage
+from UI.pages.install_page import InstallPage
+from UI.pages.remove_page import RemovePage
+from UI.pages.status_page import StatusPage
+from core.data_tools.image_loader import ImageLoader
+from core.data_tools.language_manager import LanguageManager
+from core.data_tools.load_json_data import LoadJsonData
+from core.window_tools.center_window import CenterWindow
 
 
 class ThemeInstaller(Tk):
@@ -22,6 +22,7 @@ class ThemeInstaller(Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
+        print(self.base_dir)
         self.language_manager = LanguageManager(
             self.base_dir,
             self.SUPPORTED_LANGUAGES,
@@ -31,7 +32,7 @@ class ThemeInstaller(Tk):
         self.app_language = self.language_manager.get_language()
 
         base_data_path = path.join(
-            self.base_dir, "language", "app", f"{self.app_language}.json"
+            self.base_dir, "data", "language", "app", f"{self.app_language}.json"
         )
         self.base_data = LoadJsonData().load_json_data(base_data_path)
 
