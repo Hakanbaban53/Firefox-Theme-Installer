@@ -22,7 +22,6 @@ class ThemeInstaller(Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
-        print(self.base_dir)
         self.language_manager = LanguageManager(
             self.base_dir,
             self.SUPPORTED_LANGUAGES,

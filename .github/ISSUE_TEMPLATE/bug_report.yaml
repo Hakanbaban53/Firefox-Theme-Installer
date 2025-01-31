@@ -1,0 +1,67 @@
+name: 🐛 Bug Report
+description: File a bug report
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+      - label: I searched the existing issues and did not find anything similar.
+        required: true
+  - type: textarea
+    id: the-problem
+    attributes:
+      label: The problem
+      description:
+        Describe the issue you are experiencing with theme installer. Provide a
+        clear and concise description of what you were trying to do and what
+        happened, along with any error messages you encountered.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Release version
+      description:
+        If you are using a release version, please provide the version number.
+    validations:
+      required: true
+  - type: input
+    id: linux-distro
+    attributes:
+      label: Linux distribution
+      description:
+        If you are using Linux, please provide the name and version of the
+        distribution you are using.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce the behavior
+      description: Provide steps to reproduce the problem you are experiencing.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log files
+      description:
+        Please upload a log file from a day you experienced the issue.
+      placeholder:
+        You can attach log files by clicking this area to highlight it and then
+        dragging the files in.
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Add screenshots to help explain your problem, if applicable.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description:
+        Add any other context about the problem you are experiencing here.

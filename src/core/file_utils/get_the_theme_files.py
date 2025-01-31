@@ -136,12 +136,7 @@ class ThemeDownloader:
             return False
 
     def check_theme_files(self):
-        data_json_path = path.join(self.theme_folder_path, "data", "installer_files_data.json")
-
-        if path.exists(data_json_path):
-            # logger.info("Theme has its own data JSON.")
-            return {"type": "data", "path": self.theme_folder_path}
-
+        # # Check for chrome/userChrome.css file
         for root, dirs, files in walk(self.theme_folder_path):
             if "userChrome.css" in files:
                 # logger.info("Theme has userChrome.css file.")

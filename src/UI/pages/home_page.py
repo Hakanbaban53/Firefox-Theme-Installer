@@ -11,7 +11,6 @@ from core.data_tools.image_loader import ImageLoader
 from core.data_tools.load_json_data import LoadJsonData
 from core.file_utils.detect_and_download_files import FileManager
 from core.file_utils.get_the_theme_files import ThemeDownloader
-from UI.modals.check_files_modal import FileInstallerModal
 from UI.modals.info_modals import InfoModals
 from UI.modals.theme_modal import ThemeModal
 
@@ -457,9 +456,7 @@ class HomePage(Frame):
 
     def handle_theme_type(self, theme_type):
         """Handle different types of themes based on the theme data."""
-        if theme_type == "data":
-            self.handle_data_json_theme()
-        elif theme_type == "userChrome.css":
+        if theme_type == "userChrome.css":
             self.handle_userChrome_theme()
         else:
             self.no_theme_data_found()
@@ -545,31 +542,6 @@ class HomePage(Frame):
         self.install_button.configure(state="normal")
         self.recheck_button.lift()
         self.clean_install.lower()
-
-    def handle_missing_files(self):
-        """Update UI when some theme files are missing."""
-        handle_missing_files = self.ui_data["handle_missing_files"]
-        self.install_files_button.configure(
-            text=handle_missing_files["install_files_button"],
-            text_color="#f04141",
-            state="normal",
-            width=200,
-            image=self.attention_icon, command=self.install_files
-        )
-        self.install_files_button.grid(
-            row=2,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="",
-        )
-        self.recheck_button.lift()
-
-    def install_files(self):
-        """Open modal to install missing files and recheck afterward."""
-        modal = FileInstallerModal(self, self.base_dir, self.data_json_path, self.theme_data.get("path"), app_language=self.app_language)
-        self.wait_window(modal)
-        self.recheck_files()
 
     def refetch_files(self):
         """Refetch necessary files and update UI."""

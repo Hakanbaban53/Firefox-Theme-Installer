@@ -27,9 +27,6 @@
     "theme_label": "Seçilen Tema: ",
     "install_files_button": "Temayı Yükle"
   },
-  "handle_data_json_theme": {
-    "detect_files_text": "Tema kendi veri JSON'una sahip"
-  },
   "handle_userChrome_theme": {
     "detect_files_text": "Tema userChrome.css dosyasına sahip",
     "install_files_button": "Yüklendi"
