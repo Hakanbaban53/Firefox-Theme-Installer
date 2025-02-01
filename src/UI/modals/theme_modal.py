@@ -8,6 +8,7 @@ from core.data_tools.get_theme_data import Theme, ThemeManager
 from core.data_tools.load_json_data import LoadJsonData
 from core.window_tools.center_window import CenterWindow
 from UI.modals.theme_detail_modal import ThemeDetailModal
+from data.static.global_data import DATA_PATH, DATA_URL, ITEMS_PER_PAGE
 
 
 class ThemeModal(Toplevel):
@@ -15,12 +16,9 @@ class ThemeModal(Toplevel):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(base_dir, "data", "language", "modals", "theme_modal", f"{app_language}.json")
-        THEME_DATA_PATH = path.join(
-            base_dir, "data", "local", "modals", "theme_modal", "data.json"
-        )
+
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        self.theme_data = load_json_data.load_json_data(THEME_DATA_PATH)
 
         self.custom_theme_enabled = BooleanVar()
         self.custom_theme_enabled.set(False)
@@ -47,7 +45,7 @@ class ThemeModal(Toplevel):
         self.sort_order = "asc"
         self.sort_column = self.ui_data["treeview"]["columns"][0]
         self.current_page = 1
-        self.items_per_page = self.theme_data["items_per_page"]
+        self.items_per_page = ITEMS_PER_PAGE
         self.total_pages = 1
 
         self.create_widgets()
@@ -258,8 +256,8 @@ class ThemeModal(Toplevel):
         try:
             # Attempt to load the themes
             self.theme_manager = ThemeManager(
-                json_file_path=path.join(self.cache_dir, self.theme_data["data_path"]),
-                json_file_url=self.theme_data["data_url"]
+                json_file_path=path.join(self.cache_dir, DATA_PATH),
+                json_file_url=DATA_URL
             )
             themes = self.theme_manager.get_all_themes()
 

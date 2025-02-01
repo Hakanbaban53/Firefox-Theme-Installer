@@ -13,51 +13,57 @@ from core.file_utils.detect_and_download_files import FileManager
 from core.file_utils.get_the_theme_files import ThemeDownloader
 from UI.modals.info_modals import InfoModals
 from UI.modals.theme_modal import ThemeModal
+from data.static.global_data import (
+    ANIMATION_SPEED,
+    ASSETH_PATH,
+    ATTENTION_ICON,
+    BLOCK_SPINNER_ICON,
+    CHECK_ICON,
+    CUSTOM_SCRIPT_LOADER_PATH,
+    CUSTOM_SCRIPT_LOADER_URL,
+    HEADER_TITLE_BACKGROUND,
+    LINE_TOP,
+    RELOAD_ICON,
+    THEME_NOT_SELECTED_ICON,
+    THEME_PATH,
+    THEME_SELECTED_ICON,
+)
+
 
 class HomePage(Frame):
     def __init__(self, parent, controller, base_dir, app_language):
         super().__init__(parent)
         # Load the UI data from the JSON file based on the selected language
-        UI_DATA_PATH = path.join(base_dir, "data", "language", "pages", "home_page", f"{app_language}.json")
-        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
+        UI_DATA_PATH = path.join(
+            base_dir, "data", "language", "pages", "home_page", f"{app_language}.json"
+        )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        self.paths = load_json_data.load_json_data(PATHS)
-        self.icons = load_json_data.load_json_data(ICONS)
 
         self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
 
-        # Set the animation speed
-        self.ANIMATION_SPEED = 100
-
         # Set the paths
-        self.ASSETS_PATH = path.join(
-            base_dir, self.paths["ASSETS_PATH"]
-        )
-        
+        self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
+
         self.os_properties = OSProperties(base_dir)
         self.os_values = self.os_properties.get_values()
         self.CACHE_PATH = self.os_properties.get_cache_location()
-        self.CUSTOM_SCRIPT_LOADER_PATH = path.join(
-            self.CACHE_PATH, self.paths["CUSTOM_SCRIPT_LOADER_PATH"]
-        )
-        self.THEME_PATH = path.join(
-            self.CACHE_PATH, self.paths["THEME_PATH"]
-        )
+        self.THEME_PATH = path.join(self.CACHE_PATH, THEME_PATH)
+        self.CUSTOM_SCRIPT_LOADER_PATH = path.join(self.CACHE_PATH, CUSTOM_SCRIPT_LOADER_PATH)
 
         self.thread_manager = ThreadManager()
 
-        self.navigation_button = NavigationButton(base_dir=base_dir, app_language=app_language)
+        self.navigation_button = NavigationButton(
+            base_dir=base_dir, app_language=app_language
+        )
         self.header = CreateHeader()
 
         # Initialize ImageLoader with the asset path and OS name
-        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values['os_name'])
+        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         # Initialize variables
-        self.data_json_path = None
         self.modal_theme = None
         self.theme_data = None
 
@@ -81,23 +87,31 @@ class HomePage(Frame):
 
     def create_images(self):
         # Load icons and images using the ImageLoader
-        
-        self.attention_icon = self.image_loader.load_attention_icon(self.icons)
-        self.check_icon = self.image_loader.load_check_icon(self.icons)
-        self.install_files_icon = self.image_loader.load_install_files_icon(self.icons)
-        self.theme_not_selected_icon = self.image_loader.load_theme_not_selected_icon(self.icons)
-        self.theme_selected_icon = self.image_loader.load_theme_selected_icon(self.icons)
-        self.header_title_bg = self.image_loader.load_header_title_bg(
-            self.icons, size=(390, 64)  # Specific size for HomePage
+
+        self.attention_icon = self.image_loader.load_attention_icon(ATTENTION_ICON)
+        self.check_icon = self.image_loader.load_check_icon(CHECK_ICON)
+        self.theme_not_selected_icon = self.image_loader.load_theme_not_selected_icon(
+            THEME_NOT_SELECTED_ICON
         )
-        self.line_top_img = self.image_loader.load_line_top_img(self.icons)
+        self.theme_selected_icon = self.image_loader.load_theme_selected_icon(
+            THEME_SELECTED_ICON
+        )
+        self.header_title_bg = self.image_loader.load_header_title_bg(
+            HEADER_TITLE_BACKGROUND, size=(390, 64)  # Specific size for HomePage
+        )
+        self.line_top_img = self.image_loader.load_line_top_img(LINE_TOP)
         self.os_icon_image = self.image_loader.load_os_icon_image()
-        self.select_action_img = self.image_loader.load_select_action_img(self.icons)
-        self.reload_icon = self.image_loader.load_reload_icon(self.icons)
-        
+        self.select_action_img = self.image_loader.load_select_action_img(
+            HEADER_TITLE_BACKGROUND
+        )
+        self.reload_icon = self.image_loader.load_reload_icon(RELOAD_ICON)
+
     def create_header(self):
         self.header.create_header(
-            self.home_page_frame, header_title_bg=self.header_title_bg, line_top_img=self.line_top_img, text=self.ui_data["header_label"]
+            self.home_page_frame,
+            header_title_bg=self.header_title_bg,
+            line_top_img=self.line_top_img,
+            text=self.ui_data["header_label"],
         )
 
     def create_os_info(self):
@@ -112,7 +126,7 @@ class HomePage(Frame):
         os_label.grid(
             row=2,
             column=0,
-            padx=(215,0),
+            padx=(215, 0),
             pady=20,
             sticky="ew",
         )
@@ -125,7 +139,7 @@ class HomePage(Frame):
         os_frame.grid(
             row=2,
             column=1,
-            padx=(0,215),
+            padx=(0, 215),
             pady=0,
             sticky="ew",
         )
@@ -159,7 +173,7 @@ class HomePage(Frame):
             column=0,
             columnspan=2,
             padx=0,
-            pady=(10,35),
+            pady=(10, 35),
             sticky="",
         )
 
@@ -167,7 +181,7 @@ class HomePage(Frame):
             theme_frame,
             text=theme_select["theme_label"],
             font=("Arial", 18),
-            text_color="#000000"
+            text_color="#000000",
         )
         self.theme_label.pack(
             padx=10,
@@ -205,7 +219,7 @@ class HomePage(Frame):
             column=0,
             columnspan=2,
             padx=60,
-            pady=(0,15),
+            pady=(0, 15),
             sticky="ew",
         )
         navigation_frame = CTkFrame(
@@ -222,7 +236,7 @@ class HomePage(Frame):
             column=0,
             columnspan=2,
             padx=10,
-            pady=(0,15),
+            pady=(0, 15),
             sticky="",
         )
 
@@ -245,7 +259,7 @@ class HomePage(Frame):
                     if self.theme_data.get("type") == "userChrome.css"
                     else path.join(self.theme_data.get("path"), "chrome")
                 ),
-                selected_theme_data = self.modal_theme.theme_selected.to_dict() # We sent the selected theme data a dictionary format.
+                selected_theme_data=self.modal_theme.theme_selected.to_dict(),  # We sent the selected theme data a dictionary format.
             ),
             padding_x=(5, 5),
             side="right",
@@ -255,7 +269,9 @@ class HomePage(Frame):
             navigation_frame,
             "exit_button",
             path.join(self.ASSETS_PATH, "exit.png"),
-            lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
+            lambda: InfoModals(
+                self, self.base_dir, "Exit", app_language=self.app_language
+            ),
             padding_x=(20, 10),
             side="left",
         )
@@ -302,7 +318,7 @@ class HomePage(Frame):
             fg_color="#E0E0E0",
             hover_color="#D0D0D0",
             text_color="#000000",
-            font=("Arial", 18, "bold")
+            font=("Arial", 18, "bold"),
         )
 
     def create_recheck_skip_section(self):
@@ -335,7 +351,7 @@ class HomePage(Frame):
             row=0,
             column=0,
             pady=10,
-            sticky="", 
+            sticky="",
         )
         self.clean_install.lower()
 
@@ -373,7 +389,7 @@ class HomePage(Frame):
         while True:
             try:
                 frame = PhotoImage(
-                    file=path.join(self.ASSETS_PATH, self.icons["block_spin_gif"]),
+                    file=path.join(self.ASSETS_PATH, BLOCK_SPINNER_ICON),
                     format=f"gif -index {index}",
                 )
                 frames.append(frame)
@@ -386,12 +402,14 @@ class HomePage(Frame):
         """Update the GIF animation frame by frame."""
         frame = next(frames)
         self.detect_files_text.config(image=frame)
-        self.animation_id = self.after(self.ANIMATION_SPEED, self.update_gif, frames)
+        self.animation_id = self.after(ANIMATION_SPEED, self.update_gif, frames)
 
     # Theme selection and processing
     def select_theme(self):
         """Open the theme selection modal and configure UI elements based on selection."""
-        self.modal_theme = ThemeModal(self, self.base_dir, self.CACHE_PATH, app_language=self.app_language)
+        self.modal_theme = ThemeModal(
+            self, self.base_dir, self.CACHE_PATH, app_language=self.app_language
+        )
         self.wait_window(self.modal_theme)
         self.recheck_button.lower()
 
@@ -414,17 +432,16 @@ class HomePage(Frame):
         self.clean_install.lower()
         self.recheck_button.lower()
 
-
     def update_ui_for_selected_theme(self):
         """Update UI when a theme is selected."""
         updated_ui_data = self.ui_data["update_ui_for_selected_theme"]
 
         self.install_button.configure(state="disabled")
-        
+
         self.detect_files_text.config(
-        image=self.theme_selected_icon,
-        text=f"{updated_ui_data["detect_files_text"]} ",
-        fg="#000000",
+            image=self.theme_selected_icon,
+            text=f"{updated_ui_data["detect_files_text"]} ",
+            fg="#000000",
         )
 
         self.theme_label.configure(
@@ -435,7 +452,7 @@ class HomePage(Frame):
             text=updated_ui_data["install_files_button"],
             text_color="#000000",
             image=None,
-            state="normal", 
+            state="normal",
         )
         self.clean_install.lift()
         self.install_files_button.grid(pady=10)
@@ -461,17 +478,6 @@ class HomePage(Frame):
         else:
             self.no_theme_data_found()
 
-    def handle_data_json_theme(self):
-        """Handle themes that have their own data JSON file."""
-        handle_data_json_theme = self.ui_data["handle_data_json_theme"]
-        self.detect_files_text.config(
-            text=handle_data_json_theme["detect_files_text"],
-            fg="#00FF00",
-        )
-        self.data_json_path = path.join(self.theme_data.get("path"), "data", "installer_files_data.json")
-        self.thread_manager.start_thread(target=self.fetch_files)
-        self.clean_install.lower()
-
     def handle_userChrome_theme(self):
         """Handle themes that include a userChrome.css file."""
         handle_userChrome_theme = self.ui_data["handle_userChrome_theme"]
@@ -479,13 +485,8 @@ class HomePage(Frame):
             text=handle_userChrome_theme["detect_files_text"],
             fg="#00FF00",
         )
-        self.install_button.configure(
-            state="Normal"
-        )
-        self.recheck_button.configure(
-            state="normal",
-            command=self.get_theme
-            )
+        self.install_button.configure(state="Normal")
+        self.recheck_button.configure(state="normal", command=self.get_theme)
         self.recheck_button.lift()
         self.install_files_button.configure(
             image=self.check_icon,
@@ -494,7 +495,7 @@ class HomePage(Frame):
             state="disabled",
             fg_color="#D9D9D9",
             width=150,
-        )       
+        )
         self.check_var = BooleanVar(value=False)
         self.recheck_button.lift()
         self.clean_install.lower()
@@ -504,7 +505,7 @@ class HomePage(Frame):
         no_theme_data_found = self.ui_data["no_theme_data_found"]
         self.detect_files_text.config(
             text=no_theme_data_found["detect_files_text"],
-            fg= "#FF0000",
+            fg="#FF0000",
         )
         self.install_files_button.configure(
             image=self.check_icon,
@@ -513,21 +514,8 @@ class HomePage(Frame):
             state="disabled",
             fg_color="#D9D9D9",
             width=150,
-        )  
-        self.install_button.configure(
-            state="disabled"
         )
-
-    # File handling and animations
-    def locate_files(self):
-        """Check if all necessary theme files are present."""
-        file_check_result = FileManager(self.data_json_path).check_files_exist(
-            root=self.theme_data.get("path")
-        )
-        if file_check_result:
-            self.handle_missing_files()
-        else:
-            self.handle_all_files_installed()
+        self.install_button.configure(state="disabled")
 
     def handle_all_files_installed(self):
         """Update UI when all theme files are installed."""
@@ -569,7 +557,9 @@ class HomePage(Frame):
         self.detect_files_text.config(
             text=f"{get_theme["detect_files_text"]} ", fg="#000000"
         )
-        self.thread_manager.start_thread(target=self.run_theme_process, on_finish=self.stop_loading_animation)
+        self.thread_manager.start_thread(
+            target=self.run_theme_process, on_finish=self.stop_loading_animation
+        )
 
     def get_neccessary_files(self):
         """Fetch and check necessary files for the theme."""
@@ -578,28 +568,17 @@ class HomePage(Frame):
             text=f"{get_neccessary_files["detect_files_text"]} ",
             fg="#000000",
         )
-        file_manager = FileManager(json_file_path=self.CUSTOM_SCRIPT_LOADER_PATH, json_file_url=self.paths["CUSTOM_SCRIPT_LOADER_URL"])
+        file_manager = FileManager(
+            json_file_path=self.CUSTOM_SCRIPT_LOADER_PATH,
+            json_file_url=CUSTOM_SCRIPT_LOADER_URL
+        )
         if file_manager.json_data:
             missing_files = file_manager.check_files_exist()
             if missing_files:
-                self.thread_manager.start_thread(file_manager.download_missing_files, missing_files, self.CACHE_PATH)
-
-
-    def fetch_files(self):
-        """Fetch files based on data JSON path."""
-        self.start_loading_animation()
-        file_manager = FileManager(self.data_json_path)
-        self.recheck_button.configure(
-            state="normal",
-            command=self.refetch_files
-        )
-        self.recheck_button.lift()
-
-        if file_manager.json_data:
-            self.thread_manager.start_thread(self.locate_files, on_finish=self.stop_loading_animation)
-        else:
-            self.handle_fetch_files_failure()
-
+                self.thread_manager.start_thread(
+                    file_manager.download_missing_files, missing_files, self.CACHE_PATH
+                )
+                
     def recheck_files(self):
         """Recheck file status and update UI."""
         recheck_files = self.ui_data["recheck_files"]
@@ -611,7 +590,9 @@ class HomePage(Frame):
         )
         self.install_button.configure(state="disabled")
         self.clean_install.lower()
-        self.thread_manager.start_thread(self.locate_files, on_finish=self.stop_loading_animation)
+        self.thread_manager.start_thread(
+            self.locate_files, on_finish=self.stop_loading_animation
+        )
 
     def handle_fetch_files_failure(self):
         """Handle the failure to fetch files."""

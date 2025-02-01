@@ -6,8 +6,8 @@ from core.data_tools.load_json_data import LoadJsonData
 
 
 # Uncomment and configure logging if needed
-# from logging import basicConfig, INFO, info, error
-# basicConfig(level=INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+from logging import basicConfig, INFO, info, error
+basicConfig(level=INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class FileManager:
     def __init__(self, json_file_path, json_file_url=None):
@@ -27,12 +27,12 @@ class FileManager:
                 makedirs(path.dirname(destination), exist_ok=True)
                 with open(destination, "wb") as file:
                     file.write(response.content)
-                # info(f"Downloaded {destination}")
+                info(f"Downloaded {destination}")
                 return True
             except exceptions.RequestException as e:
                 retries += 1
-                # error(f"Error downloading {download_link}: {e} (Attempt {retries}/{max_retries})")
-        # error(f"Failed to download {download_link} after {max_retries} attempts.")
+                error(f"Error downloading {download_link}: {e} (Attempt {retries}/{max_retries})")
+        error(f"Failed to download {download_link} after {max_retries} attempts.")
         return False
 
     def create_folder(self, folder_path):
@@ -41,9 +41,9 @@ class FileManager:
         """
         try:
             makedirs(folder_path, exist_ok=True)
-            # info(f"Created folder: {folder_path}")
+            info(f"Created folder: {folder_path}")
         except OSError as e:
-            # error(f"Error creating folder {folder_path}: {e}")
+            error(f"Error creating folder {folder_path}: {e}")
             raise e
 
     def download_missing_files(self, missing_files, base_dir="."):
@@ -61,10 +61,10 @@ class FileManager:
                 try:
                     if not future.result():
                         # Handle download failure
-                        # error(f"Download failed for a file.")
+                        error(f"Download failed for a file.")
                         pass
                 except Exception as e:
-                    # error(f"An error occurred during file download: {e}")
+                    error(f"An error occurred during file download: {e}")
                     raise e
 
     def check_files_exist(self, folder_file_data=None, root="."):
@@ -85,7 +85,7 @@ class FileManager:
                         self.missing_files[root] = []
                     self.missing_files[root].append({'file': folder, 'url': contents})
 
-        # info(f"Missing files: {self.missing_files}")
+        info(f"Missing files: {self.missing_files}")
         return self.missing_files
 
 # Example usage

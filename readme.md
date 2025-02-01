@@ -81,7 +81,7 @@ $ pyinstaller --onefile ./main.py --hidden-import='PIL._tkinter_finder' --add-da
 > If you want to launch with no console add the '--noconsole' argument.
 
 > **Note 2 🔩**
-> If you encounter the externally-managed-environment error while downloading with pip3 on Linux, add the --break-system-packages argument (Warning ⚠️: this argument may cause conflicts between system packages and pip packages. If your Linux distribution has the necessary packages, please use the Linux package manager).
+> If you encounter the externally-managed-environment error while downloading with pip3 on Linux, add the `--break-system-packages` argument (Warning ⚠️: this argument may cause conflicts between system packages and pip packages. If your Linux distribution has the necessary packages, please use the Linux package manager).
 
 ## ⚡ Download
 You can [download](https://github.com/Hakanbaban53/Firefox-Theme-Installer/releases) the latest installable version of Firefox Theme Installer for Windows, macOS and Linux.

@@ -13,7 +13,7 @@ class OSProperties:
         :param base_dir: Base directory path for locating the JSON data file.
         """
         self.os_properties_path = path.join(
-            base_dir, "data", "local", "OS data", "os_properties.json"
+            base_dir, "data", "static", "OS data", "os_properties.json"
         )
         self.os_name = self.detect_os()
         self.os_data = self.load_os_data()

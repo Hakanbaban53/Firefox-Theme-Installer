@@ -15,6 +15,7 @@ from core.data_tools.get_os_properties import OSProperties
 from core.data_tools.image_loader import ImageLoader
 from core.data_tools.load_json_data import LoadJsonData
 from UI.modals.info_modals import InfoModals
+from data.static.global_data import ASSETH_PATH, ATTENTION_ICON, HEADER_TITLE_BACKGROUND, LINE_TOP, THEME_SELECTED_ICON
 
 
 class RemovePage(Frame):
@@ -24,19 +25,15 @@ class RemovePage(Frame):
         UI_DATA_PATH = path.join(
             base_dir, "data", "language", "pages", "remove_page", f"{app_language}.json"
         )
-        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        self.paths = load_json_data.load_json_data(PATHS)
-        self.icons = load_json_data.load_json_data(ICONS)
 
         self.app_language = app_language
         self.controller = controller
         self.base_dir = base_dir
 
         # Set the paths
-        self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
+        self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
         self.os_properties = OSProperties(base_dir)
         self.input_values = self.os_properties.get_locations()
@@ -80,16 +77,16 @@ class RemovePage(Frame):
 
     def create_images(self):
         # Load icons and images using the ImageLoader
-        self.attention_icon = self.image_loader.load_attention_icon(self.icons)
+        self.attention_icon = self.image_loader.load_attention_icon(ATTENTION_ICON)
 
         self.header_title_bg = self.image_loader.load_header_title_bg(
-            self.icons, size=(320, 80)  # Different size specified here
+            HEADER_TITLE_BACKGROUND, size=(320, 80)  # Different size specified here
         )
 
-        self.line_top_img = self.image_loader.load_line_top_img(self.icons)
+        self.line_top_img = self.image_loader.load_line_top_img(LINE_TOP)
         self.os_icon_image = self.image_loader.load_os_icon_image()
         self.theme_detected_icon = self.image_loader.load_theme_detected_icon(
-            self.icons
+            THEME_SELECTED_ICON
         )
 
     def create_header(self):

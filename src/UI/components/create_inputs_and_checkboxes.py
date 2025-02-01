@@ -12,7 +12,7 @@ class InputsAndCheckboxes:
         INPUTS_DATA_PATH = path.join(
             base_dir,
             "data",
-            "local",
+            "static",
             "components",
             "inputs_and_checkboxes",
             "data.json",

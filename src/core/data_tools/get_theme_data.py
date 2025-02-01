@@ -1,6 +1,7 @@
 from re import search
 
 from core.data_tools.load_json_data import LoadJsonData
+from data.static.global_data import BASE_URL
 
 class Theme:
     def __init__(self, title, link, description, image, tags, **kwargs):
@@ -27,10 +28,9 @@ class Theme:
         :param image_path: The image path, either a URL or a relative path.
         :return: A complete URL to the image.
         """
-        base_url = 'https://raw.githubusercontent.com/FirefoxCSS-Store/FirefoxCSS-Store.github.io/main/docs/'
         if image_path != None and image_path.startswith(('https://', 'http://')):
             return image_path
-        return f"{base_url}{image_path}"
+        return f"{BASE_URL}{image_path}"
 
     def to_dict(self):
         """

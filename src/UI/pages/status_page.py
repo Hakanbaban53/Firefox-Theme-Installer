@@ -16,6 +16,7 @@ from core.data_tools.image_loader import ImageLoader
 from core.data_tools.load_json_data import LoadJsonData
 from core.file_utils.file_actions import FileActions
 from UI.modals.info_modals import InfoModals
+from data.static.global_data import ASSETH_PATH, CHECK_ICON, HEADER_TITLE_BACKGROUND, LINE_TOP
 
 
 class StatusPage(Frame):
@@ -26,17 +27,13 @@ class StatusPage(Frame):
         self.controller = controller
         self.base_dir = base_dir
         UI_DATA_PATH = path.join(base_dir, "data", "language", "pages", "status_page", f"{app_language}.json")
-        PATHS = path.join(base_dir, "data", "local", "global", "paths.json")
-        ICONS = path.join(base_dir, "data", "local", "global", "icons.json")
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
-        self.paths = load_json_data.load_json_data(PATHS)
-        self.icons = load_json_data.load_json_data(ICONS)
 
         self.thread_manager = ThreadManager()
 
         # Set the paths
-        self.ASSETS_PATH = path.join(base_dir, self.paths["ASSETS_PATH"])
+        self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
         self.os_properties = OSProperties(base_dir)
         self.os_values = self.os_properties.get_values()
@@ -70,12 +67,12 @@ class StatusPage(Frame):
         self.create_bottom_widgets()
 
     def create_images(self):
-        self.check_icon = self.image_loader.load_check_icon(self.icons)
+        self.check_icon = self.image_loader.load_check_icon(CHECK_ICON)
         self.os_icon_image = self.image_loader.load_os_icon_image()
         self.header_title_bg = self.image_loader.load_header_title_bg(
-            self.icons,
+            HEADER_TITLE_BACKGROUND,
         )
-        self.line_top_img = self.image_loader.load_line_top_img(self.icons)
+        self.line_top_img = self.image_loader.load_line_top_img(LINE_TOP)
 
     def create_header(self):
         header = CreateHeader()

@@ -4,6 +4,8 @@ from zipfile import ZipFile, BadZipFile
 from requests import Session, exceptions
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+
+from data.static.global_data import REPO_PROVIDERS
 # from logging import basicConfig, getLogger, INFO
 
 # # Configure logging
@@ -11,12 +13,6 @@ from urllib3 import Retry
 # logger = getLogger(__name__)
 
 class ThemeDownloader:
-    REPO_PROVIDERS = {
-        "github.com": "/archive/refs/heads/master.zip",
-        "gitlab.com": "/-/archive/main/main.zip",
-        "codeberg.org": "/archive/main.zip",
-        "git.gay": "/-/archive/main/main.zip"  # Assume similar to GitLab
-    }
 
     def __init__(self, theme_data, extract_path, clean_install, base_dir=None):
         self.theme_data = theme_data
@@ -37,7 +33,7 @@ class ThemeDownloader:
     def construct_download_url(self, repo_link):
         # # Extract domain from the repository link
         domain = repo_link.split('/')[2]
-        suffix = self.REPO_PROVIDERS.get(domain, None)
+        suffix = REPO_PROVIDERS.get(domain, None)
         if suffix:
             return repo_link + suffix
         else:
