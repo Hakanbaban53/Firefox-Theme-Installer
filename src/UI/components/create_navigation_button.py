@@ -3,17 +3,13 @@ from PIL import Image
 from customtkinter import CTkButton, CTkImage
 
 from core.data_tools.load_json_data import LoadJsonData
+from data.static.components.navigation_buttons.data import NAVIGATION_BUTTON_DATA
 
 
 class NavigationButton:
     def __init__(self, base_dir, app_language):
         load_json_data = LoadJsonData()
-        NAVIGATION_BUTTON_DATA_PATH = path.join(
-            base_dir, "data", "static", "components", "navigation_buttons", "data.json"
-        )
-        self.navigation_button_data = load_json_data.load_json_data(
-            NAVIGATION_BUTTON_DATA_PATH
-        )
+        self.navigation_button_data = NAVIGATION_BUTTON_DATA
         self.base_dir = base_dir
         NAVIGATION_BUTTON_TEXT = path.join(
             base_dir,

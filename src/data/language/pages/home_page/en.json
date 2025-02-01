@@ -35,15 +35,6 @@
     "detect_files_text": "No theme data or chrome/userChrome.css found",
     "install_files_button": "Installed"
   },
-  "handle_all_files_installed": {
-    "install_files_button": "All Files Installed"
-  },
-  "handle_missing_files": {
-    "install_files_button": "Some Files Are Missing"
-  },
-  "refetch_files": {
-    "install_files_button": "Fetching The Files"
-  },
   "get_theme": {
     "install_files_button": "Installing Files",
     "detect_files_text": "Installing Theme Files"
@@ -53,8 +44,5 @@
   },
   "recheck_files": {
     "install_files_button": "Checking Files"
-  },
-  "handle_fetch_files_failure": {
-    "install_files_button": "Failed to fetch files"
   }
 }

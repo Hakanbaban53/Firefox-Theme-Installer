@@ -47,7 +47,7 @@ class HomePage(Frame):
         # Set the paths
         self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
-        self.os_properties = OSProperties(base_dir)
+        self.os_properties = OSProperties()
         self.os_values = self.os_properties.get_values()
         self.CACHE_PATH = self.os_properties.get_cache_location()
         self.THEME_PATH = path.join(self.CACHE_PATH, THEME_PATH)
@@ -363,13 +363,6 @@ class HomePage(Frame):
             fg_color="#FFFFFF",
             image=self.reload_icon,
         )
-        self.recheck_button.grid(
-            row=0,
-            column=0,
-            pady=10,
-            sticky="",
-        )
-        self.recheck_button.lower()
 
     def start_loading_animation(self):
         """Start the loading GIF animation."""
@@ -497,7 +490,7 @@ class HomePage(Frame):
             width=150,
         )
         self.check_var = BooleanVar(value=False)
-        self.recheck_button.lift()
+        self.recheck_button.grid(row=0, column=1, pady=10, sticky="")
         self.clean_install.lower()
 
     def no_theme_data_found(self):
@@ -516,32 +509,6 @@ class HomePage(Frame):
             width=150,
         )
         self.install_button.configure(state="disabled")
-
-    def handle_all_files_installed(self):
-        """Update UI when all theme files are installed."""
-        handle_all_files_installed = self.ui_data["handle_all_files_installed"]
-        self.install_files_button.configure(
-            width=200,
-            text=handle_all_files_installed["install_files_button"],
-            text_color="#10dc60",
-            state="disabled",
-            image=self.check_icon,
-        )
-        self.install_button.configure(state="normal")
-        self.recheck_button.lift()
-        self.clean_install.lower()
-
-    def refetch_files(self):
-        """Refetch necessary files and update UI."""
-        refetch_files = self.ui_data["refetch_files"]
-        self.install_files_button.configure(
-            text=refetch_files["install_files_button"],
-            text_color="#000000",
-            state="disabled",
-        )
-        self.install_button.configure(state="disabled")
-        self.clean_install.lower()
-        self.thread_manager.start_thread(self.fetch_files)
 
     # Thread and file fetching management
     def get_theme(self):
@@ -591,19 +558,8 @@ class HomePage(Frame):
         self.install_button.configure(state="disabled")
         self.clean_install.lower()
         self.thread_manager.start_thread(
-            self.locate_files, on_finish=self.stop_loading_animation
+            self.run_theme_process, on_finish=self.stop_loading_animation
         )
-
-    def handle_fetch_files_failure(self):
-        """Handle the failure to fetch files."""
-        handle_fetch_files_failure = self.ui_data["handle_fetch_files_failure"]
-        self.install_files_button.configure(
-            image=self.attention_icon,
-            text=handle_fetch_files_failure["install_files_button"],
-            text_color="#f04141",
-            state="disabled",
-        )
-        self.clean_install.lift()
 
     def update_parameters(self, **kwargs):
         # Process and use the parameters as needed

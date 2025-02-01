@@ -11,7 +11,6 @@ from core.file_utils.file_actions import FileActions
 class PreviewTheme:
     def __init__(
         self,
-        base_dir,
         theme_dir,
         CSL,
         profile_folder,
@@ -22,7 +21,7 @@ class PreviewTheme:
         self.custom_script_loader = CSL
         self.theme_dir = theme_dir
 
-        self.os_properties = OSProperties(base_dir)
+        self.os_properties = OSProperties()
         self.current_os = self.os_properties.detect_os()  # Get current OS info
 
         self.CACHE_PATH = self.os_properties.get_cache_location()

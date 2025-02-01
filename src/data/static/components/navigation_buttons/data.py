@@ -1,4 +1,4 @@
-{
+NAVIGATION_BUTTON_DATA = {
   "fg_color": "#D9D9D9",
   "hover_color": "#EEEEEE",
   "bg_color": "#FFFFFF",

@@ -3,21 +3,13 @@ from tkinter import BooleanVar
 from customtkinter import CTkFrame, CTkLabel, CTkEntry, CTkCheckBox
 
 from core.data_tools.load_json_data import LoadJsonData
+from data.static.components.inputs_and_checkboxes.data import APPLICATION_FOLDER_ENTRY_DATA, APPLICATION_FOLDER_LABEL_DATA, CREATE_INPUT_AND_CHECKBOX_WIDGETS, CSL_CHECKBOX, INPUTS_CHECKBOXES_FRAME_DATA, PROFILE_FOLDER_ENTRY_DATA, PROFILE_FOLDER_LABEL_DATA
 
 
 class InputsAndCheckboxes:
     def __init__(self, base_dir, app_language, frame):
         self.frame = frame
         load_json_data = LoadJsonData()
-        INPUTS_DATA_PATH = path.join(
-            base_dir,
-            "data",
-            "static",
-            "components",
-            "inputs_and_checkboxes",
-            "data.json",
-        )
-        self.inputs_data = load_json_data.load_json_data(INPUTS_DATA_PATH)
 
         INPUTS_LABELS_DATA_PATH = path.join(
             base_dir,
@@ -34,154 +26,149 @@ class InputsAndCheckboxes:
 
     def create_inputs_and_checkboxes_frame(self):
         # Create the frame to hold widgets
-        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]
         self.inputs_checkboxes_frame = CTkFrame(
             self.frame,
-            width=inputs_data["inputs_checkboxes_frame"]["width"],
-            height=inputs_data["inputs_checkboxes_frame"]["height"],
-            corner_radius=inputs_data["inputs_checkboxes_frame"]["corner_radius"],
-            fg_color=inputs_data["inputs_checkboxes_frame"]["fg_color"],
+            width=INPUTS_CHECKBOXES_FRAME_DATA["width"],
+            height=INPUTS_CHECKBOXES_FRAME_DATA["height"],
+            corner_radius=INPUTS_CHECKBOXES_FRAME_DATA["corner_radius"],
+            fg_color=INPUTS_CHECKBOXES_FRAME_DATA["fg_color"],
         )
         self.inputs_checkboxes_frame.grid(
-            row=inputs_data["inputs_checkboxes_frame"]["grid_data"]["row"],
-            column=inputs_data["inputs_checkboxes_frame"]["grid_data"]["column"],
-            columnspan=inputs_data["inputs_checkboxes_frame"]["grid_data"]["columnspan"],
-            padx=inputs_data["inputs_checkboxes_frame"]["grid_data"]["padx"],
-            pady=inputs_data["inputs_checkboxes_frame"]["grid_data"]["pady"],
-            sticky=inputs_data["inputs_checkboxes_frame"]["grid_data"]["sticky"],
+            row=INPUTS_CHECKBOXES_FRAME_DATA["grid_data"]["row"],
+            column=INPUTS_CHECKBOXES_FRAME_DATA["grid_data"]["column"],
+            columnspan=INPUTS_CHECKBOXES_FRAME_DATA["grid_data"]["columnspan"],
+            padx=INPUTS_CHECKBOXES_FRAME_DATA["grid_data"]["padx"],
+            pady=INPUTS_CHECKBOXES_FRAME_DATA["grid_data"]["pady"],
+            sticky=INPUTS_CHECKBOXES_FRAME_DATA["grid_data"]["sticky"],
         )
 
     def create_profile_folder_widget(self, profile_folder_location):
-        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]["create_input_and_checkbox_widgets"]
 
         # Profile Folder Label
         profile_folder_label = CTkLabel(
             master=self.inputs_checkboxes_frame,
             text=self.inputs_labels_data["profile_folder_label"],
-            text_color=inputs_data["profile_folder_label"]["text_color"],
-            font=eval(inputs_data["profile_folder_label"]["font"]),
+            text_color=PROFILE_FOLDER_LABEL_DATA["text_color"],
+            font=eval(PROFILE_FOLDER_LABEL_DATA["font"]),
         )
         profile_folder_label.grid(
-            row=inputs_data["profile_folder_label"]["grid_data"]["row"],
-            column=inputs_data["profile_folder_label"]["grid_data"]["column"],
-            padx=inputs_data["profile_folder_label"]["grid_data"]["padx"],
-            pady=inputs_data["profile_folder_label"]["grid_data"]["pady"],
-            sticky=inputs_data["profile_folder_label"]["grid_data"]["sticky"],
+            row=PROFILE_FOLDER_LABEL_DATA["grid_data"]["row"],
+            column=PROFILE_FOLDER_LABEL_DATA["grid_data"]["column"],
+            padx=PROFILE_FOLDER_LABEL_DATA["grid_data"]["padx"],
+            pady=PROFILE_FOLDER_LABEL_DATA["grid_data"]["pady"],
+            sticky=PROFILE_FOLDER_LABEL_DATA["grid_data"]["sticky"],
         )
 
         # Profile Folder Entry
         self.profile_folder_entry = CTkEntry(
             master=self.inputs_checkboxes_frame,
-            width=inputs_data["profile_folder_entry"]["width"],
-            height=inputs_data["profile_folder_entry"]["height"],
-            fg_color=inputs_data["profile_folder_entry"]["fg_color"],
-            text_color=inputs_data["profile_folder_entry"]["text_color"],
-            corner_radius=inputs_data["profile_folder_entry"]["corner_radius"],
-            border_width=inputs_data["profile_folder_entry"]["border_width"],
-            bg_color=inputs_data["profile_folder_entry"]["bg_color"],
-            border_color=inputs_data["profile_folder_entry"]["border_color"],
+            width=PROFILE_FOLDER_ENTRY_DATA["width"],
+            height=PROFILE_FOLDER_ENTRY_DATA["height"],
+            fg_color=PROFILE_FOLDER_ENTRY_DATA["fg_color"],
+            text_color=PROFILE_FOLDER_ENTRY_DATA["text_color"],
+            corner_radius=PROFILE_FOLDER_ENTRY_DATA["corner_radius"],
+            border_width=PROFILE_FOLDER_ENTRY_DATA["border_width"],
+            bg_color=PROFILE_FOLDER_ENTRY_DATA["bg_color"],
+            border_color=PROFILE_FOLDER_ENTRY_DATA["border_color"],
             placeholder_text=profile_folder_location,
         )
         self.profile_folder_entry.grid(
-            row=inputs_data["profile_folder_entry"]["grid_data"]["row"],
-            column=inputs_data["profile_folder_entry"]["grid_data"]["column"],
-            padx=inputs_data["profile_folder_entry"]["grid_data"]["padx"],
-            pady=inputs_data["profile_folder_entry"]["grid_data"]["pady"],
-            sticky=inputs_data["profile_folder_entry"]["grid_data"]["sticky"],
+            row=PROFILE_FOLDER_ENTRY_DATA["grid_data"]["row"],
+            column=PROFILE_FOLDER_ENTRY_DATA["grid_data"]["column"],
+            padx=PROFILE_FOLDER_ENTRY_DATA["grid_data"]["padx"],
+            pady=PROFILE_FOLDER_ENTRY_DATA["grid_data"]["pady"],
+            sticky=PROFILE_FOLDER_ENTRY_DATA["grid_data"]["sticky"],
         )
 
         return self.profile_folder_entry
 
     def create_application_folder_widget(self, application_folder):
-        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]["create_input_and_checkbox_widgets"]
 
         # Application Folder Label
         application_folder_label = CTkLabel(
             master=self.inputs_checkboxes_frame,
             text=self.inputs_labels_data["application_folder_label"],
-            text_color=inputs_data["application_folder_label"]["text_color"],
-            font=eval(inputs_data["application_folder_label"]["font"]),
+            text_color=APPLICATION_FOLDER_LABEL_DATA["text_color"],
+            font=eval(APPLICATION_FOLDER_LABEL_DATA["font"]),
         )
         application_folder_label.grid(
-            row=inputs_data["application_folder_label"]["grid_data"]["row"],
-            column=inputs_data["application_folder_label"]["grid_data"]["column"],
-            padx=inputs_data["application_folder_label"]["grid_data"]["padx"],
-            pady=inputs_data["application_folder_label"]["grid_data"]["pady"],
-            sticky=inputs_data["application_folder_label"]["grid_data"]["sticky"],
+            row=APPLICATION_FOLDER_LABEL_DATA["grid_data"]["row"],
+            column=APPLICATION_FOLDER_LABEL_DATA["grid_data"]["column"],
+            padx=APPLICATION_FOLDER_LABEL_DATA["grid_data"]["padx"],
+            pady=APPLICATION_FOLDER_LABEL_DATA["grid_data"]["pady"],
+            sticky=APPLICATION_FOLDER_LABEL_DATA["grid_data"]["sticky"],
         )
 
         # Application Folder Entry
         self.application_folder_entry = CTkEntry(
             master=self.inputs_checkboxes_frame,
-            width=inputs_data["application_folder_entry"]["width"],
-            height=inputs_data["application_folder_entry"]["height"],
-            fg_color=inputs_data["application_folder_entry"]["fg_color"],
-            text_color=inputs_data["application_folder_entry"]["text_color"],
-            corner_radius=inputs_data["application_folder_entry"]["corner_radius"],
-            border_width=inputs_data["application_folder_entry"]["border_width"],
-            bg_color=inputs_data["application_folder_entry"]["bg_color"],
-            border_color=inputs_data["application_folder_entry"]["border_color"],
+            width=APPLICATION_FOLDER_ENTRY_DATA["width"],
+            height=APPLICATION_FOLDER_ENTRY_DATA["height"],
+            fg_color=APPLICATION_FOLDER_ENTRY_DATA["fg_color"],
+            text_color=APPLICATION_FOLDER_ENTRY_DATA["text_color"],
+            corner_radius=APPLICATION_FOLDER_ENTRY_DATA["corner_radius"],
+            border_width=APPLICATION_FOLDER_ENTRY_DATA["border_width"],
+            bg_color=APPLICATION_FOLDER_ENTRY_DATA["bg_color"],
+            border_color=APPLICATION_FOLDER_ENTRY_DATA["border_color"],
             placeholder_text=application_folder,
         )
         self.application_folder_entry.grid(
-            row=inputs_data["application_folder_entry"]["grid_data"]["row"],
-            column=inputs_data["application_folder_entry"]["grid_data"]["column"],
-            padx=inputs_data["application_folder_entry"]["grid_data"]["padx"],
-            pady=inputs_data["application_folder_entry"]["grid_data"]["pady"],
-            sticky=inputs_data["application_folder_entry"]["grid_data"]["sticky"],
+            row=APPLICATION_FOLDER_ENTRY_DATA["grid_data"]["row"],
+            column=APPLICATION_FOLDER_ENTRY_DATA["grid_data"]["column"],
+            padx=APPLICATION_FOLDER_ENTRY_DATA["grid_data"]["padx"],
+            pady=APPLICATION_FOLDER_ENTRY_DATA["grid_data"]["pady"],
+            sticky=APPLICATION_FOLDER_ENTRY_DATA["grid_data"]["sticky"],
         )
 
         return self.application_folder_entry
 
     def create_CSL_checkbox(self):
-        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]["create_input_and_checkbox_widgets"]
 
         CSL_checkbox = CTkCheckBox(
             master=self.inputs_checkboxes_frame,
             text=self.inputs_labels_data["CSL_checkbox"],
-            fg_color=inputs_data["CSL_checkbox"]["fg_color"],
-            hover_color=inputs_data["CSL_checkbox"]["hover_color"],
-            text_color=inputs_data["CSL_checkbox"]["text_color"],
-            bg_color=inputs_data["CSL_checkbox"]["bg_color"],
-            font=eval(inputs_data["CSL_checkbox"]["font"]),
-            border_color=inputs_data["CSL_checkbox"]["border_color"],
+            fg_color=CSL_CHECKBOX["fg_color"],
+            hover_color=CSL_CHECKBOX["hover_color"],
+            text_color=CSL_CHECKBOX["text_color"],
+            bg_color=CSL_CHECKBOX["bg_color"],
+            font=eval(CSL_CHECKBOX["font"]),
+            border_color=CSL_CHECKBOX["border_color"],
             variable=self.CSL,
             onvalue=True,
             offvalue=False,
         )
         CSL_checkbox.grid(
-            row=inputs_data["CSL_checkbox"]["grid_data"]["row"],
-            column=inputs_data["CSL_checkbox"]["grid_data"]["column"],
-            padx=inputs_data["CSL_checkbox"]["grid_data"]["padx"],
-            pady=inputs_data["CSL_checkbox"]["grid_data"]["pady"],
-            sticky=inputs_data["CSL_checkbox"]["grid_data"]["sticky"],
+            row=CSL_CHECKBOX["grid_data"]["row"],
+            column=CSL_CHECKBOX["grid_data"]["column"],
+            padx=CSL_CHECKBOX["grid_data"]["padx"],
+            pady=CSL_CHECKBOX["grid_data"]["pady"],
+            sticky=CSL_CHECKBOX["grid_data"]["sticky"],
         )
 
         return self.CSL
 
     def create_edit_checkbox(self, command):
-        inputs_data = self.inputs_data["create_inputs_and_checkboxes"]["create_input_and_checkbox_widgets"]
 
         edit_checkbox = CTkCheckBox(
             master=self.inputs_checkboxes_frame,
             text=self.inputs_labels_data["edit_checkbox"],
-            fg_color=inputs_data["edit_checkbox"]["fg_color"],
-            hover_color=inputs_data["edit_checkbox"]["hover_color"],
-            text_color=inputs_data["edit_checkbox"]["text_color"],
-            bg_color=inputs_data["edit_checkbox"]["bg_color"],
-            font=eval(inputs_data["edit_checkbox"]["font"]),
-            border_color=inputs_data["edit_checkbox"]["border_color"],
+            fg_color=CREATE_INPUT_AND_CHECKBOX_WIDGETS["fg_color"],
+            hover_color=CREATE_INPUT_AND_CHECKBOX_WIDGETS["hover_color"],
+            text_color=CREATE_INPUT_AND_CHECKBOX_WIDGETS["text_color"],
+            bg_color=CREATE_INPUT_AND_CHECKBOX_WIDGETS["bg_color"],
+            font=eval(CREATE_INPUT_AND_CHECKBOX_WIDGETS["font"]),
+            border_color=CREATE_INPUT_AND_CHECKBOX_WIDGETS["border_color"],
             command=command,
             variable=self.check_var,
             onvalue=True,
             offvalue=False,
         )
         edit_checkbox.grid(
-            row=inputs_data["edit_checkbox"]["grid_data"]["row"],
-            column=inputs_data["edit_checkbox"]["grid_data"]["column"],
-            padx=inputs_data["edit_checkbox"]["grid_data"]["padx"],
-            pady=inputs_data["edit_checkbox"]["grid_data"]["pady"],
-            sticky=inputs_data["edit_checkbox"]["grid_data"]["sticky"],
+            row=CREATE_INPUT_AND_CHECKBOX_WIDGETS["grid_data"]["row"],
+            column=CREATE_INPUT_AND_CHECKBOX_WIDGETS["grid_data"]["column"],
+            padx=CREATE_INPUT_AND_CHECKBOX_WIDGETS["grid_data"]["padx"],
+            pady=CREATE_INPUT_AND_CHECKBOX_WIDGETS["grid_data"]["pady"],
+            sticky=CREATE_INPUT_AND_CHECKBOX_WIDGETS["grid_data"]["sticky"],
         )
 
         return self.check_var

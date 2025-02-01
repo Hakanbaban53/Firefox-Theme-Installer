@@ -35,7 +35,7 @@ class StatusPage(Frame):
         # Set the paths
         self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
-        self.os_properties = OSProperties(base_dir)
+        self.os_properties = OSProperties()
         self.os_values = self.os_properties.get_values()
 
         self.CACHE_PATH = self.os_properties.get_cache_location()

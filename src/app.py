@@ -13,21 +13,15 @@ from core.data_tools.image_loader import ImageLoader
 from core.data_tools.language_manager import LanguageManager
 from core.data_tools.load_json_data import LoadJsonData
 from core.window_tools.center_window import CenterWindow
+from data.static.global_data import LANGUAGES
+
 
 
 class ThemeInstaller(Tk):
-    SUPPORTED_LANGUAGES = ["en", "tr"]
-    LANGUAGE_NAMES = {"en": "English", "tr": "Türkçe"}
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
-        self.language_manager = LanguageManager(
-            self.base_dir,
-            self.SUPPORTED_LANGUAGES,
-            self.LANGUAGE_NAMES,
-            fallback_language="en",
-        )
+        self.language_manager = LanguageManager()
         self.app_language = self.language_manager.get_language()
 
         base_data_path = path.join(
@@ -78,9 +72,7 @@ class ThemeInstaller(Tk):
         )
         self.background_label.pack(fill="both", expand=True)
 
-        language_names = [
-            self.LANGUAGE_NAMES[lang] for lang in self.SUPPORTED_LANGUAGES
-        ]
+        language_names = list(LANGUAGES.values())
         self.language_button = CTkOptionMenu(
             self.image_frame,
             values=language_names,  # Display user-friendly names
@@ -88,7 +80,7 @@ class ThemeInstaller(Tk):
             bg_color="#2B2631",
             font=("Inter", 12),
         )
-        self.language_button.set(self.LANGUAGE_NAMES[self.app_language])
+        self.language_button.set(LANGUAGES[self.app_language])
         self.language_button.place(relx=0.5, rely=0.95, anchor="center")
 
     def change_language(self, selected_language):
@@ -98,12 +90,12 @@ class ThemeInstaller(Tk):
         :param selected_language: The user-friendly language name selected from the OptionMenu.
         """
         if (
-            selected_language in self.LANGUAGE_NAMES.values()
-            and selected_language != self.LANGUAGE_NAMES[self.app_language]
+            selected_language in LANGUAGES.values()
+            and selected_language != LANGUAGES[self.app_language]
         ):
             language_code = [
                 lang
-                for lang, name in self.LANGUAGE_NAMES.items()
+                for lang, name in LANGUAGES.items()
                 if name == selected_language
             ][0]
             self.language_manager.save_language(language_code)
@@ -225,7 +217,6 @@ class ThemeInstaller(Tk):
     def exit_confirmation(self):
         """Display exit confirmation modal."""
         InfoModals(self, self.base_dir, "Exit", app_language=self.app_language)
-
 
 if __name__ == "__main__":
     app = ThemeInstaller()

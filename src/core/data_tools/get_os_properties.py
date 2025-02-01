@@ -1,20 +1,15 @@
 from os import path
 from platform import system
 
-from core.data_tools.load_json_data import LoadJsonData
-
+from data.static.os_properties import LINUX, MACOS, WINDOWS
 
 class OSProperties:
-    def __init__(self, base_dir):
+    def __init__(self):
         """
         Initializes the OSProperties class, loads OS-specific data,
         and determines the current operating system.
 
-        :param base_dir: Base directory path for locating the JSON data file.
         """
-        self.os_properties_path = path.join(
-            base_dir, "data", "static", "OS data", "os_properties.json"
-        )
         self.os_name = self.detect_os()
         self.os_data = self.load_os_data()
 
@@ -34,13 +29,16 @@ class OSProperties:
 
     def load_os_data(self):
         """
-        Loads operating system-specific data from the JSON file.
+        Loads operating system-specific data from the Python file.
 
-        :return: A dictionary of OS-specific data or an empty dictionary if loading fails.
+        :return: A dictionary of OS-specific data.
         """
-        load_json_data = LoadJsonData()
-        os_data = load_json_data.load_json_data(self.os_properties_path)
-        return os_data if os_data else {}
+        if self.os_name == "windows":
+            return WINDOWS
+        elif self.os_name == "macos":
+            return MACOS
+        else:
+            return LINUX
 
     def get_values(self):
         """
@@ -48,7 +46,7 @@ class OSProperties:
 
         :return: A dictionary of values for the current OS.
         """
-        return self.os_data.get(self.os_name, {})
+        return self.os_data
 
     def get_locations(self):
         """
@@ -94,6 +92,4 @@ class OSProperties:
 
         :return: A string representing the OS color in hex format.
         """
-        return self.get_values().get(
-            "os_color", "#FFFFFF"
-        )  # Default to white if not specified
+        return self.get_values().get("os_color", "#FFFFFF")  # Default to white if not specified

@@ -44,7 +44,7 @@ class InstallPage(Frame):
         # Set the paths
         self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
-        self.os_properties = OSProperties(base_dir)
+        self.os_properties = OSProperties()
         self.input_values = self.os_properties.get_locations()
         self.os_values = self.os_properties.get_values()
 
@@ -326,7 +326,6 @@ class InstallPage(Frame):
         )
 
         self.preview = PreviewTheme(
-            self.base_dir,
             self.theme_dir,
             self.CSL.get(),
             profile_folder,

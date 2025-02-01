@@ -1,3 +1,7 @@
+# Language Data
+LANGUAGES = {"en": "English", "tr": "Türkçe"}
+
+# Global Data
 ATTENTION_ICON = "attention.png"
 CHECK_ICON = "check.png"
 THEME_PREVIEW_ICON = "preview.png"
@@ -14,7 +18,7 @@ ANIMATION_SPEED = 100
 
 ASSETH_PATH = "assets"
 THEME_PATH = "themes"
-CUSTOM_SCRIPT_LOADER_URL = "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/files%20data/fx-autoconfig.json"
+CUSTOM_SCRIPT_LOADER_URL = "https://raw.githubusercontent.com/Hakanbaban53/RealFire-Installer/main/data/files%20data/fx-autoconfig.json",
 CUSTOM_SCRIPT_LOADER_PATH = "data/fx-autoconfig.json"
 
 # Themes Modal

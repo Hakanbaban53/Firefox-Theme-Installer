@@ -3,22 +3,24 @@ from locale import getdefaultlocale
 from json import dump, load
 
 from core.data_tools.get_os_properties import OSProperties
+from data.static.global_data import LANGUAGES
+
 
 
 class LanguageManager:
-    def __init__(self, base_dir, supported_languages, language_names, fallback_language='en', config_file="config.json"):
+    def __init__(self, fallback_language='en', config_file="settings.json"):
         """
         Initializes the LanguageManager with supported languages, language names, a fallback language,
         and handles saving/loading the language from a config file.
-
+        
         :param supported_languages: A list of supported language codes (e.g., ['en', 'tr']).
         :param language_names: A dictionary mapping language codes to user-friendly names (e.g., {'en': 'English', 'tr': 'Türkçe'}).
         :param fallback_language: The default language code to fall back on if the system language is not supported.
         :param config_file: Path to the configuration file for saving/loading the selected language.
         """
-        self.CACHE_PATH = OSProperties(base_dir).get_cache_location()
-        self.supported_languages = supported_languages
-        self.language_names = language_names  # Map codes to names (e.g. {'en': 'English', 'tr': 'Türkçe'})
+        self.CACHE_PATH = OSProperties().get_cache_location()
+        self.supported_languages = list(LANGUAGES.keys())
+        self.language_names = LANGUAGES  # Map codes to names (e.g. {'en': 'English', 'tr': 'Türkçe'})
         self.fallback_language = fallback_language
         self.config_file = path.join(self.CACHE_PATH, config_file)
         self.system_language = self.detect_system_language()

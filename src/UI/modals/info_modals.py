@@ -12,8 +12,6 @@ class InfoModals(Toplevel):
     MODAL_TYPES = {
         "exit": "exit_modal",
         "attention": "attention_modal",
-        "check_files_installed": "check_files_installed_modal",
-        "check_files_not_installed": "check_files_not_installed_modal",
         "language_change": "language_change_modal",
     }
 
