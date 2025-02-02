@@ -163,7 +163,7 @@ We welcome contributions from the community to help improve Firefox Theme Instal
 
 ## 🔑 License
 
-Firefox Theme Installer is licensed under the [GNU General Public License v3.0](LICENSE).
+Firefox Theme Installer is licensed under the [MIT License](LICENSE).
 
 ---
 
