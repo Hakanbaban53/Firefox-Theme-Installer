@@ -15,25 +15,31 @@ from core.data_tools.get_os_properties import OSProperties
 from core.data_tools.image_loader import ImageLoader
 from core.data_tools.load_json_data import LoadJsonData
 from UI.modals.info_modals import InfoModals
-from data.static.global_data import ASSETH_PATH, ATTENTION_ICON, HEADER_TITLE_BACKGROUND, LINE_TOP, THEME_SELECTED_ICON
+from data.static.global_data import (
+    APP_LANGUAGE,
+    ASSETS_PATH,
+    ATTENTION_ICON,
+    BACK_ICON,
+    BASE_DIR,
+    EXIT_ICON,
+    HEADER_TITLE_BACKGROUND,
+    LINE_TOP,
+    REMOVE_ICON,
+    THEME_SELECTED_ICON,
+)
 
 
 class RemovePage(Frame):
-    def __init__(self, parent, controller, base_dir, app_language):
+    def __init__(self, parent, controller):
         super().__init__(parent)
         # Load the UI data from the JSON file
         UI_DATA_PATH = path.join(
-            base_dir, "data", "language", "pages", "remove_page", f"{app_language}.json"
+            BASE_DIR, "data", "language", "pages", "remove_page", f"{APP_LANGUAGE}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
 
-        self.app_language = app_language
         self.controller = controller
-        self.base_dir = base_dir
-
-        # Set the paths
-        self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
         self.os_properties = OSProperties()
         self.input_values = self.os_properties.get_locations()
@@ -41,18 +47,13 @@ class RemovePage(Frame):
 
         self.header = CreateHeader()
 
-        self.navigation_button = NavigationButton(
-            base_dir=base_dir, app_language=app_language
-        )
+        self.navigation_button = NavigationButton()
 
         self.profile_folder_location = GetFolderLocations(
             self.os_values
         ).get_profile_folder()
 
         self.chrome_folder = path.join(self.profile_folder_location, "chrome")
-
-        # Initialize ImageLoader with the asset path and OS name
-        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         self.configure_layout()
         self.create_widgets()
@@ -77,16 +78,18 @@ class RemovePage(Frame):
 
     def create_images(self):
         # Load icons and images using the ImageLoader
-        self.attention_icon = self.image_loader.load_attention_icon(ATTENTION_ICON)
+        image_loader = ImageLoader(ASSETS_PATH)
 
-        self.header_title_bg = self.image_loader.load_header_title_bg(
-            HEADER_TITLE_BACKGROUND, size=(320, 80)  # Different size specified here
+        self.attention_icon = image_loader.load_CTK_image(ATTENTION_ICON, (24, 24))
+        self.header_title_bg = image_loader.load_CTK_image(
+            HEADER_TITLE_BACKGROUND, size=(390, 64)  # Specific size for HomePage
         )
-
-        self.line_top_img = self.image_loader.load_line_top_img(LINE_TOP)
-        self.os_icon_image = self.image_loader.load_os_icon_image()
-        self.theme_detected_icon = self.image_loader.load_theme_detected_icon(
-            THEME_SELECTED_ICON
+        self.line_top_img = image_loader.load_CTK_image(LINE_TOP, (650, 6))
+        self.os_icon_image = image_loader.load_CTK_image(
+            f"{self.os_values["os_name"].lower()}.png", (20, 24)
+        )
+        self.theme_detected_icon = image_loader.load_CTK_image(
+            THEME_SELECTED_ICON, (24, 32)
         )
 
     def create_header(self):
@@ -99,8 +102,6 @@ class RemovePage(Frame):
 
     def create_inputs_and_checkboxes(self):
         self.inputs_and_checkboxes = InputsAndCheckboxes(
-            base_dir=self.base_dir,
-            app_language=self.app_language,
             frame=self.remove_page_frame,
         )
 
@@ -158,8 +159,6 @@ class RemovePage(Frame):
             self,
             chrome_folder=self.chrome_folder,
             theme_detected_icon=self.theme_detected_icon,
-            base_dir=self.base_dir,
-            app_language=self.app_language,
         )
         self.detect_installed_theme_component.create_installed_themes(
             preview_and_check_installed_theme_frame
@@ -190,7 +189,7 @@ class RemovePage(Frame):
         self.remove_button = self.navigation_button.create_navigation_button(
             parent,
             "remove_button",
-            path.join(self.ASSETS_PATH, "remove.png"),
+            path.join(ASSETS_PATH, REMOVE_ICON),
             lambda: self.controller.show_frame(
                 "status_page",
                 come_from_which_page="remove",
@@ -200,7 +199,6 @@ class RemovePage(Frame):
                 application_folder=SpecialInputFunc().get_variables(
                     self.application_folder_entry
                 ),
-                base_dir=self.base_dir,
             ),
             padding_x=(10, 20),
             side="right",
@@ -210,7 +208,7 @@ class RemovePage(Frame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "back_button",
-            path.join(self.ASSETS_PATH, "back.png"),
+            path.join(ASSETS_PATH, BACK_ICON),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame("home_page"),
@@ -218,10 +216,8 @@ class RemovePage(Frame):
         self.navigation_button.create_navigation_button(
             parent,
             "exit_button",
-            path.join(self.ASSETS_PATH, "exit.png"),
-            lambda: InfoModals(
-                self, self.base_dir, "Exit", app_language=self.app_language
-            ),
+            path.join(ASSETS_PATH, EXIT_ICON),
+            lambda: InfoModals(self, "Exit"),
             padding_x=(20, 10),
             side="left",
         )

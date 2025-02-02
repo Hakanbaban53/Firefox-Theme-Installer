@@ -3,12 +3,9 @@ from locale import getdefaultlocale
 from json import dump, load
 
 from core.data_tools.get_os_properties import OSProperties
-from data.static.global_data import LANGUAGES
-
-
 
 class LanguageManager:
-    def __init__(self, fallback_language='en', config_file="settings.json"):
+    def __init__(self, LANGUAGES, fallback_language='en', config_file="settings.json"):
         """
         Initializes the LanguageManager with supported languages, language names, a fallback language,
         and handles saving/loading the language from a config file.

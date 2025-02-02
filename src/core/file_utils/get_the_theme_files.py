@@ -14,7 +14,7 @@ from data.static.global_data import REPO_PROVIDERS
 
 class ThemeDownloader:
 
-    def __init__(self, theme_data, extract_path, clean_install, base_dir=None):
+    def __init__(self, theme_data, extract_path, clean_install):
         self.theme_data = theme_data
         self.extract_path = extract_path
         self.sanitized_title = self.sanitize_title(self.theme_data.title)
@@ -22,7 +22,6 @@ class ThemeDownloader:
         self.theme_folder_path = path.join(extract_path, f"{self.sanitized_title}-main")
         self.download_url = self.construct_download_url(self.theme_data.link)
         self.clean_install = clean_install
-        self.base_dir = base_dir
 
         makedirs(extract_path, exist_ok=True)
 
@@ -137,6 +136,9 @@ class ThemeDownloader:
             if "userChrome.css" in files:
                 # logger.info("Theme has userChrome.css file.")
                 return {"type": "userChrome.css", "path": root}
+            elif "userContent.css" in files:
+                # logger.info("Theme has userContent.css file.")
+                return {"type": "userContent.css", "path": root}
 
         # logger.warning("No theme data or chrome/userChrome.css found.")
         return None

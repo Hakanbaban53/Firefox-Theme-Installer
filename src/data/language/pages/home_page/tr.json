@@ -32,7 +32,7 @@
     "install_files_button": "Yüklendi"
   },
   "no_theme_data_found": {
-    "detect_files_text": "Tema verisi veya chrome/userChrome.css bulunamadı",
+    "detect_files_text": "Tema verisi veya userChrome.css bulunamadı",
     "install_files_button": "Yüklendi"
   },
   "handle_all_files_installed": {

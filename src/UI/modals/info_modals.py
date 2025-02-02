@@ -6,6 +6,7 @@ from UI.components.set_window_icon import SetWindowIcon
 from core.component_tools.thread_manager import ThreadManager
 from core.data_tools.load_json_data import LoadJsonData
 from core.window_tools.center_window import CenterWindow
+from data.static.global_data import APP_LANGUAGE, BASE_DIR
 
 
 class InfoModals(Toplevel):
@@ -15,15 +16,15 @@ class InfoModals(Toplevel):
         "language_change": "language_change_modal",
     }
 
-    def __init__(self, parent, base_dir, modal_type, app_language):
+    def __init__(self, parent, modal_type):
         super().__init__(parent)
         INFO_MODALS_DATA_PATH = path.join(
-            base_dir,
+            BASE_DIR,
             "data",
             "language",
             "modals",
             "info_modals",
-            f"{app_language}.json",
+            f"{APP_LANGUAGE}.json",
         )
         load_json_data = LoadJsonData()
         self.info_modals_data = load_json_data.load_json_data(
@@ -32,7 +33,6 @@ class InfoModals(Toplevel):
         self.button_data = load_json_data.load_json_data(INFO_MODALS_DATA_PATH).get(
             "buttons", {}
         )
-        self.base_dir = base_dir
         self.modal_key = self.get_modal_key(modal_type)
         self.configure_window(parent)
         CenterWindow(self).center_window()
@@ -56,7 +56,7 @@ class InfoModals(Toplevel):
         self.resizable(False, False)
         self.wait_visibility()
         self.grab_set()
-        SetWindowIcon(self.base_dir).set_window_icon(self)
+        SetWindowIcon().set_window_icon(self)
 
     def create_modal(self):
         """Create the modal based on the type specified."""

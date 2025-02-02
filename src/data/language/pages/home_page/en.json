@@ -32,7 +32,7 @@
     "install_files_button": "Installed"
   },
   "no_theme_data_found": {
-    "detect_files_text": "No theme data or chrome/userChrome.css found",
+    "detect_files_text": "No theme data or userChrome.css found",
     "install_files_button": "Installed"
   },
   "get_theme": {

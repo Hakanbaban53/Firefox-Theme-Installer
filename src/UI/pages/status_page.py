@@ -16,36 +16,42 @@ from core.data_tools.image_loader import ImageLoader
 from core.data_tools.load_json_data import LoadJsonData
 from core.file_utils.file_actions import FileActions
 from UI.modals.info_modals import InfoModals
-from data.static.global_data import ASSETH_PATH, CHECK_ICON, HEADER_TITLE_BACKGROUND, LINE_TOP
+from data.static.global_data import (
+    APP_LANGUAGE,
+    ASSETS_PATH,
+    BACK_ICON,
+    BASE_DIR,
+    CHECK_ICON,
+    EXIT_ICON,
+    FINISH_ICON,
+    HEADER_TITLE_BACKGROUND,
+    LINE_TOP,
+)
 
 
 class StatusPage(Frame):
-    def __init__(self, parent, controller, base_dir, app_language):
+    def __init__(self, parent, controller):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        self.app_language = app_language
         self.controller = controller
-        self.base_dir = base_dir
-        UI_DATA_PATH = path.join(base_dir, "data", "language", "pages", "status_page", f"{app_language}.json")
+        UI_DATA_PATH = path.join(
+            BASE_DIR, "data", "language", "pages", "status_page", f"{APP_LANGUAGE}.json"
+        )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
 
         self.thread_manager = ThreadManager()
-
-        # Set the paths
-        self.ASSETS_PATH = path.join(base_dir, ASSETH_PATH)
 
         self.os_properties = OSProperties()
         self.os_values = self.os_properties.get_values()
 
         self.CACHE_PATH = self.os_properties.get_cache_location()
 
-        self.navigation_button = NavigationButton(base_dir=base_dir, app_language=app_language)
+        self.navigation_button = NavigationButton()
 
         self.come_from_which_page = None
 
         self.file_actions = FileActions(self.os_values["os_name"])
-        self.image_loader = ImageLoader(self.ASSETS_PATH, self.os_values["os_name"])
 
         self.configure_layout()
         self.create_widgets()
@@ -67,12 +73,16 @@ class StatusPage(Frame):
         self.create_bottom_widgets()
 
     def create_images(self):
-        self.check_icon = self.image_loader.load_check_icon(CHECK_ICON)
-        self.os_icon_image = self.image_loader.load_os_icon_image()
-        self.header_title_bg = self.image_loader.load_header_title_bg(
-            HEADER_TITLE_BACKGROUND,
+        image_loader = ImageLoader(ASSETS_PATH)
+
+        self.check_icon = image_loader.load_CTK_image(CHECK_ICON, (24, 24))
+        self.os_icon_image = image_loader.load_CTK_image(
+            f"{self.os_values["os_name"].lower()}.png", (20, 24)
         )
-        self.line_top_img = self.image_loader.load_line_top_img(LINE_TOP)
+        self.header_title_bg = image_loader.load_CTK_image(
+            HEADER_TITLE_BACKGROUND, size=(390, 64)  # Specific size for HomePage
+        )
+        self.line_top_img = image_loader.load_CTK_image(LINE_TOP, (650, 6))
 
     def create_header(self):
         header = CreateHeader()
@@ -140,11 +150,11 @@ class StatusPage(Frame):
         self.create_os_info(bottom_frame)
 
     def create_navigation_buttons(self, parent):
-        self.finish_button=self.navigation_button.create_navigation_button(
+        self.finish_button = self.navigation_button.create_navigation_button(
             parent,
             "finish_button",
-            path.join(self.ASSETS_PATH, "finish.png"),
-            lambda: InfoModals(self, self.base_dir, "Attention", app_language=self.app_language),
+            path.join(ASSETS_PATH, FINISH_ICON),
+            lambda: InfoModals(self, "Attention"),
             padding_x=(10, 20),
             side="right",
             img_side="right",
@@ -153,7 +163,7 @@ class StatusPage(Frame):
         self.back_button = self.navigation_button.create_navigation_button(
             parent,
             "back_button",
-            path.join(self.ASSETS_PATH, "back.png"),
+            path.join(ASSETS_PATH, BACK_ICON),
             padding_x=(5, 5),
             side="right",
             command=lambda: self.controller.show_frame(
@@ -161,11 +171,11 @@ class StatusPage(Frame):
             ),
             state="Normal",
         )
-        self.exit_button=self.navigation_button.create_navigation_button(
+        self.exit_button = self.navigation_button.create_navigation_button(
             parent,
             "exit_button",
-            path.join(self.ASSETS_PATH, "exit.png"),
-            lambda: InfoModals(self, self.base_dir, "Exit", app_language=self.app_language),
+            path.join(ASSETS_PATH, EXIT_ICON),
+            lambda: InfoModals(self, "Exit"),
             padding_x=(20, 10),
             side="left",
         )
@@ -203,7 +213,6 @@ class StatusPage(Frame):
         self.come_from_which_page = kwargs.get("come_from_which_page")
         self.profile_folder = kwargs.get("profile_folder")
         self.application_folder = kwargs.get("application_folder")
-        self.base_dir = kwargs.get("base_dir")
         self.theme_dir = kwargs.get("theme_dir")
         self.custom_script_loader = kwargs.get("custom_script_loader")
         self.selected_theme_data = kwargs.get("selected_theme_data")
@@ -227,7 +236,7 @@ class StatusPage(Frame):
         install = self.ui_data["install"]
         self.action_label.configure(text=f"{install}  ")
         user_js_src = path.join(self.CACHE_PATH, "fx-autoconfig", "user.js")
-        
+
         if path.exists(user_js_src):
             self.file_actions.copy_file(user_js_src, self.profile_folder)
 
@@ -278,4 +287,3 @@ class StatusPage(Frame):
         )
         self.file_actions.remove_file(path.join(self.profile_folder, "user.js"))
         self.file_actions.remove_folder(path.join(self.profile_folder, "chrome"))
-

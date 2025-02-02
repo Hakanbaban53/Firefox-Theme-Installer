@@ -4,20 +4,20 @@ from customtkinter import CTkButton, CTkImage
 
 from core.data_tools.load_json_data import LoadJsonData
 from data.static.components.navigation_buttons.data import NAVIGATION_BUTTON_DATA
+from data.static.global_data import APP_LANGUAGE, BASE_DIR
 
 
 class NavigationButton:
-    def __init__(self, base_dir, app_language):
+    def __init__(self):
         load_json_data = LoadJsonData()
         self.navigation_button_data = NAVIGATION_BUTTON_DATA
-        self.base_dir = base_dir
         NAVIGATION_BUTTON_TEXT = path.join(
-            base_dir,
+            BASE_DIR,
             "data",
             "language",
             "components",
             "navigation_buttons",
-            f"{app_language}.json",
+            f"{APP_LANGUAGE}.json",
         )
         self.navigation_button_text = load_json_data.load_json_data(
             NAVIGATION_BUTTON_TEXT

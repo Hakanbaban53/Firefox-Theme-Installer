@@ -13,7 +13,7 @@ To add a new language to the Firefox Theme Installer, follow these steps:
     - Make sure to keep the same structure and format as the original file.
 
 3. **Update the Language List**
-    - Open the `global_data.py` file in the `src/data/static` directory. [Link to the file](../src/data/static/global_data.py#L2)
+    - Open the `global_data.py` file in the `src/data/static` directory. [Link to the file](../src/data/static/global_data.py#L7)
     - Add the new language to the `LANGUAGES` list with the language code and name (e.g., `{"en": "English", "fr": "French"}`). For example:
     ```python
     LANGUAGES = [

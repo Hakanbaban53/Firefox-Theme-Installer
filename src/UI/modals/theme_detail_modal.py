@@ -19,17 +19,17 @@ from core.component_tools.thread_manager import ThreadManager
 from core.data_tools.get_os_properties import OSProperties
 from core.data_tools.load_json_data import LoadJsonData
 from core.window_tools.center_window import CenterWindow
+from data.static.global_data import APP_LANGUAGE, BASE_DIR
 
 class ThemeDetailModal(Toplevel):
-    def __init__(self, parent, theme, base_dir, app_language):
+    def __init__(self, parent, theme):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "language", "modals", "theme_detail_modal", f"{app_language}.json"
+        UI_DATA_PATH = path.join(BASE_DIR, "data", "language", "modals", "theme_detail_modal", f"{APP_LANGUAGE}.json"
         )
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
         
-        self.base_dir = base_dir
         self.theme = theme
         self.configure_modal_window(parent)
         CenterWindow(self).center_window()
@@ -60,7 +60,7 @@ class ThemeDetailModal(Toplevel):
         self.geometry("700x700")
         self.wait_visibility()
         self.grab_set()
-        SetWindowIcon(self.base_dir).set_window_icon(self)
+        SetWindowIcon().set_window_icon(self)
         
     def create_detail_window(self, theme):
         """Creates and configures the theme detail window."""

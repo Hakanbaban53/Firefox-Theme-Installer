@@ -54,34 +54,17 @@
 * Custom script loader support
 
 ## ⚡ Download
-You can [download](https://github.com/Hakanbaban53/Firefox-Theme-Installer/releases) the latest installable version of Firefox Theme Installer for Windows, macOS and Linux.
+You can [download](https://github.com/Hakanbaban53/Firefox-Theme-Installer/releases) the latest installable version of Firefox Theme Installer for Windows and Linux (I add the MacOS path but I didn't test it because I don't have a MacOS device).
 
-## 🏗️ Build For Testing
+## ❓ How Its Work 
 
-To clone and run this application, you'll need [Git](https://git-scm.com), Python and some python libraries installed on your computer. From your command line:
+When you install a Firefox theme, the app checks for the presence of `userChrome.css` or `userContent.css` files. If either of these files is found, the app will copy all associated files and directories from the location of the `userChrome.css` or `userContent.css` file. If neither file is found, the app will return an error message: `No theme data or userChrome.css found`.
 
-```bash
-# Clone this repository
-$ git clone https://github.com/Hakanbaban53/Firefox-Theme-Installer
+All themes installing with the app are stored in the `themes` directory. This folder under the cache directory. If you want to remove a theme, you can do it from the app or manually delete the theme folder from the `themes` directory. Here is the [directory](src/data/static/os_properties.py) of the cache directory.
 
-# Go into the repository
-$ cd Firefox-Theme-Installer
+## 🏗️ Test and Build
 
-# Install dependencies
-$ pip3 install customtkinter tk pillow requests pyinstaller
-
-# Build the app in Windows
-$ pyinstaller --onefile .\src\app.py --icon=../Firefox-Theme-Installer/src/assets/firefox.ico --add-data "..\Firefox-Theme-Installer\src\assets;assets" --add-data "..\Firefox-Theme-Installer\src\data\language;data\language"
-
-# Build the app in Linux
-$ pyinstaller --onefile ./src/app.py --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/src/assets:assets" --add-data="../Firefox-Theme-Installer/src/data/language:data/language"
-```
-
-> **Note 1 🔩**
-> If you want to launch with no console add the '--noconsole' argument.
-
-> **Note 2 🔩**
-> If you encounter the externally-managed-environment error while downloading with pip3 on Linux, add the `--break-system-packages` argument (Warning ⚠️: this argument may cause conflicts between system packages and pip packages. If your Linux distribution has the necessary packages, please use the Linux package manager).
+To test and build the app, check the [test](docs/test.md) guide.
 
 ## 🚀 Issues
 
@@ -180,7 +163,7 @@ We welcome contributions from the community to help improve Firefox Theme Instal
 
 ## 🔑 License
 
-MIT
+Firefox Theme Installer is licensed under the [GNU General Public License v3.0](LICENSE).
 
 ---
 

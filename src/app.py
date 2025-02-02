@@ -1,4 +1,3 @@
-import sys
 from os import path
 from tkinter import Frame, Tk
 from customtkinter import CTkLabel, CTkOptionMenu
@@ -10,22 +9,23 @@ from UI.pages.install_page import InstallPage
 from UI.pages.remove_page import RemovePage
 from UI.pages.status_page import StatusPage
 from core.data_tools.image_loader import ImageLoader
-from core.data_tools.language_manager import LanguageManager
 from core.data_tools.load_json_data import LoadJsonData
 from core.window_tools.center_window import CenterWindow
-from data.static.global_data import LANGUAGES
-
+from data.static.global_data import (
+    APP_LANGUAGE,
+    ASSETS_PATH,
+    LANGUAGES,
+    BASE_DIR,
+    change_language,
+)
 
 
 class ThemeInstaller(Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.base_dir = getattr(sys, "_MEIPASS", path.abspath(path.dirname(__file__)))
-        self.language_manager = LanguageManager()
-        self.app_language = self.language_manager.get_language()
 
         base_data_path = path.join(
-            self.base_dir, "data", "language", "app", f"{self.app_language}.json"
+            BASE_DIR, "data", "language", "app", f"{APP_LANGUAGE}.json"
         )
         self.base_data = LoadJsonData().load_json_data(base_data_path)
 
@@ -42,7 +42,7 @@ class ThemeInstaller(Tk):
         self.geometry("1115x666")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.exit_confirmation)
-        SetWindowIcon(self.base_dir).set_window_icon(self)
+        SetWindowIcon().set_window_icon(self)
         CenterWindow(self).center_window()
 
     def create_widgets(self):
@@ -59,8 +59,8 @@ class ThemeInstaller(Tk):
         )
         self.image_frame.place(x=0, y=0)
 
-        image_loader = ImageLoader(path.join(self.base_dir, "assets"))
-        installer_img = image_loader.load_installer_img("installer_img.png")
+        image_loader = ImageLoader(ASSETS_PATH)
+        installer_img = image_loader.load_CTK_image("installer_img.png", (315, 666))
 
         installer_version = self.base_data["installer_version"]
         self.background_label = CTkLabel(
@@ -80,7 +80,7 @@ class ThemeInstaller(Tk):
             bg_color="#2B2631",
             font=("Inter", 12),
         )
-        self.language_button.set(LANGUAGES[self.app_language])
+        self.language_button.set(LANGUAGES[APP_LANGUAGE])
         self.language_button.place(relx=0.5, rely=0.95, anchor="center")
 
     def change_language(self, selected_language):
@@ -89,20 +89,8 @@ class ThemeInstaller(Tk):
 
         :param selected_language: The user-friendly language name selected from the OptionMenu.
         """
-        if (
-            selected_language in LANGUAGES.values()
-            and selected_language != LANGUAGES[self.app_language]
-        ):
-            language_code = [
-                lang
-                for lang, name in LANGUAGES.items()
-                if name == selected_language
-            ][0]
-            self.language_manager.save_language(language_code)
-            self.app_language = language_code
-            InfoModals(
-                self, self.base_dir, "language_change", app_language=self.app_language
-            )
+        change_language(selected_language)
+        InfoModals(self, "language_change")
 
     def create_page_container(self):
         """Create a container to hold all the frames (pages) of the application."""
@@ -114,7 +102,7 @@ class ThemeInstaller(Tk):
 
     def create_frame(self, page_class):
         """Create and return a new frame for the specified page class, passing the current language."""
-        frame = page_class(self.container, self, self.base_dir, self.app_language)
+        frame = page_class(self.container, self)  # Pass the variables to the page class
         frame.configure(bg="#2B2631")
         frame.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
         return frame
@@ -216,7 +204,8 @@ class ThemeInstaller(Tk):
 
     def exit_confirmation(self):
         """Display exit confirmation modal."""
-        InfoModals(self, self.base_dir, "Exit", app_language=self.app_language)
+        InfoModals(self, "Exit")
+
 
 if __name__ == "__main__":
     app = ThemeInstaller()

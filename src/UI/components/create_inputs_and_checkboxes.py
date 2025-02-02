@@ -4,20 +4,21 @@ from customtkinter import CTkFrame, CTkLabel, CTkEntry, CTkCheckBox
 
 from core.data_tools.load_json_data import LoadJsonData
 from data.static.components.inputs_and_checkboxes.data import APPLICATION_FOLDER_ENTRY_DATA, APPLICATION_FOLDER_LABEL_DATA, CREATE_INPUT_AND_CHECKBOX_WIDGETS, CSL_CHECKBOX, INPUTS_CHECKBOXES_FRAME_DATA, PROFILE_FOLDER_ENTRY_DATA, PROFILE_FOLDER_LABEL_DATA
+from data.static.global_data import APP_LANGUAGE, BASE_DIR
 
 
 class InputsAndCheckboxes:
-    def __init__(self, base_dir, app_language, frame):
+    def __init__(self, frame):
         self.frame = frame
         load_json_data = LoadJsonData()
 
         INPUTS_LABELS_DATA_PATH = path.join(
-            base_dir,
+            BASE_DIR,
             "data",
             "language",
             "components",
             "inputs_and_checkboxes",
-            f"{app_language}.json",
+            f"{APP_LANGUAGE}.json",
         )
         self.inputs_labels_data = load_json_data.load_json_data(INPUTS_LABELS_DATA_PATH)
         self.create_inputs_and_checkboxes_frame()

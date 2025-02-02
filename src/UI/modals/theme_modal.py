@@ -8,14 +8,14 @@ from core.data_tools.get_theme_data import Theme, ThemeManager
 from core.data_tools.load_json_data import LoadJsonData
 from core.window_tools.center_window import CenterWindow
 from UI.modals.theme_detail_modal import ThemeDetailModal
-from data.static.global_data import DATA_PATH, DATA_URL, ITEMS_PER_PAGE
+from data.static.global_data import APP_LANGUAGE, BASE_DIR, DATA_PATH, DATA_URL, ITEMS_PER_PAGE
 
 
 class ThemeModal(Toplevel):
-    def __init__(self, parent, base_dir, cache_dir, app_language):
+    def __init__(self, parent, cache_dir):
         super().__init__(parent)
         # Load the UI data from the JSON file
-        UI_DATA_PATH = path.join(base_dir, "data", "language", "modals", "theme_modal", f"{app_language}.json")
+        UI_DATA_PATH = path.join(BASE_DIR, "data", "language", "modals", "theme_modal", f"{APP_LANGUAGE}.json")
 
         load_json_data = LoadJsonData()
         self.ui_data = load_json_data.load_json_data(UI_DATA_PATH)
@@ -32,8 +32,6 @@ class ThemeModal(Toplevel):
             self.ui_data["treeview"]["columns"][1]: "description"  # "Açıklama" -> "description"
         }
 
-        self.app_language = app_language
-        self.base_dir = base_dir
         self.cache_dir = cache_dir
         self.configure_layout(parent)
         CenterWindow(self).center_window()
@@ -66,7 +64,7 @@ class ThemeModal(Toplevel):
         )  # Using pack because of the grid layout not working with treeview. (Center_window func not working properly with treeview soo I fix like this :D)
         self.theme_modal_frame.columnconfigure(0, weight=1)
 
-        SetWindowIcon(self.base_dir).set_window_icon(self)
+        SetWindowIcon().set_window_icon(self)
 
     def create_widgets(self):
         self.create_top_frame()
@@ -433,7 +431,7 @@ class ThemeModal(Toplevel):
             )
 
             if theme_data:
-                ThemeDetailModal(self, theme_data, base_dir=self.base_dir, app_language=self.app_language)
+                ThemeDetailModal(self, theme_data)
 
     def next_page(self):
         if self.current_page < self.total_pages:
