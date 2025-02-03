@@ -93,7 +93,10 @@ class FileActions:
             if self.os_name.lower() in ["linux", "darwin"]:
                 elevated_command = f'pkexec bash -c "{batched_command}"'
             elif self.os_name.lower() == "windows":
-                elevated_command = f'powershell -Command "Start-Process cmd \'/c {batched_command}\' -Verb RunAs"'
+                elevated_command = (
+                    'powershell -Command "'
+                    'Start-Process cmd -ArgumentList \'/c {}\' -Verb RunAs"'
+                ).format(batched_command.replace('"', '\\"'))
             else:
                 raise NotImplementedError("Elevation not implemented for this OS")
 
