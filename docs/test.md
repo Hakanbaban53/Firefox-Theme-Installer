@@ -29,10 +29,10 @@ To set up the test environment, follow these steps:
 ## Running Tests
 To run the tests, use the following command:
 ```bash
-pytest
+pytest # Not implemented yet
 ```
 
-## Test Cases
+## Test Cases (Not implemented yet)
 ### Test Case 1: Detect OS
 **Description:** Verify that the `detect_os` method correctly identifies the operating system.
 

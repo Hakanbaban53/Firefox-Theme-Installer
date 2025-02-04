@@ -3,10 +3,10 @@ name: Github Actions Builder
 on:
   push:
     tags:
-      - "V[0-9]+.*" # Build for both Linux, Windows and macOS
-      - "VW[0-9]+.*" # Build for Windows only
-      - "VL[0-9]+.*" # Build for Linux only
-      - "VM[0-9]+.*" # Build for macOS only
+      - "[vV][0-9]+.*" # Build for both Linux, Windows and macOS
+      - "[vV][wW][0-9]+.*" # Build for Windows only
+      - "[vV][lL][0-9]+.*" # Build for Linux only
+      - "[vV][mM][0-9]+.*" # Build for macOS only
 
 jobs:
   prepare:
@@ -40,31 +40,32 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile ./main.py --name Firefox-Theme-Installer-Linux --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/assets:assets" --add-data="../Firefox-Theme-Installer/language:language" --add-data="../Firefox-Theme-Installer/data/local:data/local" --hidden-import='PIL._tkinter_finder' --noconsole
+          pyinstaller --onefile ./src/app.py --name Firefox-Theme-Installer-Linux --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/src/assets:assets" --add-data="../Firefox-Theme-Installer/src/data/language:data/language" --noconsole
 
-      - name: Upload Linux executable
-        uses: actions/upload-artifact@v3
+      - name: Make binary executable
+        run: |
+          chmod +x dist/Firefox-Theme-Installer-Linux
+
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-executable
           path: dist/Firefox-Theme-Installer-Linux
-      - name: Upload firefox icon
-        uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v4
         with:
           name: firefox.png
-          path: assets/firefox.png
+          path: src/assets/firefox.png
 
   package-to-appimage:
     runs-on: ubuntu-latest
     needs: build-linux
     if: startsWith(github.ref, 'refs/tags/VL') || startsWith(github.ref, 'refs/tags/V')
     steps:
-      - name: Download Linux executable
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: linux-executable
 
-      - name: Download firefox icon
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: firefox.png
 
@@ -120,8 +121,7 @@ jobs:
           ARCH=x86_64 ./appimagetool-x86_64.AppImage Firefox-Theme-Installer.AppDir Firefox-Theme-Installer.AppImage
         shell: bash
 
-      - name: Upload AppImage
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Firefox-Theme-Installer.AppImage
           path: Firefox-Theme-Installer.AppImage
@@ -146,7 +146,7 @@ jobs:
 
         - name: Build with PyInstaller
           run: |
-            pyinstaller --onefile .\main.py --name Firefox-Theme-Installer --icon=../Firefox-Theme-Installer/assets/firefox.ico --add-data "..\Firefox-Theme-Installer\assets:assets" --add-data "..\Firefox-Theme-Installer\language:language" --add-data "..\Firefox-Theme-Installer\data\local:data\local" --noconsole
+            pyinstaller --onefile .\src\app.py --name Firefox-Theme-Installer --icon=../Firefox-Theme-Installer/src/assets/firefox.ico --add-data "..\Firefox-Theme-Installer\src\assets;assets" --add-data "..\Firefox-Theme-Installer\src\data\language;data\language" --noconsole
 
         - name: Create self-signed certificate
           run: |
@@ -164,65 +164,10 @@ jobs:
             signtool sign /f cert.pfx /p password /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\Firefox-Theme-Installer.exe
           shell: powershell
 
-        - name: Upload signed executable
-          uses: actions/upload-artifact@v3
+        - uses: actions/upload-artifact@v4
           with:
             name: Firefox-Theme-Installer.exe
             path: dist\Firefox-Theme-Installer.exe
-
-
-#   build-macos:
-#     runs-on: macos-latest
-#     needs: prepare
-#     if: startsWith(github.ref, 'refs/tags/VM') || startsWith(github.ref, 'refs/tags/V')
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v3
-
-#       - name: Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: "3.x"
-
-#       - name: Install dependencies
-#         run: |
-#           python -m pip install --upgrade pip
-#           pip install customtkinter tk pillow requests pyinstaller
-
-#       - name: Build with PyInstaller
-#         run: |
-#           pyinstaller --onefile ./main.py --name Firefox-Theme-Installer-MacOS --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/assets:assets" --add-data="../Firefox-Theme-Installer/language:language" --add-data="../Firefox-Theme-Installer/data/local:data/local" --noconsole
-
-#       - name: Upload macOS executable
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: theme-installer-macos
-#           path: dist/Firefox-Theme-Installer-MacOS
-
-#   package-to-dmg:
-#     runs-on: macos-latest
-#     needs: build-macos
-#     if: startsWith(github.ref, 'refs/tags/VM') || startsWith(github.ref, 'refs/tags/V')
-#     steps:
-#       - name: Download macOS executable
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: theme-installer-macos
-
-#       - name: Install dependencies
-#         run: |
-#           brew install create-dmg
-
-#       - name: Package into DMG
-#         run: |
-#           create-dmg dist/Firefox-Theme-Installer-MacOS Firefox-Theme-Installer-MacOS.dmg
-#         shell: bash
-
-#       - name: Upload DMG
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: Firefox-Theme-Installer-MacOS.dmg
-#           path: Firefox-Theme-Installer-MacOS.dmg
 
   create-release:
     runs-on: ubuntu-latest
@@ -230,39 +175,33 @@ jobs:
       build-linux,
       package-to-appimage,
       build-windows
-    #   build-macos,
-    #   package-to-dmg
     ]
     steps:
-      - name: Download Linux AppImage
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: Firefox-Theme-Installer.AppImage
-          path: ./
 
-      - name: Download Windows Executable
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: Firefox-Theme-Installer.exe
-          path: ./
 
       - name: Read info
         id: tags
         shell: bash
         run: |
-          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
-          echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@master
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.tags.outputs.TAG }}
           release_name: Release ${{ steps.tags.outputs.TAG }}
           body: |
-            Release ${{ steps.tags.outputs.tag }}
+            Release ${{ steps.tags.outputs.TAG }}
           draft: false
           prerelease: false
 
@@ -285,13 +224,3 @@ jobs:
           asset_path: ./Firefox-Theme-Installer.exe
           asset_name: Firefox-Theme-Installer.exe
           asset_content_type: application/x-msdownload
-
-    #   - name: Upload macOS DMG
-    #     uses: softprops/action-gh-release@v1
-    #     with:
-    #       tag: ${{ github.ref }}
-    #       files: |
-    #         /home/runner/work/Firefox-Theme-Installer/Firefox-Theme-Installer/Firefox-Theme-Installer-MacOS.dmg
-    #     env:
-    #       GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
-
