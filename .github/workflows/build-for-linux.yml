@@ -14,7 +14,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: |
@@ -24,83 +24,112 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile ./main.py --hidden-import='PIL._tkinter_finder' --add-data="../RealFire-Installer/assets:assets" --add-data="../RealFire-Installer/language:language" --add-data="../RealFire-Installer/data/local:data/local" --hidden-import='PIL._tkinter_finder' --noconsole
+          pyinstaller --onefile ./src/app.py --name Firefox-Theme-Installer-Linux --hidden-import='PIL._tkinter_finder' --add-data="../Firefox-Theme-Installer/src/assets:assets" --add-data="../Firefox-Theme-Installer/src/data/language:data/language" --noconsole
 
+      - name: Make binary executable
+        run: |
+          chmod +x dist/Firefox-Theme-Installer-Linux
       - name: Package into AppImage
         run: |
-          mkdir -p RealFire-Installer.AppDir/usr/bin
-          cp /home/runner/work/RealFire-Installer/RealFire-Installer/dist/main RealFire-Installer.AppDir/usr/bin/
-          cp /home/runner/work/RealFire-Installer/RealFire-Installer/assets/firefox.png RealFire-Installer.AppDir/
-          
-          cat << 'EOF' > RealFire-Installer.AppDir/AppRun
+          chmod +x Firefox-Theme-Installer-Linux
+          mkdir -p Firefox-Theme-Installer.AppDir/usr/bin
+          cp Firefox-Theme-Installer-Linux Firefox-Theme-Installer.AppDir/usr/bin/
+          cp firefox.png Firefox-Theme-Installer.AppDir/
+
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/AppRun
           #!/bin/bash
           SELF=$(readlink -f "$0")
           HERE=${SELF%/*}
           EXEC="${HERE}/usr/bin/start_app.sh"
           exec "${EXEC}"
           EOF
-          
-          chmod +x RealFire-Installer.AppDir/AppRun
 
-    
-          cat << 'EOF' > RealFire-Installer.AppDir/RealFire.desktop
+          chmod +x Firefox-Theme-Installer.AppDir/AppRun
+
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/Firefox-Theme-Installer.desktop
           [Desktop Entry]
           Type=Application
-          Name=RealFire Installer
+          Name=Firefox Theme Installer
           Exec=start_app.sh
           Icon=firefox
-          Comment=RealFire Installer
+          Comment=Firefox Theme Installer
           Categories=Utility;
           EOF
 
-          chmod +x RealFire-Installer.AppDir/RealFire.desktop
-          
-          cat << 'EOF' > RealFire-Installer.AppDir/usr/bin/start_app.sh
+          chmod +x Firefox-Theme-Installer.AppDir/Firefox-Theme-Installer.desktop
+
+          cat << 'EOF' > Firefox-Theme-Installer.AppDir/usr/bin/start_app.sh
           #!/bin/bash
           APPIMAGE_DIR=$(dirname "$(realpath "$0")")
-          APP_EXECUTABLE="${APPIMAGE_DIR}/main"
+          APP_EXECUTABLE="${APPIMAGE_DIR}/Firefox-Theme-Installer-Linux"
           if [ ! -f "$APP_EXECUTABLE" ]; then
               echo "Error: App executable not found: $APP_EXECUTABLE"
               exit 1
           fi
           env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" "$APP_EXECUTABLE" "$@"
           EOF
-          
-          chmod +x RealFire-Installer.AppDir/usr/bin/start_app.sh
-          
+
+          chmod +x Firefox-Theme-Installer.AppDir/usr/bin/start_app.sh
+
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x ./appimagetool-x86_64.AppImage
-          ARCH=x86_64 ./appimagetool-x86_64.AppImage RealFire-Installer.AppDir RealFire-Installer.AppImage
+          ARCH=x86_64 ./appimagetool-x86_64.AppImage Firefox-Theme-Installer.AppDir Firefox-Theme-Installer.AppImage
 
           chmod +x RealFire-Installer.AppImage
-
         shell: bash
 
-      - name: Upload Linux build artifact
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: RealFire-Installer-Linux
-          path: RealFire-Installer.AppImage
+          name: Firefox-Theme-Installer.AppImage
+          path: Firefox-Theme-Installer.AppImage
 
-      - name: Create GitHub Release - Linux
-        id: create_release_linux
-        uses: actions/create-release@v1
+      - name: Extract Release Info
+        id: release_info
+        run: |
+            # Extract version number from the tag
+            VERSION=$(echo ${GITHUB_REF#refs/tags/} | sed 's/^[Vv]//')
+            TAG=${GITHUB_REF/refs\/tags\//}
+            
+            # Extract commit message and extended description
+            COMMIT_MESSAGE=$(git log -1 --pretty=format:%s)
+            EXTENDED_DESCRIPTION=$(git log -1 --pretty=format:%b)
+  
+            # Format the release notes
+            if [ -z "$EXTENDED_DESCRIPTION" ]; then
+              BODY="### Release Notes:
+              **$COMMIT_MESSAGE**"
+            else
+              BODY="### Release Notes:
+              **$COMMIT_MESSAGE**
+              $EXTENDED_DESCRIPTION"
+            fi
+  
+            # Write outputs to GITHUB_OUTPUT for later steps
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "TAG=$TAG" >> $GITHUB_OUTPUT
+            echo "BODY<<EOF" >> $GITHUB_OUTPUT
+            echo "$BODY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+  
+
+      - name: Create Release - Linux 
+        id: create_release
+        uses: actions/create-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0-linux
-          release_name: RealFire Installer v1.0.0 - Linux
-          body: |
-            Release for Linux build of RealFire Installer v1.0.0.
+          tag_name: ${{ steps.release_info.outputs.TAG }}
+          release_name: Release ${{ steps.release_info.outputs.TAG }}
+          body: ${{ steps.release_info.outputs.BODY }}
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset - Linux
+    
+      - name: Upload Linux AppImage
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release_linux.outputs.upload_url }}
-          asset_path: ./RealFire-Installer.AppImage
-          asset_name: RealFire-Installer-Linux.AppImage
-          asset_content_type: application/x-iso9660-appimage
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Firefox-Theme-Installer.AppImage
+          asset_name: Firefox-Theme-Installer-Linux.AppImage
+          asset_content_type: application/x-executable

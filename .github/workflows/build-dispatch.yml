@@ -11,10 +11,6 @@ on:
         description: 'Build for Linux'
         required: false
         default: 'false'
-      build-for-macos:
-        description: 'Build for macOS'
-        required: false
-        default: 'false'
       build-for-all:
         description: 'Build for all platforms'
         required: false
@@ -45,7 +41,3 @@ jobs:
       - name: Dispatch Windows build
         if: github.event.inputs.build-for-windows == 'true' || github.event.inputs.build-for-all == 'true'
         run: gh workflow run build-for-windows.yml --ref ${{ github.ref }}
-
-      - name: Dispatch macOS build
-        if: github.event.inputs.build-for-macos == 'true' || github.event.inputs.build-for-all == 'true'
-        run: gh workflow run build-for-macos.yml --ref ${{ github.ref }}
