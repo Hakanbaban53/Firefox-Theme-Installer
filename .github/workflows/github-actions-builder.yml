@@ -167,7 +167,7 @@ jobs:
         - uses: actions/upload-artifact@v4
           with:
             name: Firefox-Theme-Installer.exe
-            path: dist\Firefox-Theme-Installer.exe
+            path: dist\Firefox-Theme-Installer.exe    
 
   create-release:
     runs-on: ubuntu-latest
@@ -177,6 +177,37 @@ jobs:
       build-windows
     ]
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Extract Release Info
+        id: release_info
+        run: |
+          # Extract version number from the tag
+          VERSION=$(echo ${GITHUB_REF#refs/tags/} | sed 's/^[Vv]//')
+          TAG=${GITHUB_REF/refs\/tags\//}
+          
+          # Extract commit message and extended description
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:%s)
+          EXTENDED_DESCRIPTION=$(git log -1 --pretty=format:%b)
+
+          # Format the release notes
+          if [ -z "$EXTENDED_DESCRIPTION" ]; then
+            BODY="### Release Notes:
+            **$COMMIT_MESSAGE**"
+          else
+            BODY="### Release Notes:
+            **$COMMIT_MESSAGE**
+            $EXTENDED_DESCRIPTION"
+          fi
+
+          # Write outputs to GITHUB_OUTPUT for later steps
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "BODY<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - uses: actions/download-artifact@v4
         with:
           name: Firefox-Theme-Installer.AppImage
@@ -185,23 +216,15 @@ jobs:
         with:
           name: Firefox-Theme-Installer.exe
 
-      - name: Read info
-        id: tags
-        shell: bash
-        run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.RFGITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tags.outputs.TAG }}
-          release_name: Release ${{ steps.tags.outputs.TAG }}
-          body: |
-            Release ${{ steps.tags.outputs.TAG }}
+          tag_name: ${{ steps.release_info.outputs.TAG }}
+          release_name: Release ${{ steps.release_info.outputs.TAG }}
+          body: ${{ steps.release_info.outputs.BODY }}
           draft: false
           prerelease: false
 
