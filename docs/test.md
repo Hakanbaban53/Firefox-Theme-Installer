@@ -15,7 +15,7 @@ To set up the test environment, follow these steps:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/Firefox-Theme-Installer.git
+    git clone https://github.com/Hakanbaban53/Firefox-Theme-Installer.git
     ```
 2. Navigate to the project directory:
     ```bash
