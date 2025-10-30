@@ -10,8 +10,8 @@ class LanguageManager:
         Initializes the LanguageManager with supported languages, language names, a fallback language,
         and handles saving/loading the language from a config file.
         
-        :param supported_languages: A list of supported language codes (e.g., ['en', 'tr']).
-        :param language_names: A dictionary mapping language codes to user-friendly names (e.g., {'en': 'English', 'tr': 'Türkçe'}).
+        :param supported_languages: A list of supported language codes (e.g., ['en', 'tr', 'zh_CN']).
+        :param language_names: A dictionary mapping language codes to user-friendly names (e.g., {'en': 'English', 'tr': 'Türkçe', 'zh_CN': '简体中文'}).
         :param fallback_language: The default language code to fall back on if the system language is not supported.
         :param config_file: Path to the configuration file for saving/loading the selected language.
         """

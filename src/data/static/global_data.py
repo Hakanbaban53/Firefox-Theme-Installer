@@ -4,7 +4,7 @@ import sys
 from core.data_tools.language_manager import LanguageManager
 
 # Language Data
-LANGUAGES = {"en": "English", "tr": "Türkçe"}
+LANGUAGES = {"en": "English", "tr": "Türkçe", "zh_CN": "简体中文"}
 
 language_manager = LanguageManager(LANGUAGES)
 APP_LANGUAGE = language_manager.get_language()

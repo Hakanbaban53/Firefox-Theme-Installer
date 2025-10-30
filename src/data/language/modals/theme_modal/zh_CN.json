@@ -1,0 +1,35 @@
+{
+  "search_bar": {
+    "placeholder_text": "搜索主题"
+  },
+  "treeview": {
+    "columns": ["标题", "介绍"]
+  },
+  "buttons": {
+    "select_button": "选择主题",
+    "error_button": "重试",
+    "loading_button": "加载中",
+    "custom_select_button": "选择自定义主题",
+    "empty_custom_theme": "未选择自定义主题",
+    "invalid_custom_theme": "无效的自定义主题",
+    "pagination": {
+      "prev_button": "上一页",
+      "next_button": "下一页"
+    }
+  },
+  "custom_theme": {
+    "checkbox_label": "自定义主题",
+    "custom_theme_title": "输入自定义主题的URL:",
+    "supported_version_controllers": "支持的URL来源: Github, GitLab, CodeBerg, GitGay"
+  },
+  "retrying": "重试中",
+  "detail_info_text": "双击查看主题详情",
+  "tags": "筛选",
+  "error_messages": {
+    "no_themes": "没有可用的主题。请检查您的主题源或网络连接。",
+    "retry_failed": "重试失败:"
+  },
+  "pagination": {
+    "label_template": "页面"
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "installed_themes_label": {
+      "text": ""
+    },
+    "theme_details_button": {
+      "text": "主题详情"
+    },
+
+  "update_ui": {
+    "installed_themes_label_unkown":"已安装未知主题 ",
+    "installed_themes_label_no_theme":"未安装主题 ",
+    "installed_themes_label_theme":"已安装主题: "
+  }
+}
