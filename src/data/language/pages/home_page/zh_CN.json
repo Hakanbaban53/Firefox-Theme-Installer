@@ -1,0 +1,48 @@
+{
+  "header_label": "欢迎使用Firefox主题安装程序",
+
+  "create_os_info": {
+    "os_label": "你使用的操作系统:"
+  },
+  "theme_select": {
+    "theme_label": "未选择主题",
+    "theme_select_button": "选择主题"
+  },
+  "create_navigation_buttons": {
+    "select_action_label": "请选择操作"
+  },
+  "create_file_detection": {
+    "detect_files_text": "请选择主题",
+    "install_files_button": "显示文件"
+  },
+  "create_recheck_skip_section": {
+    "clean_install_checkbox": "全新安装"
+  },
+  "clear_selection": {
+    "detect_files_text": "请选择主题",
+    "theme_label": "选择的主题:"
+  },
+  "update_ui_for_selected_theme": {
+    "detect_files_text": "主题已选择",
+    "theme_label": "选择的主题:",
+    "install_files_button": "安装主题"
+  },
+  "handle_userChrome_theme": {
+    "detect_files_text": "主题包含 userChrome.css 文件",
+    "install_files_button": "已安装"
+  },
+  "no_theme_data_found": {
+    "detect_files_text": "未找到主题数据或 userChrome.css",
+    "install_files_button": "已安装"
+  },
+  "get_theme": {
+    "install_files_button": "安装文件中",
+    "detect_files_text": "安装主题文件中"
+  },
+  "get_neccessary_files": {
+    "detect_files_text": "获取必要的文件"
+  },
+  "recheck_files": {
+    "install_files_button": "检查文件"
+  }
+}

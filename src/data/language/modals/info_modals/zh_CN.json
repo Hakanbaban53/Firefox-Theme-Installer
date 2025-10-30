@@ -1,0 +1,21 @@
+{
+  "modals": {
+    "exit_modal": {
+      "modal_title": "退出确认",
+      "modal_label": "你确定要退出吗?"
+    },
+    "attention_modal": {
+      "modal_title": "注意!",
+      "modal_label": "RealFire 安装成功。\n 请重启Firefox两次!"
+    },
+    "language_change_modal": {
+      "modal_title": "更改语言",
+      "modal_label": "语言更改将在重启后应用。"
+    }
+  },
+  "buttons": {
+    "ok_button": "Ok",
+    "yes_button": "Yes",
+    "no_button": "No"
+  }
+}

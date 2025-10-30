@@ -1,0 +1,9 @@
+{
+  "header_label": "安装状态",
+  "update_text": {
+    "install": "安装成功",
+    "remove": "移除成功"
+  },
+  "install": "安装中",
+  "remove": "移除中"
+}
