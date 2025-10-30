@@ -3,6 +3,8 @@ import sys
 
 from core.data_tools.language_manager import LanguageManager
 
+VERSION = "2.5.2"
+
 # Language Data
 LANGUAGES = {"en": "English", "tr": "Türkçe", "zh_CN": "简体中文"}
 

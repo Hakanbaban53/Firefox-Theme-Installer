@@ -17,6 +17,7 @@ from data.static.global_data import (
     LANGUAGES,
     BASE_DIR,
     change_language,
+    VERSION,
 )
 
 
@@ -62,7 +63,14 @@ class ThemeInstaller(Tk):
         image_loader = ImageLoader(ASSETS_PATH)
         installer_img = image_loader.load_CTK_image("installer_img.png", (315, 666))
 
-        installer_version = self.base_data["installer_version"]
+        # Use installer_version template from language data and inject dynamic VERSION
+        installer_version_template = self.base_data.get("installer_version", "")
+        try:
+            installer_version = installer_version_template.format(version=VERSION)
+        except Exception:
+            # Fallback: replace token if format fails or template doesn't use format fields
+            installer_version = installer_version_template.replace("{version}", VERSION)
+
         self.background_label = CTkLabel(
             self.image_frame,
             image=installer_img,

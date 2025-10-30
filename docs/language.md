@@ -7,6 +7,13 @@ To add a new language to the Firefox Theme Installer, follow these steps:
     - Create a new JSON file with the language code as the filename (e.g., `fr.json` for French).
     - Make sure to create the file in every directory under `language` (e.g., `src/data/language`, `src/data/language/components`, `src/data/language/pages`, etc.).
 
+    > Note: You need the reference of the version number on `language/app/<language_code>.json` file with `{version}` placeholder. For example, in `en.json`, you should add:
+    ```json
+    {
+        "installer_version": "Theme Installer Version: V{version}"
+    }
+    ```
+
 2. **Translate Strings**
     - Open the newly created language file.
     - Copy the content from `en.json` (English) and translate each string into the new language.
