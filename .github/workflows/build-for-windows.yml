@@ -23,28 +23,12 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile .\main.py --icon=../Firefox-Theme-Installer/assets/icons/firefox.ico --add-data "..\Firefox-Theme-Installer\assets:assets" --add-data "..\Firefox-Theme-Installer\language:language" --add-data "..\Firefox-Theme-Installer\data\local:data\local" --noconsole
-
-      - name: Install Windows SDK
-        run: |
-          choco install windows-sdk-10.0 --confirm
-        shell: powershell
-
-      - name: Create self-signed certificate
-        run: |
-          openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=RealFire"
-          openssl pkcs12 -export -out cert.pfx -inkey key.pem -in cert.pem -passout pass:password
-
-      - name: Sign the executable
-        run: |
-          $env:PATH += ";C:\Program Files (x86)\Windows Kits\10\bin\x64"
-          signtool sign /f cert.pfx /p password /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\main.exe
-        shell: powershell
+          pyinstaller --onefile .\src\app.py --name Firefox-Theme-Installer --icon=../Firefox-Theme-Installer/src/assets/firefox.ico --add-data "..\Firefox-Theme-Installer\src\assets;assets" --add-data "..\Firefox-Theme-Installer\src\data\language;data\language" --noconsole
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Firefox-Theme-Installer
-          path: dist\main.exe
+          name: Firefox-Theme-Installer.exe
+          path: dist\Firefox-Theme-Installer.exe    
 
       - name: Extract Release Info
         id: release_info
